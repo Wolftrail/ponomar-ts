@@ -21,6 +21,9 @@ export interface LiturgicalDay {
 	readonly menaionSaints: readonly ResolvedSaint[];
 	/** Union of paschalSaints then menaionSaints, in that order. */
 	readonly allSaints: readonly ResolvedSaint[];
+	/** Highest `church.rank` across `allSaints` (0 if none). Matches upstream
+	 * `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`. */
+	readonly dRank: number;
 }
 
 export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
@@ -29,11 +32,19 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const menaion = selectMenaionEntry(context);
 	const paschalSaints = paschal ? resolveSaints(paschal, context) : [];
 	const menaionSaints = menaion ? resolveSaints(menaion, context) : [];
+	const allSaints = [...paschalSaints, ...menaionSaints];
+	let dRank = 0;
+	for (const s of allSaints) {
+		if (s.church?.rank !== undefined && s.church.rank > dRank) {
+			dRank = s.church.rank;
+		}
+	}
 	return {
 		context,
 		paschalSaints,
 		menaionSaints,
-		allSaints: [...paschalSaints, ...menaionSaints],
+		allSaints,
+		dRank,
 	};
 }
 
@@ -55,3 +66,10 @@ export type {
 	ReadingRef,
 } from "./readings.ts";
 export { getDailyReadings, getLiturgyReadings } from "./readings.ts";
+export type {
+	FastingCase,
+	FastingLevel,
+	FastingPermissions,
+	FastingResult,
+} from "./fasting.ts";
+export { getFasting } from "./fasting.ts";

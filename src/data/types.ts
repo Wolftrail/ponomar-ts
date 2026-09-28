@@ -102,6 +102,22 @@ export interface Commemoration {
 	readonly scriptures: readonly Scripture[];
 }
 
+/** One `<RULE>` inside a `<PERIOD>` in Commands/Fasting.xml.
+ * `case` is a 7-character bitstring like `"0000111"`. See `FastingLevel`
+ * in `src/engine/fasting.ts` for the semantics of each bit position. */
+export interface FastingRule {
+	readonly case: string;
+	readonly cmd?: string;
+}
+
+/** One `<PERIOD>` block in Commands/Fasting.xml. Skipped entirely when `cmd`
+ * evaluates to false; otherwise its rules are evaluated in document order and
+ * the last-matching rule's `case` wins. */
+export interface FastingPeriod {
+	readonly cmd?: string;
+	readonly rules: readonly FastingRule[];
+}
+
 /**
  * The `<LIFE>` element for a saint: the prose "story" plus its attribution.
  * `body` may be empty if upstream only recorded metadata (e.g. `Repose="4th Century"`).

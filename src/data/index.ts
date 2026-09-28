@@ -10,4 +10,5 @@ export { PENTECOSTARION } from "./pentecostarion.ts";
 export { TRIODION } from "./triodion.ts";
 export { MENAION } from "./menaion.ts";
 export { DIVINE_LITURGY_COMMANDS } from "./divineLiturgy.ts";
+export { FASTING_RULES } from "./fasting.ts";
 export { COMMEMORATIONS } from "./commemorations.ts";

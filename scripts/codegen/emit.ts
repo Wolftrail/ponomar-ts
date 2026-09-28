@@ -4,10 +4,12 @@ import type {
 	Command,
 	Commemoration,
 	DayEntry,
+	FastingPeriod,
 	Life,
 } from "../../src/data/types.ts";
 import { parseCommandsFile } from "./parseCommands.ts";
 import { parseDayFile } from "./parseDay.ts";
+import { parseFastingFile } from "./parseFasting.ts";
 import { parseLifeFile } from "./parseLife.ts";
 
 const HEADER =
@@ -112,6 +114,17 @@ export function emitCommands(
 		`export const ${exportName}: ReadonlyArray<Command> = ${json(commands)} as const;\n`,
 	].join("\n");
 	return { relPath, content: body };
+}
+
+/** Emit the ordered `<PERIOD>` list from Commands/Fasting.xml. */
+export function emitFasting(file: string): EmittedFile {
+	const periods: FastingPeriod[] = parseFastingFile(file);
+	const body = [
+		HEADER,
+		`import type { FastingPeriod } from "./types.ts";\n`,
+		`export const FASTING_RULES: ReadonlyArray<FastingPeriod> = ${json(periods)} as const;\n`,
+	].join("\n");
+	return { relPath: "fasting.ts", content: body };
 }
 
 /** Emit a commemorations map keyed by cId.

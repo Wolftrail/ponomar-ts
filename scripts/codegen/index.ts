@@ -12,6 +12,7 @@ import {
 	emitCommands,
 	emitCommemorations,
 	emitCycle,
+	emitFasting,
 	emitLives,
 	emitMenaion,
 	type EmittedFile,
@@ -48,6 +49,7 @@ const emitted: EmittedFile[] = [
 		path.join(vendorXml, "Commands", "DivineLiturgy.xml"),
 		"divineLiturgy.ts",
 	),
+	emitFasting(path.join(vendorXml, "Commands", "Fasting.xml")),
 	emitCommemorations([
 		path.join(vendorXml, "lives"),
 		path.join(vendorXml, "Commemorations"),

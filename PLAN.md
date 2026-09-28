@@ -234,10 +234,19 @@ Shipped:
 **Language policy**: English only. Other languages are handled by consumers; the codegen does not pull in `languages/{cu,el,ru,fr,la,zh,ar}/xml/lives/`.
 
 
-### Phase 6 — Fasting *(post-M1)*
+### Phase 6 — Fasting rules *(shipped as `0.1.0-alpha.2`)*
 
-- Port `Fasting.java` as `src/engine/fasting.ts`. Reuses StringOp + generated
-  `Fasting.xml` rules. Returns 7-bit fasting code + level enum.
+**Status: ✅ done.** Port of `Ponomar/Fasting.java` + `Commands/Fasting.xml`.
+
+- **6a. ✅ Types** — [src/data/types.ts](src/data/types.ts) gains `FastingRule` (7-char bitstring + optional DSL `cmd`) and `FastingPeriod` (optional DSL `cmd` + ordered rules).
+- **6b. ✅ Codegen** — [scripts/codegen/parseFasting.ts](scripts/codegen/parseFasting.ts) reads `Commands/Fasting.xml`, validating every `Cmd=` as DSL and every `Case=` as a `[01]{7}` bitstring. [scripts/codegen/emit.ts](scripts/codegen/emit.ts) emits `src/data/fasting.ts` exporting `FASTING_RULES: readonly FastingPeriod[]` in document order.
+- **6c. ✅ `dRank` correctness** — [src/engine/day.ts](src/engine/day.ts) `dslContext` default changed from 10 → 0 to match upstream `Main.java`'s initial state. `LiturgicalDay` now carries a computed `dRank` = max of `church.rank` across all resolved saints (matches `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`). `getDailyReadings` passes the computed rank into the DSL context so `Cmd="dRank < 5"` guards on matins gospels finally resolve correctly.
+- **6d. ✅ Runtime API** — [src/engine/fasting.ts](src/engine/fasting.ts) walks `FASTING_RULES` in order, skipping periods whose `cmd` is false, otherwise letting the last-matching rule's `case` win. Returns `{ case, level, permitted, isDefault, context }`. `level` maps the 9 canonical patterns (`no-food`/`strict`/`no-oil`/`oil`/`caviar`/`fish`/`meat-excluded`/`no-fast`/`wine`) plus `custom` fallback. `permitted` decodes the bitstring into `{ meat, dairy, fish, caviar, oil, cookedFood, food }` booleans.
+- **6e. ✅ Public API** — top-barrel exports `getFasting`, `FastingResult`, `FastingLevel`, `FastingPermissions`. Also available via `ponomar-ts/engine`.
+- **6f. ✅ Tests** — [tests/fasting.test.ts](tests/fasting.test.ts) covers 9 canonical days (Pascha / Bright Wed / Clean Mon / Cheesefare Wed / Great Fri / Apostles' Fast Wed / Nativity Fast Fri / Nativity Eve / Nativity itself) plus shape / bit-mapping invariants. 174/174 total tests pass.
+
+Deferred: consumer-facing display strings (upstream's `convert()` produces localized human-readable prose from the bitstring — that's the front-end's job per the language policy above).
+
 
 ### Phase 7 — Service selection *(post-M1)*
 

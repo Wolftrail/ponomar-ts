@@ -47,8 +47,9 @@ export function computeDayContext(gregorian: CalendarDate): DayContext {
 
 /**
  * Format a `DayContext` as a plain lookup table for the DSL evaluator.
- * `dRank` defaults to 10 (upstream's "no rank found" fallback), matching
- * initial state before Commemorations are loaded.
+ * `dRank` defaults to 0 (upstream Main.java's initial state before any
+ * commemorations have been read); pass a computed rank via `extra` once
+ * you know it (see `getLiturgicalDay` for the max-over-saints logic).
  */
 export function dslContext(
 	ctx: DayContext,
@@ -60,7 +61,7 @@ export function dslContext(
 		nday: ctx.nday,
 		ndayP: ctx.ndayP,
 		ndayF: ctx.ndayF,
-		dRank: 10,
+		dRank: 0,
 		GS: 1,
 		...extra,
 	};

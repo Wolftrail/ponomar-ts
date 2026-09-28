@@ -50,7 +50,7 @@ export function getDailyReadings(
 	opts: GetDailyReadingsOptions = {},
 ): DailyReadings {
 	const day = getLiturgicalDay(gregorian);
-	const vars = dslContext(day.context);
+	const vars = dslContext(day.context, { dRank: day.dRank });
 	const refs: ReadingRef[] = [];
 	collectFrom(day.paschalSaints, "paschal", vars, opts, refs);
 	collectFrom(day.menaionSaints, "menaion", vars, opts, refs);
