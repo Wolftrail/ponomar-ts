@@ -33,3 +33,86 @@ export interface Command {
 	readonly cmd?: string;
 	readonly comment?: string;
 }
+
+/**
+ * Which service block a `<SCRIPTURE>` element was nested in.
+ * `unknown` is used when a SCRIPTURE appears outside any recognised wrapper.
+ */
+export type ServiceContext =
+	| "liturgy"
+	| "matins"
+	| "vespers"
+	| "primes"
+	| "terce"
+	| "sexte"
+	| "none"
+	| "unknown";
+
+/** One `<SCRIPTURE>` element from a saint's lives XML. */
+export interface Scripture {
+	readonly service: ServiceContext;
+	/** Raw `Type` attribute: `apostol`, `gospel`, `matins`, `vespers`, `1`, `2`, `3`, ... */
+	readonly type: string;
+	/** Bible reference expression, e.g. `Heb_13:7-16` or `Composite_3`. */
+	readonly reading: string;
+	readonly pericope?: string;
+	/** Raw StringOp DSL guard; evaluated at runtime. */
+	readonly cmd?: string;
+	readonly note?: string;
+}
+
+/** `<NAME>` attributes on a commemoration. All are optional and free-form English strings. */
+export interface SaintName {
+	readonly nominative?: string;
+	readonly short?: string;
+	readonly long?: string;
+	readonly shortN?: string;
+	readonly shortF?: string;
+	readonly index?: string;
+}
+
+/** `<CHURCH>` attributes: rank/cycle in upstream numbering; tone kept raw (may be DSL). */
+export interface Church {
+	/** 0 = Pascha, 1 = Great Feast, ... 8 = Simple service. */
+	readonly rank?: number;
+	readonly cycle?: number;
+	readonly tone?: string;
+}
+
+/** `<INFO>` attributes: biographical anchors (birth/death year, month, day, place). */
+export interface SaintInfo {
+	readonly birthY?: string;
+	readonly birthM?: string;
+	readonly birthD?: string;
+	readonly birthN?: string;
+	readonly placeB?: string;
+	readonly deathY?: string;
+	readonly deathM?: string;
+	readonly deathD?: string;
+	readonly deathN?: string;
+	readonly placeD?: string;
+}
+
+/** All non-prose metadata for a single saint, keyed by `cId` in the emitted map. */
+export interface Commemoration {
+	readonly cId: string;
+	readonly name?: SaintName;
+	readonly church?: Church;
+	readonly info?: SaintInfo;
+	readonly scriptures: readonly Scripture[];
+}
+
+/**
+ * The `<LIFE>` element for a saint: the prose "story" plus its attribution.
+ * `body` may be empty if upstream only recorded metadata (e.g. `Repose="4th Century"`).
+ * Prose contains HTML-like entities (`<p>`, `<a>`, `&#8212;`, ...) — consumers
+ * should treat it as untrusted markup and sanitize before rendering.
+ */
+export interface Life {
+	readonly cId: string;
+	readonly body: string;
+	readonly id?: string;
+	readonly copyright?: string;
+	readonly translator?: string;
+	readonly repose?: string;
+}

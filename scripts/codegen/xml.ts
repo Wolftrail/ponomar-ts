@@ -32,7 +32,10 @@ const ENTITIES: Readonly<Record<string, string>> = {
 };
 
 export function parseXml(source: string): Element {
-	const p = new Parser(source);
+	// Strip a leading UTF-8 BOM if present; some upstream files carry one.
+	const src =
+		source.charCodeAt(0) === 0xfeff ? source.slice(1) : source;
+	const p = new Parser(src);
 	p.skipProlog();
 	const root = p.readElement();
 	p.skipTrailing();

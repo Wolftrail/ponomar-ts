@@ -1,6 +1,6 @@
 {
   "name": "ponomar-ts",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.1",
   "description": "TypeScript port of the Ponomar Orthodox liturgics engine: paschal date math, Typicon rule dispatcher, saint & reading resolution.",
   "keywords": [
     "orthodox",
@@ -53,14 +53,27 @@
     "./data": {
       "types": "./dist/data/index.d.ts",
       "import": "./dist/data/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine/index.d.ts",
+      "import": "./dist/engine/index.js"
+    },
+    "./lives": {
+      "types": "./dist/lives.d.ts",
+      "import": "./dist/lives.js"
     }
   },
   "files": [
     "dist",
     "src",
     "LICENSE",
+    "NOTICE.md",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": ">=20"
   },

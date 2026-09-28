@@ -10,21 +10,25 @@ import path, { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
 	emitCommands,
+	emitCommemorations,
 	emitCycle,
+	emitLives,
 	emitMenaion,
 	type EmittedFile,
 } from "./emit.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "..", "..");
-const vendorXml = resolve(
+const vendorRoot = resolve(
 	repoRoot,
 	"vendor",
 	"ponomar",
 	"Ponomar",
 	"languages",
-	"xml",
 );
+const vendorXml = resolve(vendorRoot, "xml");
+const vendorCuXml = resolve(vendorRoot, "cu", "xml");
+const vendorEnXml = resolve(vendorRoot, "en", "xml");
 const dataRoot = resolve(repoRoot, "src", "data");
 const checkOnly = process.argv.includes("--check");
 
@@ -38,12 +42,22 @@ if (!existsSync(vendorXml)) {
 const emitted: EmittedFile[] = [
 	emitCycle("PENTECOSTARION", path.join(vendorXml, "pentecostarion")),
 	emitCycle("TRIODION", path.join(vendorXml, "triodion")),
-	emitMenaion(vendorXml),
+	emitMenaion(vendorXml, vendorCuXml),
 	emitCommands(
 		"DIVINE_LITURGY_COMMANDS",
 		path.join(vendorXml, "Commands", "DivineLiturgy.xml"),
 		"divineLiturgy.ts",
 	),
+	emitCommemorations([
+		path.join(vendorXml, "lives"),
+		path.join(vendorXml, "Commemorations"),
+		path.join(vendorEnXml, "lives"),
+	]),
+	emitLives([
+		path.join(vendorXml, "lives"),
+		path.join(vendorXml, "Commemorations"),
+		path.join(vendorEnXml, "lives"),
+	]),
 ];
 
 mkdirSync(dataRoot, { recursive: true });

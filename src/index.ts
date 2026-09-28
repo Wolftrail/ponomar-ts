@@ -12,3 +12,6 @@ export * as jdate from "./core/calendar/jdate.ts";
 export * as pcalendar from "./core/calendar/pcalendar.ts";
 export * as dsl from "./core/dsl/index.ts";
 export * as data from "./data/index.ts";
+export * as engine from "./engine/index.ts";
+export { getLiturgicalDay, getDailyReadings, getLiturgyReadings } from "./engine/index.ts";
+export type { LiturgicalDay, DailyReadings, ReadingRef } from "./engine/index.ts";

@@ -183,37 +183,69 @@ generated records (e.g. Pascha day, Christmas, Forgiveness Sunday).
 
 ### Phase 4 — Day composition & readings *(M1 part 4; the deliverable)*
 
-- **4a.** `src/engine/day.ts` — given a `JDate`, produce a full `DayInfo`:
-  `{ doy, dow, nday, ndayP, ndayF, dRank, tone, saints }`. Rank is the max
-  rank over all commemorations for that day (upstream logic).
-- **4b.** `src/engine/readings.ts` — port `DivineLiturgy1.java`'s core
-  `Readings()` method. Uses StringOp on the DivineLiturgy commands. Ignores
-  transferred-reading tomorrow/yesterday cross-day recursion for M1 (mark as
-  a TODO for Phase 7).
-- **4c.** Public API:
-  `getDailyReadings(gregorianDate, { scheme: 'lucan' | 'jordanville' }): { epistle: Ref[], gospel: Ref[] }`.
-- **4d.** Golden tests: run against upstream Perl `test_lj.pl` output for a
-  full year of dates.
+**Status: ✅ Phase 4a-4c done; readings deferred to Phase 5 (needs Commemorations codegen).**
 
-Verification: on a curated set of 20+ liturgically significant dates (Pascha,
-Nativity, Theophany, Sundays after Pentecost, Great Lent weekdays), the
-generated readings match upstream. Publish a comparison harness.
+Shipped this phase:
 
-**→ M1 SHIP TARGET: end of Phase 4.** The Bible site can now render "Today's
-Epistle & Gospel".
+- **4a. ✅ `src/engine/day.ts`** — `computeDayContext(gregorianDate)` → `{ gregorian, julian, doy, dow, nday, ndayP, ndayF }`. `dslContext(ctx)` returns a flat record ready for the StringOp evaluator (with `dRank: 10` fallback matching upstream initial state).
+- **4b. ✅ `src/engine/lookup.ts`** — `selectPaschalCycleEntry(ctx)` picks the correct `PENTECOSTARION[nday]`, `TRIODION[|nday|-1]`, or `PENTECOSTARION[ndayP]` DayEntry per upstream selection rules. `selectMenaionEntry(ctx)` looks up `MENAION[JulianMM-DD]`. Menaion codegen now unions the canonical `languages/xml/{MM}` tree with the Slavonic `languages/cu/xml/{MM}` fallback, giving full-year coverage (366 keys incl. leap day). XML parser now tolerates a leading UTF-8 BOM.
+- **4c. ✅ `src/engine/resolve.ts`** — `resolveSaints(entry, ctx)` filters saints by their `Cmd` DSL guard and resolves numeric `Tone` expressions to integers.
+- **4d. ✅ Public API** — `getLiturgicalDay(gregorianDate)` → `{ context, paschalSaints, menaionSaints, allSaints }`. Exposed via `src/engine/index.ts`, top barrel, and `./engine` subpath export.
+- **4e. ✅ Tests** — 10 new `tests/engine.test.ts` cases: Pascha 2020 = nday 0 & Sunday; Julian Jan 1 → doy 0; negative/positive `nday` around Pascha; pentecostarion/triodion selection; Nativity (Julian Dec 25 = Greg Jan 7 2024) resolves to `MENAION["12-25"]` with cId `3174`; Cmd-guarded saints filtered; tones are finite integers.
 
-### Phase 5 — Fasting *(post-M1)*
+Verification: 149/149 tests pass; `tsc --noEmit` clean; `npm run codegen -- --check` clean; `npm run build` clean.
+
+**Milestone**: shipped as `ponomar-ts@0.1.0-alpha.0` on npm (dist-tag `alpha`).
+
+
+### Phase 5 — Commemoration readings *(M1 completion; first-cut)*
+
+**Status: ✅ Phase 5a-5c done; ordering logic deferred to Phase 5.5.**
+
+Shipped this phase:
+
+- **5a. ✅ Types** — `Scripture`, `ServiceContext`, `Commemoration` added to [src/data/types.ts](src/data/types.ts).
+- **5b. ✅ Codegen** — [scripts/codegen/parseLife.ts](scripts/codegen/parseLife.ts) parses `languages/xml/lives/<cId>.xml`, capturing only `<SCRIPTURE>` elements with their service-block context (LITURGY / MATINS / VESPERS / PRIMES / TERCE / SEXTE / NONE). [scripts/codegen/emit.ts](scripts/codegen/emit.ts) `emitCommemorations` unions canonical `languages/xml/lives` with `languages/en/xml/lives` fallback. Emits `src/data/commemorations.ts` — 672 cIds with scripture. Files with no SCRIPTURE are skipped entirely. Cmd DSL guards validated at build time.
+- **5c. ✅ Runtime API** — [src/engine/readings.ts](src/engine/readings.ts) provides `getDailyReadings(gregorian, { service?, type? })` and `getLiturgyReadings(gregorian)`. Filters saints' scriptures by Cmd DSL guard at runtime; each ref is tagged with its source (`paschal` | `menaion`).
+- **5d. ✅ Tests** — [tests/readings.test.ts](tests/readings.test.ts) verifies Pascha 2020 → Acts 1:1-8 + Jn 1:1-17; Nativity 2024 → Gal 4:4-7 + Mt 2:1-12; service/type filters; source tagging. 155/155 total tests pass.
+- **5e. ✅ Public API** — top-barrel exports `getDailyReadings`, `getLiturgyReadings`, `DailyReadings`, `ReadingRef`. Available via `ponomar-ts/engine` subpath too.
+
+Deferred to Phase 5.5 (ordering, not blocking consumers who just need the raw refs):
+
+- Port `DivineLiturgy1.Readings()` ordering: floaters → pentecostarion → menaion, Saturday inversion (menaion first), skipped-reading transfer ("Lucan jump") to the next weekday, cross-day recursion for transferred readings.
+- Rank-aware SERVICE selection (`<SERVICE Type="N">` currently ignored; all scriptures collected regardless of the day's `dRank`).
+
+
+### Phase 5.1 — Commemoration metadata & English lives *(UI-facing enrichment)*
+
+**Status: ✅ done (shipped as `0.1.0-alpha.1`).**
+
+Motivation: `ResolvedSaint` initially exposed only opaque `cId` / `sIds`. Consumers wiring the engine into UIs needed titles, feast ranks, biographical anchors and life prose. This phase adds those without a breaking change.
+
+Shipped:
+
+- **5.1a. ✅ Types** — [src/data/types.ts](src/data/types.ts) gains `SaintName` (Nominative / Short / Long / ShortN / ShortF / Index), `Church` (rank / cycle / tone), `SaintInfo` (birth/death year/month/day/note + place), and `Life` (body + Id / Copyright / Translator / Repose). `Commemoration` gains optional `name`, `church`, `info`.
+- **5.1b. ✅ Codegen** — [scripts/codegen/parseLife.ts](scripts/codegen/parseLife.ts) now extracts NAME / CHURCH / INFO / LIFE in addition to SCRIPTURE, and accepts both `<SAINT>` and `<COMMEMORATION>` roots. [scripts/codegen/emit.ts](scripts/codegen/emit.ts) walks a list of source roots recursively and field-merges records when a cId appears in multiple sources (English NAME wins on individual attributes; scriptures concat; life body prefers whichever source had one). Sources unioned: `languages/xml/lives/`, `languages/xml/Commemorations/**`, `languages/en/xml/lives/`.
+- **5.1c. ✅ Emitted modules** — `src/data/commemorations.ts` (~1.6 MB emitted TS: metadata for 3.4k cIds) + `src/data/lives.ts` (~1.6 MB emitted TS: 501 populated LIFE bodies + attribution).
+- **5.1d. ✅ Runtime join** — [src/engine/resolve.ts](src/engine/resolve.ts) reads `COMMEMORATIONS` at runtime and adds optional `name`, `church`, `info` to every returned `ResolvedSaint`. Purely additive — no existing callers break.
+- **5.1e. ✅ Subpath `ponomar-ts/lives`** — LIFE bodies live behind a dedicated subpath (`src/lives.ts` → `dist/lives.js`) so consumers who only need calendar + metadata do not pay the prose payload. Ships `LIVES` map + `getLife(cId)` helper.
+- **5.1f. ✅ Tests** — new `tests/lives.test.ts` (Nativity has Bulgakov body; Emily has Repose metadata; ≥400 cIds have both metadata and a life) plus extra `tests/engine.test.ts` cases (Nativity resolves with joined name; Emily has short "Emily" + index "Emily of Cæsarea"). 162/162 tests pass.
+
+**Language policy**: English only. Other languages are handled by consumers; the codegen does not pull in `languages/{cu,el,ru,fr,la,zh,ar}/xml/lives/`.
+
+
+### Phase 6 — Fasting *(post-M1)*
 
 - Port `Fasting.java` as `src/engine/fasting.ts`. Reuses StringOp + generated
   `Fasting.xml` rules. Returns 7-bit fasting code + level enum.
 
-### Phase 6 — Service selection *(post-M1)*
+### Phase 7 — Service selection *(post-M1)*
 
 - Port `ServiceInfo.java` → `src/engine/services.ts`. Determines which
   services apply on a given day (Prime type, Kathisma numbers, etc.). Returns
   a structured selection; does not compose the text.
 
-### Phase 7 — Service composition & commemorations *(later)*
+### Phase 8 — Service composition & commemorations *(later)*
 
 - Port `Service.java`, `Commemoration1.java`, `Matins.java`, `RoyalHours.java`,
   `UsualBeginning.java`, `{Third,Sixth,Ninth}Hour.java`.
@@ -222,12 +254,12 @@ Epistle & Gospel".
   callers can render.
 - Sequential-readings cross-day recursion (yesterday/tomorrow) added here.
 
-### Phase 8 — Astronomy *(optional, standalone)*
+### Phase 9 — Astronomy *(optional, standalone)*
 
 - Port `Sunrise.java` and lunar phase from `Paschalion.java` into
   `src/astronomy/`. No dependency on the rest of the engine.
 
-### Phase 9 — Bible index *(later)*
+### Phase 10 — Bible index *(later)*
 
 - Port `Bible.java`'s reference parser (book abbrev → canonical id,
   chapter/verse). No text — text lives in whatever Bible dataset the consumer
