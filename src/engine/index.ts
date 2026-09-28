@@ -73,3 +73,8 @@ export type {
 	FastingResult,
 } from "./fasting.ts";
 export { getFasting } from "./fasting.ts";
+export type {
+	OrderedLiturgyReadings,
+	OrderedReading,
+} from "./orderedLiturgy.ts";
+export { getOrderedLiturgyReadings } from "./orderedLiturgy.ts";

@@ -248,6 +248,26 @@ Shipped:
 Deferred: consumer-facing display strings (upstream's `convert()` produces localized human-readable prose from the bitstring — that's the front-end's job per the language policy above).
 
 
+### Phase 5.5 — Divine Liturgy reading ordering *(shipped as `0.1.0-alpha.3`)*
+
+**Status: ✅ partial — canonical ordering + Suppress + Class3Transfers classification. Cross-day transfers deferred to Phase 5.6.**
+
+Ported from `Ponomar/DivineLiturgy1.java` (`Readings()` + `classifyReadings`), consuming the `DIVINE_LITURGY_COMMANDS` codegen (from `Commands/DivineLiturgy.xml`).
+
+- **5.5a. ✅ Classification** — each `ReadingRef` is tagged `sequential` (movable-cycle placeholder, `cId` is a 4-digit number in `[9000, 9899]`) or `festal` (menaion, high-rank floater, anything else). Matches upstream `Commemoration1.getRank() === -2` semantics.
+- **5.5b. ✅ Suppress** — `getOrderedLiturgyReadings` evaluates every `Suppress` COMMAND against the current day's DSL vars. On a match, sequential refs are dropped (Nativity, Theophany, their eves on non-Sat/non-Sun, Exaltation/Transfiguration on Sunday, etc.). Festal refs are preserved.
+- **5.5c. ✅ Class3Transfers** — sequential refs matching a `Class3Transfers` COMMAND are moved to a separate `suppressed` bucket so consumers can either drop them or display them as "transferred to another day". Full cross-day transfer recursion is deferred.
+- **5.5d. ✅ Saturday inversion** — on `dow === 6`, festal appears before sequential in the output; on every other weekday, sequential appears first. Matches upstream's `if (dow == 6)` branch.
+- **5.5e. ✅ Rank-aware `<SERVICE Type>` selection** — **deferred**. Only 6 of 3,371 commemorations carry a `<CHURCH Rank>` in the current corpus, making rank-gated service selection meaningless for now. Revisit when a proper rank pipeline is in place.
+- **5.5f. ✅ Public API** — `getOrderedLiturgyReadings(gregorian): OrderedLiturgyReadings` on the top barrel and `ponomar-ts/engine`. Returns `{ context, apostol, gospel, suppressed, refs }`; every entry extends `ReadingRef` with a `rank: "sequential" | "festal"` tag.
+- **5.5g. ✅ Tests** — [tests/orderedLiturgy.test.ts](tests/orderedLiturgy.test.ts) covers classification, Suppress on Nativity, Pascha kept, Saturday vs. weekday inversion, and result-shape invariants. 185/185 total tests pass.
+
+Deferred to a future **Phase 5.6** (Lucan jump / cross-day transfer):
+
+- Port `TransferRulesB` (accept transfers from tomorrow) + `TransferRulesF` (accept from yesterday). Requires recursive `getOrderedLiturgyReadings` calls into adjacent days and merging their `suppressed` back into today's `refs`.
+- Handle the September / October / November "Lucan jump" boundary where sequential-reading numbering shifts to a Lucan cycle.
+
+
 ### Phase 7 — Service selection *(post-M1)*
 
 - Port `ServiceInfo.java` → `src/engine/services.ts`. Determines which

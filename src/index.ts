@@ -13,7 +13,7 @@ export * as pcalendar from "./core/calendar/pcalendar.ts";
 export * as dsl from "./core/dsl/index.ts";
 export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
-export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting } from "./engine/index.ts";
+export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
 	DailyReadings,
@@ -21,4 +21,6 @@ export type {
 	FastingResult,
 	FastingLevel,
 	FastingPermissions,
+	OrderedLiturgyReadings,
+	OrderedReading,
 } from "./engine/index.ts";
