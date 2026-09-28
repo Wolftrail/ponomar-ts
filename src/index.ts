@@ -14,6 +14,7 @@ export * as dsl from "./core/dsl/index.ts";
 export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
 export * as bible from "./bible/index.ts";
+export * as astronomy from "./astronomy/index.ts";
 export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
@@ -43,3 +44,20 @@ export type {
 } from "./engine/index.ts";
 export { parseBibleRef, formatBibleRef, findBook, BibleRefError } from "./bible/index.ts";
 export type { BibleBook, BibleRef, VerseEndpoint, VerseRange } from "./bible/index.ts";
+export {
+	SunAltitude,
+	formatClock,
+	getSunriseSunset,
+	LUNAR_MONTH,
+	LUNAR_HALF_DAY,
+	getLunarCycle,
+	getLunarPhase,
+	getLunarPhaseName,
+	getNextNewMoon,
+	getNextFullMoon,
+} from "./astronomy/index.ts";
+export type {
+	SunriseSunsetOptions,
+	SunriseSunsetResult,
+	LunarPhaseName,
+} from "./astronomy/index.ts";

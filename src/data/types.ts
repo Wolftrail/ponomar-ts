@@ -73,7 +73,9 @@ export interface SaintName {
 
 /** `<CHURCH>` attributes: rank/cycle in upstream numbering; tone kept raw (may be DSL). */
 export interface Church {
-	/** 0 = Pascha, 1 = Great Feast, ... 8 = Simple service. */
+	/** Higher = more festive. 8 = Pascha, 7 = Great Feast of the Lord,
+	 * 6 = Great Feast of the Theotokos, 5 = Vigil, 4 = Polyeleos,
+	 * 3 = Doxology, 2 = Six-stichera, 1 = Simple daily, 0 = No rank. */
 	readonly rank?: number;
 	readonly cycle?: number;
 	readonly tone?: string;

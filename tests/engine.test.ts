@@ -123,3 +123,69 @@ describe("getLiturgicalDay", () => {
 		assert.equal(emily.name?.index, "Emily of Cæsarea");
 	});
 });
+
+describe("getLiturgicalDay: rank overlay", () => {
+	// Upstream ships <CHURCH Rank=...> on only ~6 XML files; the overlay
+	// (src/data/rankOverlay.ts) supplies ranks for Pascha, the Twelve Great
+	// Feasts, Bright Week, and a handful of vigil-rank saints.
+
+	test("Pascha 2020 → dRank 8, cId 9001 carries rank 8", () => {
+		const day = getLiturgicalDay({ year: 2020, month: 4, day: 19 });
+		assert.equal(day.dRank, 8);
+		const pascha = day.paschalSaints.find((s) => s.cId === "9001");
+		assert.ok(pascha, "expected cId 9001 (Pascha) in paschal saints");
+		assert.equal(pascha.church?.rank, 8);
+	});
+
+	test("Bright Monday 2020 → dRank 7 via cId 9002", () => {
+		// Julian Apr 7 2020 = Gregorian Apr 20 2020, day after Pascha.
+		const day = getLiturgicalDay({ year: 2020, month: 4, day: 20 });
+		assert.equal(day.dRank, 7);
+		assert.ok(day.paschalSaints.some((s) => s.cId === "9002"));
+	});
+
+	test("Nativity of Christ → dRank 7 via cId 3174", () => {
+		const day = getLiturgicalDay({ year: 2024, month: 1, day: 7 });
+		assert.equal(day.dRank, 7);
+		const nativity = day.menaionSaints.find((s) => s.cId === "3174");
+		assert.equal(nativity?.church?.rank, 7);
+	});
+
+	test("Dormition → dRank 6 via cId 4444", () => {
+		// Julian Aug 15 = Gregorian Aug 28 2024.
+		const day = getLiturgicalDay({ year: 2024, month: 8, day: 28 });
+		assert.equal(day.dRank, 6);
+		const dormition = day.menaionSaints.find((s) => s.cId === "4444");
+		assert.equal(dormition?.church?.rank, 6);
+	});
+
+	test("Beheading of the Forerunner → dRank 5 via cId 91007", () => {
+		// Julian Aug 29 = Gregorian Sep 11 2024.
+		const day = getLiturgicalDay({ year: 2024, month: 9, day: 11 });
+		assert.equal(day.dRank, 5);
+	});
+
+	test("Ordinary Tuesday → dRank 0 (no overlay hit)", () => {
+		// Julian Oct 15 = Gregorian Oct 28 2025 (a Tuesday, no listed feast).
+		const day = getLiturgicalDay({ year: 2025, month: 10, day: 28 });
+		assert.equal(day.dRank, 0);
+		for (const s of day.allSaints) {
+			assert.notEqual(s.church?.rank, 8);
+			assert.notEqual(s.church?.rank, 7);
+			assert.notEqual(s.church?.rank, 6);
+		}
+	});
+
+	test("overlay preserves non-rank <CHURCH> attributes when present", () => {
+		// cId 373 is one of the six upstream-ranked records: it also carries
+		// no cycle/tone, so the safest assertion is that after overlay it
+		// carries the overlaid rank (7 = Meeting of the Lord).
+		// Julian Feb 2 = Gregorian Feb 15 2024.
+		const day = getLiturgicalDay({ year: 2024, month: 2, day: 15 });
+		const meeting = day.menaionSaints.find((s) => s.cId === "373");
+		assert.ok(meeting, "expected cId 373 in menaion saints");
+		assert.equal(meeting.church?.rank, 7);
+		assert.equal(day.dRank, 7);
+	});
+});
+

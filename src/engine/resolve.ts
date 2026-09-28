@@ -12,7 +12,7 @@ import type {
 	SaintInfo,
 	SaintName,
 } from "../data/index.ts";
-import { COMMEMORATIONS } from "../data/index.ts";
+import { COMMEMORATIONS, RANK_OVERLAY } from "../data/index.ts";
 import type { DayContext } from "./day.ts";
 import { dslContext } from "./day.ts";
 
@@ -44,17 +44,30 @@ export function resolveSaints(
 	for (const s of entry.saints) {
 		if (s.cmd !== undefined && !evaluateBool(s.cmd, vars)) continue;
 		const meta = COMMEMORATIONS[s.cId];
+		const church = applyRankOverlay(s.cId, meta?.church);
 		out.push({
 			sIds: s.sIds,
 			cId: s.cId,
 			...(s.src !== undefined ? { src: s.src } : {}),
 			tone: resolveTone(s, vars),
 			...(meta?.name !== undefined ? { name: meta.name } : {}),
-			...(meta?.church !== undefined ? { church: meta.church } : {}),
+			...(church !== undefined ? { church } : {}),
 			...(meta?.info !== undefined ? { info: meta.info } : {}),
 		});
 	}
 	return out;
+}
+
+// The overlay authoritatively supplies `rank` for the curated cIds. If the
+// generated `Church` metadata already carries `cycle`/`tone`, we preserve
+// those and only replace `rank`.
+function applyRankOverlay(
+	cId: string,
+	meta: Church | undefined,
+): Church | undefined {
+	const overlay = RANK_OVERLAY[cId];
+	if (overlay === undefined) return meta;
+	return { ...(meta ?? {}), rank: overlay };
 }
 
 function resolveTone(

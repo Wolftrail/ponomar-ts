@@ -406,10 +406,22 @@ Deviations from upstream:
 - `Pericope="…"` attributes on `<SCRIPTURE>` are lectionary-index metadata, not scripture references; they are surfaced elsewhere in the pipeline (Scripture record on `Commemoration`) and not touched by this parser.
 - Bare book-name lookup keys used with `getReading=` (e.g. `Verses="Jerem"`) are dynamic lookup keys, not references, and are correctly rejected by `parseBibleRef` — consumers use the day's scripture list to resolve them.
 
-### Phase 9 — Astronomy *(optional, standalone)*
+### Phase 9 — Astronomy *(shipped as `0.2.0-alpha.2`)*
 
-- Port `Sunrise.java` and lunar phase from `Paschalion.java` into
-  `src/astronomy/`. No dependency on the rest of the engine.
+**Status: ✅ done.** Ports [Ponomar/Sunrise.java](vendor/ponomar/Ponomar/Sunrise.java) (itself a translation of Paul Schlyter's public-domain SUNRISET.C, 1992) and the Metonic-cycle lunar-phase paths from [Ponomar/Paschalion.java](vendor/ponomar/Ponomar/Paschalion.java) into [src/astronomy/](src/astronomy/). Standalone module — no dependency on the rest of the engine. This phase also ships a rank overlay ([src/data/rankOverlay.ts](src/data/rankOverlay.ts)) that fills in `<CHURCH Rank="…">` for major feasts upstream forgot to annotate.
+
+- **9.1 ✅ Sunrise/sunset** — [src/astronomy/sunrise.ts](src/astronomy/sunrise.ts) exposes `getSunriseSunset(date: CalendarDate, opts): SunriseSunsetResult` returning `{ sunriseHours, sunsetHours, sunAlwaysUp, sunAlwaysDown }` in local time (decimal hours). Options carry `longitude` (east+, west−), `latitude` (north+, south−), `tzOffsetHours`, optional `isDST`, and optional `altitude`. Standard altitudes exposed as `SunAltitude = { DEFAULT: -0.833, CIVIL: -6, NAUTICAL: -12, AMATEUR: -15, ASTRONOMICAL: -18 }`. Polar day/night detection surfaces as `sunAlwaysUp` / `sunAlwaysDown` flags. Also ships `formatClock(hours)` → `"HH:MM"` for convenience.
+- **9.2 ✅ Metonic lunar phase** — [src/astronomy/lunar.ts](src/astronomy/lunar.ts) exposes `getLunarPhase(date: JulianDate): number` (returns [0, 1) with 0 = new, 0.5 = full), `getLunarPhaseName(date)` (buckets into eight cardinal names: `new` / `waxing-crescent` / `first-quarter` / `waxing-gibbous` / `full` / `waning-gibbous` / `last-quarter` / `waning-crescent`), `getLunarCycle(year)` (Metonic index 1..19; throws for years < 33), plus `getNextNewMoon(date)` and `getNextFullMoon(date)`. Constants exported as `LUNAR_MONTH = 29.52916667` and `LUNAR_HALF_DAY = 0.016932411`. Uses the same 19-entry `FOUNDATION` table (age of the moon on 1 March Julian for each Metonic year) as upstream — bit-for-bit identical.
+- **9.3 ✅ Barrel + exports** — [src/astronomy/index.ts](src/astronomy/index.ts) re-exports every public symbol. Wired into [src/index.ts](src/index.ts) as the `astronomy` namespace + flat re-exports, and into [package.json](package.json) `exports` as `ponomar-ts/astronomy`.
+- **9.4 ✅ Rank overlay** — [src/data/rankOverlay.ts](src/data/rankOverlay.ts) supplies a curated `cId → rank` map (Pascha=8, Bright Week + Great Feasts of the Lord=7, Great Feasts of the Theotokos=6, vigil-rank saints=5). Upstream ships `<CHURCH Rank="…">` on ~6 files total; the overlay fills the gap so consumers can key UI decisions off `s.church?.rank` and `day.dRank`. Applied by `resolveSaints` in [src/engine/resolve.ts](src/engine/resolve.ts) — overlay is authoritative for the listed cIds, `cycle`/`tone` from generated data are preserved.
+- **9.5 ✅ Tests** — [tests/astronomy/sunrise.test.ts](tests/astronomy/sunrise.test.ts) covers Moscow summer/winter solstice (matches published civil times to the minute), NYC equinox with DST, civil-twilight altitude widening the window, and 80°N polar day/night. [tests/astronomy/lunar.test.ts](tests/astronomy/lunar.test.ts) covers Metonic cycle wraparound, `>=33` guard, phase range, Metonic full/new-moon locality, cardinal-name bucketing, and next-new/full-moon locality. Rank-overlay tests in [tests/engine.test.ts](tests/engine.test.ts) cover Pascha, Bright Monday, Nativity, Dormition, Beheading, and a no-hit ordinary day. **300/300 total tests pass.**
+
+Deviations from upstream:
+
+- Sunrise takes a **Gregorian** `CalendarDate` (civil convention); upstream takes a `JDate` (Julian) but internally converts to JDN which is calendar-neutral.
+- Lunar phase takes a **Julian** date (matches upstream's "1 March Julian" anchor); passing a Gregorian date will shift the result by ~13 days. Use `fromGregorian` to convert.
+- No UI strings — upstream's `getSunriseSunsetString` and `getLunarPhaseString` produce localised strings via `LanguagePack`; consumers handle formatting. `formatClock` covers the common `HH:MM` case.
+- No `JDate` mutation — upstream's `getNextNewMoon` / `getNextFullMoon` mutate the input in place; ours return new `JulianDate` values.
 
 ### Explicitly out of scope (initial port; may reconsider later)
 

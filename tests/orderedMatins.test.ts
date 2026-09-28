@@ -8,12 +8,10 @@ import { getOrderedMatinsReadings } from "../src/engine/orderedMatins.ts";
 describe("getOrderedMatinsReadings — Sunday menaion yields to sequential", () => {
 	// On these Sundays a menaion matins reading conflicts with the paschal-cycle
 	// resurrection gospel; per Matins.Suppress() (dow==0 && dRank<=6) the
-	// menaion reading yields.
+	// menaion reading yields. Dates chosen to fall outside the rank overlay
+	// so dRank stays at 0 and the quietSunday branch fires.
 	const cases = [
-		{ date: { year: 2020, month: 1, day: 19 }, label: "Sun Jan 19 2020" },
 		{ date: { year: 2020, month: 5, day: 24 }, label: "Sun May 24 2020" },
-		{ date: { year: 2020, month: 6, day: 7 }, label: "Sun Jun 7 2020 (Pentecost)" },
-		{ date: { year: 2020, month: 9, day: 27 }, label: "Sun Sep 27 2020" },
 		{ date: { year: 2020, month: 10, day: 4 }, label: "Sun Oct 4 2020" },
 	];
 	for (const c of cases) {
@@ -31,6 +29,52 @@ describe("getOrderedMatinsReadings — Sunday menaion yields to sequential", () 
 				"suppressed refs should be menaion/festal",
 			);
 			assert.ok(r.suppressed.length > 0, "expected menaion ref to be suppressed");
+		});
+	}
+});
+
+describe("getOrderedMatinsReadings — Sunday paschal yields to great-feast menaion", () => {
+	// Rule 1: dow==0 && dRank>6 && (nday<-49 || nday>0). When a Great Feast of
+	// the Lord (rank 7 via overlay) coincides with a Sunday outside Great Lent
+	// through Pascha, any paschal-cycle sequential resurrection gospel yields
+	// to the feast. Only Pentecost happens to have a paschal matins ref on
+	// its day; Theophany and Elevation Sundays only carry a menaion matins
+	// ref, so the rule fires vacuously.
+	const cases = [
+		{
+			date: { year: 2020, month: 1, day: 19 },
+			label: "Sun Jan 19 2020 (Theophany)",
+			paschalPresent: false,
+		},
+		{
+			date: { year: 2020, month: 6, day: 7 },
+			label: "Sun Jun 7 2020 (Pentecost)",
+			paschalPresent: true,
+		},
+		{
+			date: { year: 2020, month: 9, day: 27 },
+			label: "Sun Sep 27 2020 (Elevation)",
+			paschalPresent: false,
+		},
+	];
+	for (const c of cases) {
+		test(`${c.label}: menaion feast reading kept, any paschal suppressed`, () => {
+			const r = getOrderedMatinsReadings(c.date);
+			assert.equal(r.context.dow, 0, "expected Sunday");
+			for (const s of r.suppressed) {
+				assert.equal(s.source, "paschal");
+				assert.equal(s.rank, "sequential");
+			}
+			if (c.paschalPresent) {
+				assert.ok(
+					r.suppressed.length > 0,
+					"expected paschal ref to be suppressed",
+				);
+			}
+			assert.ok(
+				r.refs.some((x) => x.source === "menaion"),
+				"expected menaion feast reading to be kept",
+			);
 		});
 	}
 });
