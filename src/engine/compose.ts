@@ -39,6 +39,8 @@ export interface ComposeServiceOptions {
 	/** Ritual variant: `0` = normal, `1` = Lenten (no kathisma),
 	 *  `2` = Lenten (with kathisma), `3` = Lenten during Holy Week. */
 	readonly PFlag2?: number;
+	/** SixthHour only: `1` if a scripture reading (paremia) is appointed today. */
+	readonly PFlag3?: number;
 	/** Cap on `<GET>` expansion depth. Default: `4`. Guards against upstream
 	 *  templates that might cycle if hand-edited. */
 	readonly maxIncludeDepth?: number;
@@ -70,6 +72,7 @@ export function composeService(
 		PS: options.PS ?? 0,
 		PFlag1: options.PFlag1 ?? 0,
 		PFlag2: options.PFlag2 ?? 0,
+		PFlag3: options.PFlag3 ?? 0,
 	});
 	const maxDepth = options.maxIncludeDepth ?? 4;
 	const seen = new Set<string>();

@@ -61,6 +61,9 @@ export function dslContext(
 		nday: ctx.nday,
 		ndayP: ctx.ndayP,
 		ndayF: ctx.ndayF,
+		// `Year` is the Julian civil year (upstream `Main.java` line 462).
+		// Referenced by menaion Cmd guards like `Year % 4 == 0` for Feb 29.
+		Year: ctx.julian.year,
 		dRank: 0,
 		GS: 1,
 		...extra,

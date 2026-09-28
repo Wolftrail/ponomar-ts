@@ -367,9 +367,26 @@ Deviations from upstream:
 - Language policy: English-only for now. Adding another language is a matter of pointing `emitPhrases` at a second `languages/<lang>/xml/Services/` and emitting a parallel `PHRASES_<LANG>` map.
 - `Octoecheos/**` and `Var/**` are intentionally excluded — they're structural (tone-cycle variable declarations and dynamic GET wiring), not textual phrases. Their rendering belongs to the Hour wrappers in Phase 8c-iii or to consumers.
 
-#### Phase 8c-iii — Hour class wrappers *(later)*
+#### Phase 8c-iii — Hour class wrappers *(shipped as `0.1.0-alpha.10`)*
 
-- Port `NinthHour.java`, `SixthHour.java`, `ThirdHour.java`, `RoyalHours.java`, `PaschalHours.java` as thin runtime helpers over `composeService` — mostly a matter of computing `PFlag1` / `PFlag2` / `PS` from the day context + user preference, then delegating.
+**Status: ✅ done.** Third slice of `Ponomar/Service.java`: ports `Ponomar/{NinthHour,SixthHour,ThirdHour,Prime}.java`'s "which template do I compose for this Little Hour today, and with what service flags?" glue as a thin one-function API over `composeService`.
+
+- **8c-iii.1 ✅ Types** — [src/engine/hours.ts](src/engine/hours.ts) exposes `HourName = "prime" | "third" | "sixth" | "ninth"`, `GetHourServiceOptions { PS?, PFlag1?, PFlag2?, PFlag3? }`, and `HourServiceResult { context, hour, selection, templateName, service, PS, PFlag1, PFlag2, PFlag3 }`.
+- **8c-iii.2 ✅ Runtime** — `getHourService(gregorian, hour, options?)`:
+  1. Runs `getServices(gregorian)` to obtain the merged `HourSelection` for the requested hour (`prime → services.prime`, `third → services.terce`, `sixth → services.sexte`, `ninth → services.none`).
+  2. When the selection's `type === "None"` (Royal Hours day — Great Fri, Nativity Eve, Theophany Eve) returns `{ templateName: null, service: null }`.
+  3. When `type === "Paschal"` composes `PaschalHours.xml` (invariant across all four hours during Bright Week).
+  4. Otherwise composes the per-hour template (`Prime` / `ThirdHour` / `SixthHour` / `NinthHour`).
+  5. Auto-derives `PFlag2 = selection.type === "Lenten" ? 1 : 0` when the caller doesn't override it. `PS`, `PFlag1`, `PFlag3` all default to `0` matching upstream's `Analyse.dayInfo` initialisation.
+- **8c-iii.3 ✅ composeService PFlag3** — SixthHour.xml is the only template that references `PFlag3` (`"Whether there is a reading or not: 1 == A reading is appointed"`). [src/engine/compose.ts](src/engine/compose.ts) `ComposeServiceOptions` grew a `PFlag3?: number` field (defaulted to `0`) so the DSL guard `PFlag3 == 1` no longer throws `Unknown variable "PFlag3"` when composing SixthHour.
+- **8c-iii.4 ✅ Public API** — `getHourService`, `HourName`, `HourServiceResult`, `GetHourServiceOptions` on both the top barrel and `ponomar-ts/engine`.
+- **8c-iii.5 ✅ Tests** — [tests/hours.test.ts](tests/hours.test.ts) covers Pascha 2020 (all four hours Paschal → PaschalHours), a random summer Wednesday (Normal for each hour → per-hour template + PFlag2=0), Clean Monday 2020 (Lenten → auto PFlag2=1), Great Friday 2020 (Type='None' → null service), caller flag overrides (PFlag2 override, PS=1 vs PS=0 directive count differs, PFlag1=1 skips UsualBeginning), and DayContext round-tripping. **249/249 total tests pass.**
+
+Deviations from upstream:
+
+- No UI selector state — `PS` (0..3) and `PFlag1..3` are just typed options; upstream stores them in a global `Analyse.dayInfo` map that mutates between UI dialogs.
+- Tone / weekday Octoecheos file loading (upstream reads `Octoecheos/Tone N/<Weekday>.xml` as extra `<PRIMES/TERCE/SEXTE/NONE>` overrides) is not applied here — those files parameterise troparia/kontakia IDs that live inside `Var/` includes, which we deliberately keep as opaque `get` directives for consumers to render.
+- Royal Hours: consumers who need them can call `composeService(gregorian, "RoyalHours", …)` directly; there is no separate `getRoyalHours` wrapper because upstream's dispatch logic for "is today a Royal Hours day" already lives in `getHourService`'s `type === "None"` branch.
 
 ### Phase 9 — Astronomy *(optional, standalone)*
 
