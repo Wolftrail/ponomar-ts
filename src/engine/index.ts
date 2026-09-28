@@ -94,10 +94,19 @@ export type {
 export { getOrderedMatinsReadings } from "./orderedMatins.ts";
 export type { ComposedService, ComposeServiceOptions } from "./compose.ts";
 export { composeService } from "./compose.ts";
+export type { ResolvedTitle } from "./phrases.ts";
+export {
+	getPhrase,
+	resolveBibleHeader,
+	resolveCommand,
+	resolveCreate,
+	resolveTitle,
+} from "./phrases.ts";
 export type {
 	BibleDirective,
 	CreateDirective,
 	GetDirective,
+	Phrase,
 	ServiceDirective,
 	ServiceTemplate,
 	ServiceTitle,

@@ -6,6 +6,7 @@ import type {
 	DayEntry,
 	FastingPeriod,
 	Life,
+	Phrase,
 	ServicePeriod,
 	ServiceTemplate,
 } from "../../src/data/types.ts";
@@ -13,6 +14,7 @@ import { parseCommandsFile } from "./parseCommands.ts";
 import { parseDayFile } from "./parseDay.ts";
 import { parseFastingFile } from "./parseFasting.ts";
 import { parseLifeFile } from "./parseLife.ts";
+import { parsePhraseTree } from "./parsePhrases.ts";
 import { parseServiceRulesFile } from "./parseServiceRules.ts";
 import { parseServiceTemplate } from "./parseServiceTemplate.ts";
 
@@ -159,6 +161,17 @@ export function emitServiceTemplates(dir: string): EmittedFile {
 		`export const SERVICE_TEMPLATES: Readonly<Record<string, ServiceTemplate>> = ${json(map)} as const;\n`,
 	].join("\n");
 	return { relPath: "serviceTemplates.ts", content: body };
+}
+
+/** Emit the flat phrase map for one language's Services/ tree. */
+export function emitPhrases(servicesDir: string): EmittedFile {
+	const map: Record<string, Phrase> = parsePhraseTree(servicesDir);
+	const body = [
+		HEADER,
+		`import type { Phrase } from "./types.ts";\n`,
+		`export const PHRASES: Readonly<Record<string, Phrase>> = ${json(sortKeys(map))} as const;\n`,
+	].join("\n");
+	return { relPath: "phrases.ts", content: body };
 }
 
 /** Emit a commemorations map keyed by cId.

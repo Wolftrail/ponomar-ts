@@ -352,11 +352,20 @@ Deviations from upstream:
 - HTML rendering — CSS styling, header formatting, `Command` red-italic emission, etc. all belong to consumers.
 - Upstream's mutable `Analyse.dayInfo` map is replaced by an immutable per-call `dslContext`.
 
-#### Phase 8c-ii — Phrase text codegen *(later)*
+#### Phase 8c-ii — Phrase text codegen *(shipped as `0.1.0-alpha.9`)*
 
-- Emit per-language `PHRASES_<LANG>: Readonly<Record<string, string>>` maps from `languages/<lang>/xml/Services/{CommonPrayers,Text,Header,Command,Var,Octoecheos}/*.xml`.
-- Add a runtime `resolvePhrase(directive, lang)` that maps a `CreateDirective.what` (or a `ServiceTitle.value` / `.source` / `.header`) to its language-specific `TEXT Value=`.
-- Language policy still English-only for now (`languages/en/…`); other languages ship if/when needed.
+**Status: ✅ done.** Second slice of `Ponomar/Service.java`: harvests every static phrase XML file under `languages/en/xml/Services/{CommonPrayers,Text,Header,Command}/**` into one flat `PHRASES` map so consumers can render `CreateDirective` / `BibleDirective.header` / `ServiceTitle` labels without re-implementing Ponomar's per-directory lookup conventions. Dynamic content (`Var/` — runtime GET wiring, and `Octoecheos/**` — tone-cycle variable definitions) stays out of the phrase map; it's structural data rather than fixed text.
+
+- **8c-ii.1 ✅ Type** — [src/data/types.ts](src/data/types.ts) gains `Phrase { text, header? }`.
+- **8c-ii.2 ✅ Codegen** — [scripts/codegen/parsePhrases.ts](scripts/codegen/parsePhrases.ts) recursively walks the four phrase roots, accepts any single-element root (`<COMMONPRAYER>` / `<TROPARION>` / `<KONTAKION>`), and extracts `<TEXT Value>` (required) + optional `<HEADER Value>`. [scripts/codegen/emit.ts](scripts/codegen/emit.ts) `emitPhrases` produces `src/data/phrases.ts` exporting `PHRASES: Readonly<Record<string, Phrase>>` keyed by the file's path relative to `Services/` minus `.xml` (e.g. `"CommonPrayers/BlessedIsOurGod"`, `"CommonPrayers/TROPARION/FRI1"`, `"Text/NinthHour"`, `"Command/Bow"`). Current corpus: **283 phrases** (234 CommonPrayers, 22 Text, 12 Header, 15 Command; 169 also carry a `header` field).
+- **8c-ii.3 ✅ Runtime API** — [src/engine/phrases.ts](src/engine/phrases.ts) exposes `getPhrase(key)` plus four convenience resolvers that encode the upstream directory conventions: `resolveCreate(CreateDirective)` → `CommonPrayers/<what>`, `resolveCommand(name)` → `Command/<name>`, `resolveBibleHeader(BibleDirective)` → `Header/<Book><FirstToken>`, `resolveTitle(ServiceTitle)` → `Text/<Value|Source|Header|Comment>`.
+- **8c-ii.4 ✅ Public API** — All resolvers + the `Phrase` type on both the top barrel and `ponomar-ts/engine`.
+- **8c-ii.5 ✅ Tests** — [tests/phrases.test.ts](tests/phrases.test.ts) verifies a representative sample from every root (AlleluiaGlory, Psalm5 header, Bow command, NinthHour label), the nested TROPARION/KONTAKION subdirs (FRI1 body + header), corpus-wide count invariants, and each resolver against real inline directives (including the dynamic BIBLE `getReading=` form returning `undefined`). **240/240 total tests pass.**
+
+Deviations from upstream:
+
+- Language policy: English-only for now. Adding another language is a matter of pointing `emitPhrases` at a second `languages/<lang>/xml/Services/` and emitting a parallel `PHRASES_<LANG>` map.
+- `Octoecheos/**` and `Var/**` are intentionally excluded — they're structural (tone-cycle variable declarations and dynamic GET wiring), not textual phrases. Their rendering belongs to the Hour wrappers in Phase 8c-iii or to consumers.
 
 #### Phase 8c-iii — Hour class wrappers *(later)*
 

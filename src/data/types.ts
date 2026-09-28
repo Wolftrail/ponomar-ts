@@ -254,3 +254,11 @@ export interface BibleDirective extends DirectiveBase {
 	readonly header?: boolean;
 	readonly twoStars?: boolean;
 }
+
+/** One phrase XML file from `languages/<lang>/xml/Services/**`.
+ *  The `text` field carries `<TEXT Value="…"/>`; the optional `header`
+ *  carries `<HEADER Value="…"/>` if present in the same file. */
+export interface Phrase {
+	readonly text: string;
+	readonly header?: string;
+}

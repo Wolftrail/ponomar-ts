@@ -15,6 +15,7 @@ import {
 	emitFasting,
 	emitLives,
 	emitMenaion,
+	emitPhrases,
 	emitServiceRules,
 	emitServiceTemplates,
 	type EmittedFile,
@@ -54,6 +55,7 @@ const emitted: EmittedFile[] = [
 	emitFasting(path.join(vendorXml, "Commands", "Fasting.xml")),
 	emitServiceRules(path.join(vendorXml, "Commands", "ServiceRules.xml")),
 	emitServiceTemplates(path.join(vendorXml, "Services")),
+	emitPhrases(path.join(vendorEnXml, "Services")),
 	emitCommemorations([
 		path.join(vendorXml, "lives"),
 		path.join(vendorXml, "Commemorations"),
