@@ -13,6 +13,7 @@ export * as pcalendar from "./core/calendar/pcalendar.ts";
 export * as dsl from "./core/dsl/index.ts";
 export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
+export * as bible from "./bible/index.ts";
 export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
@@ -40,3 +41,5 @@ export type {
 	Phrase,
 	ResolvedTitle,
 } from "./engine/index.ts";
+export { parseBibleRef, formatBibleRef, findBook, BibleRefError } from "./bible/index.ts";
+export type { BibleBook, BibleRef, VerseEndpoint, VerseRange } from "./bible/index.ts";

@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import type {
+	BibleBook,
 	Command,
 	Commemoration,
 	DayEntry,
@@ -10,6 +11,7 @@ import type {
 	ServicePeriod,
 	ServiceTemplate,
 } from "../../src/data/types.ts";
+import { parseBibleBooks } from "./parseBibleBooks.ts";
 import { parseCommandsFile } from "./parseCommands.ts";
 import { parseDayFile } from "./parseDay.ts";
 import { parseFastingFile } from "./parseFasting.ts";
@@ -172,6 +174,29 @@ export function emitPhrases(servicesDir: string): EmittedFile {
 		`export const PHRASES: Readonly<Record<string, Phrase>> = ${json(sortKeys(map))} as const;\n`,
 	].join("\n");
 	return { relPath: "phrases.ts", content: body };
+}
+
+/** Emit the en/kjv Bible book registry from `bible.xml` as a keyed map plus
+ *  an alias index that maps every accepted form (`Id`, `Short`, and
+ *  `Short`-with-underscores-for-spaces) to the canonical `Id`. */
+export function emitBibleBooks(file: string): EmittedFile {
+	const books = parseBibleBooks(file);
+	const map: Record<string, BibleBook> = {};
+	const aliases: Record<string, string> = {};
+	for (const b of books) {
+		map[b.id] = b;
+		aliases[b.id] = b.id;
+		aliases[b.short] = b.id;
+		if (b.short.includes(" ")) aliases[b.short.replace(/ /g, "_")] = b.id;
+		aliases[b.name] = b.id;
+	}
+	const body = [
+		HEADER,
+		`import type { BibleBook } from "./types.ts";\n`,
+		`export const BIBLE_BOOKS: Readonly<Record<string, BibleBook>> = ${json(map)} as const;\n`,
+		`export const BIBLE_BOOK_ALIASES: Readonly<Record<string, string>> = ${json(sortKeys(aliases))} as const;\n`,
+	].join("\n");
+	return { relPath: "bibleBooks.ts", content: body };
 }
 
 /** Emit a commemorations map keyed by cId.

@@ -9,6 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path, { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+	emitBibleBooks,
 	emitCommands,
 	emitCommemorations,
 	emitCycle,
@@ -56,6 +57,7 @@ const emitted: EmittedFile[] = [
 	emitServiceRules(path.join(vendorXml, "Commands", "ServiceRules.xml")),
 	emitServiceTemplates(path.join(vendorXml, "Services")),
 	emitPhrases(path.join(vendorEnXml, "Services")),
+	emitBibleBooks(path.join(vendorXml, "bible.xml")),
 	emitCommemorations([
 		path.join(vendorXml, "lives"),
 		path.join(vendorXml, "Commemorations"),

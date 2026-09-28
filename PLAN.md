@@ -388,16 +388,28 @@ Deviations from upstream:
 - Tone / weekday Octoecheos file loading (upstream reads `Octoecheos/Tone N/<Weekday>.xml` as extra `<PRIMES/TERCE/SEXTE/NONE>` overrides) is not applied here — those files parameterise troparia/kontakia IDs that live inside `Var/` includes, which we deliberately keep as opaque `get` directives for consumers to render.
 - Royal Hours: consumers who need them can call `composeService(gregorian, "RoyalHours", …)` directly; there is no separate `getRoyalHours` wrapper because upstream's dispatch logic for "is today a Royal Hours day" already lives in `getHourService`'s `type === "None"` branch.
 
+### Phase 10 — Bible reference parser *(shipped as `0.2.0-alpha.1`)*
+
+**Status: ✅ done.** Ports the reference-string handling paths from `Ponomar/Bible.java` (book abbrev → canonical id + chapter/verse ranges). Scripture text is not shipped — text belongs in whatever Bible dataset the consumer chooses.
+
+- **10.1 ✅ Book registry** — [scripts/codegen/parseBibleBooks.ts](scripts/codegen/parseBibleBooks.ts) walks the `<BIBLE Id="en/bible/kjv">` block of [vendor/ponomar/Ponomar/languages/xml/bible.xml](vendor/ponomar/Ponomar/languages/xml/bible.xml). `emitBibleBooks` in [scripts/codegen/emit.ts](scripts/codegen/emit.ts) emits [src/data/bibleBooks.ts](src/data/bibleBooks.ts) with `BIBLE_BOOKS: Readonly<Record<string, BibleBook>>` (78 books keyed by canonical `Id`) plus `BIBLE_BOOK_ALIASES: Readonly<Record<string, string>>` (163 alias entries mapping `Id`, `Short`, `Short`-with-underscores, and `Name` → canonical `Id`). New `BibleBook` interface in [src/data/types.ts](src/data/types.ts).
+- **10.2 ✅ Runtime parser** — [src/bible/parse.ts](src/bible/parse.ts) `parseBibleRef(input): BibleRef` implements the grammar `Book "_" Chapter (":" VerseSpec)?` where `VerseSpec` is a comma-separated list of `Endpoint ("-" Endpoint)?` ranges and each `Endpoint` may be `(Chapter ":")? Verse ("a"|"b"|"c")?`. The book/chapter separator is the LAST underscore (so `I_Tim_4:5-8` works). Half-verse suffixes (`22b`, `3a`) are preserved on both endpoints. Cross-chapter ranges (`I Tim_3:14-4:5`, `Heb_7:26-8:2`, `Rom_13:11b-14:4`, `Jn_5:30b-6:2`) parse into a single `VerseRange` with `start.chapter !== end.chapter`. Whole-chapter refs (`Psalm_5`) yield `ranges: []`. Chapter overflow (e.g. `Jude_5:1` — Jude has 1 chapter) throws `BibleRefError`.
+- **10.3 ✅ Format + lookup** — [src/bible/format.ts](src/bible/format.ts) exposes `findBook(nameOrShort)` and `formatBibleRef(ref)`. `BibleRef` carries the original `bookLabel` from the source string so `formatBibleRef(parseBibleRef(x)) === x` for every corpus reference.
+- **10.4 ✅ Barrel** — [src/bible/index.ts](src/bible/index.ts) re-exports `parseBibleRef`, `formatBibleRef`, `findBook`, `BibleRefError`, `BIBLE_BOOKS`, `BIBLE_BOOK_ALIASES`, and the `BibleRef` / `BibleBook` / `VerseRange` / `VerseEndpoint` types. Wired into `src/index.ts` (top-level re-exports + `bible` namespace) and `package.json` `exports` as `ponomar-ts/bible`.
+- **10.5 ✅ Corpus sweep** — [scripts/validate-bible-refs.ts](scripts/validate-bible-refs.ts) collects every unique `Reading=` / `Verses=` value across the vendor XML tree (1170 unique refs) and pipes each through `parseBibleRef`. **1169 / 1170 parse cleanly**; the single failure is an upstream typo (`Reading="Mt_26:1-20; "` — stray semicolon in [lives/9803.xml](vendor/ponomar/Ponomar/languages/xml/lives/9803.xml)).
+- **10.6 ✅ Tests** — [tests/bible.test.ts](tests/bible.test.ts) covers registry shape, alias resolution (`I_Tim` / `I Tim` / `I Timothy` / `Ps` all resolve), simple ranges, whole-chapter refs, cross-chapter ranges, half-verse suffixes on start / end / multi-range, error cases (unknown book, missing separator, out-of-range chapter, non-numeric verse), and format round-trips for eight canonical corpus samples. **276/276 total tests pass.**
+
+Deviations from upstream:
+
+- `Bible.java`'s Swing UI (search box, navigation, popup rendering) is out of scope. Only the reference-parsing paths are ported.
+- Non-English `<BIBLE>` blocks (Brenton, French, Church Slavonic, Latin, Chinese) are ignored: canonical book ids are language-neutral so a consumer can join `BibleRef.book` to their own text dataset in any language.
+- `Pericope="…"` attributes on `<SCRIPTURE>` are lectionary-index metadata, not scripture references; they are surfaced elsewhere in the pipeline (Scripture record on `Commemoration`) and not touched by this parser.
+- Bare book-name lookup keys used with `getReading=` (e.g. `Verses="Jerem"`) are dynamic lookup keys, not references, and are correctly rejected by `parseBibleRef` — consumers use the day's scripture list to resolve them.
+
 ### Phase 9 — Astronomy *(optional, standalone)*
 
 - Port `Sunrise.java` and lunar phase from `Paschalion.java` into
   `src/astronomy/`. No dependency on the rest of the engine.
-
-### Phase 10 — Bible index *(later)*
-
-- Port `Bible.java`'s reference parser (book abbrev → canonical id,
-  chapter/verse). No text — text lives in whatever Bible dataset the consumer
-  chooses.
 
 ### Explicitly out of scope (initial port; may reconsider later)
 

@@ -262,3 +262,22 @@ export interface Phrase {
 	readonly text: string;
 	readonly header?: string;
 }
+
+/** One `<BOOK>` entry inside the `<BIBLE Id="en/bible/kjv">` block of
+ *  `languages/xml/bible.xml`. English full-name / short-name / chapter-count
+ *  metadata used by the reference parser under `src/bible/`. */
+export interface BibleBook {
+	/** Canonical id (e.g. `"Gen"`, `"I_Tim"`, `"Psalm"`). Stable across
+	 *  language packs. */
+	readonly id: string;
+	/** Human-readable book name (e.g. `"Genesis"`, `"I Timothy"`). */
+	readonly name: string;
+	/** Abbreviated form used in `Reading=` attributes (e.g. `"Gen"`,
+	 *  `"I Tim"`). May contain spaces; never contains `_`. */
+	readonly short: string;
+	/** Number of chapters. */
+	readonly chapters: number;
+	/** Language-pack introit for lectionary rendering (may be empty). */
+	readonly intro?: string;
+}
+

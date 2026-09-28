@@ -14,4 +14,5 @@ export { FASTING_RULES } from "./fasting.ts";
 export { SERVICE_RULES } from "./serviceRules.ts";
 export { SERVICE_TEMPLATES } from "./serviceTemplates.ts";
 export { PHRASES } from "./phrases.ts";
+export { BIBLE_BOOKS, BIBLE_BOOK_ALIASES } from "./bibleBooks.ts";
 export { COMMEMORATIONS } from "./commemorations.ts";
