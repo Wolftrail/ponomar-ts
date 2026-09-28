@@ -268,6 +268,23 @@ Deferred to a future **Phase 5.6** (Lucan jump / cross-day transfer):
 - Handle the September / October / November "Lucan jump" boundary where sequential-reading numbering shifts to a Lucan cycle.
 
 
+### Phase 5.6 — Cross-day transfer *(shipped as `0.1.0-alpha.4`)*
+
+**Status: ✅ done.** Ports upstream `DivineLiturgy1.Readings()`'s adjacent-day pull logic on top of the Phase 5.5 classification pipeline.
+
+- **5.6a. ✅ `dowOrigin` on every `OrderedReading`** — the day-of-week a reading was originally scheduled for. Equals `context.dow` for today's own readings; differs when the ref was cross-day-transferred. Additive: existing consumers can ignore it.
+- **5.6b. ✅ `Transfer` gate** — evaluated first. When true (`nday >= 52 || nday < -55`, i.e. outside a window around Pascha), cross-day pulls become eligible.
+- **5.6c. ✅ `TransferRulesF` — pull from yesterday** — when today's DSL vars match (default rule fires on Tuesdays outside Lent), recursively evaluate yesterday with `crossDay=false`, take its `suppressed` refs, and *prepend* them to today's `apostol`/`gospel` — matching upstream's `dailyVf = yesterdaySuppressed + today + tomorrowSuppressed` layout.
+- **5.6d. ✅ `TransferRulesB` — pull from tomorrow** — fires on most non-Sunday weekdays outside Lent; recursively evaluate tomorrow, take its `suppressed`, and *append* to today's refs. Verified end-to-end on Nativity Eve 2024: Fri 2024-01-05 (Julian Dec 23, doy=356) drains its sequential readings via Class3Transfers, and Thu 2024-01-04 pulls them in tagged `dowOrigin=5`.
+- **5.6e. ✅ Bounded recursion** — the recursive call uses `crossDay=false`, so the maximum depth is 1. Verified by a regression test that Wed 2024-01-03 does not transitively acquire Friday's refs through Thursday.
+- **5.6f. ✅ Tests** — [tests/orderedLiturgy.test.ts](tests/orderedLiturgy.test.ts) grows with Fri drains sequential / Thu pulls Fri / trailing-position invariant / recursion-bound check / `dowOrigin` shape. 191/191 total tests pass.
+
+Deviations from upstream (documented in the module header):
+
+- Upstream overrides `dRank = "0"` for the recursive adjacent-day lookup. This suppresses rank-gated `Class3Transfers` (`dRank >= 5`) and rank-gated `Suppress` clauses when peeking at the neighbor. Because only 6/3371 cIds carry a rank at all, mirroring this override is inert on today's data; deferred until rank data becomes richer.
+- Full Lucan-jump *numbering* boundary (September–November sequential-reading cycle reset) is out of scope for the ordering engine — it belongs to the sequential-reading generation, which today ships as static day XML.
+
+
 ### Phase 7 — Service selection *(post-M1)*
 
 - Port `ServiceInfo.java` → `src/engine/services.ts`. Determines which

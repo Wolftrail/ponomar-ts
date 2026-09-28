@@ -97,4 +97,80 @@ describe("getOrderedLiturgyReadings — shape", () => {
 		const r = getOrderedLiturgyReadings({ year: 2020, month: 7, day: 15 });
 		for (const x of r.refs) assert.match(x.rank, /^(sequential|festal)$/);
 	});
+
+	test("every ref carries a numeric dowOrigin in 0..6", () => {
+		const r = getOrderedLiturgyReadings({ year: 2020, month: 7, day: 15 });
+		for (const x of r.refs) {
+			assert.equal(typeof x.dowOrigin, "number");
+			assert.ok(x.dowOrigin >= 0 && x.dowOrigin <= 6);
+		}
+	});
+});
+
+describe("getOrderedLiturgyReadings — cross-day transfer (Phase 5.6)", () => {
+	// Jan 5 2024 Greg = Julian Dec 23, doy=356, Fri. This is the day Royal
+	// Hours occur when Nativity Eve (doy=357) falls on Saturday. Its
+	// sequential readings are Class3-transferred; Thu Jan 4 (doy=355) picks
+	// them up via TransferRulesB.
+	test("Fri Jan 5 2024 (Royal Hours) suppresses its sequential readings", () => {
+		const r = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 5 });
+		assert.equal(r.context.dow, 5);
+		assert.equal(r.context.doy, 356);
+		assert.ok(
+			r.suppressed.some((x) => x.rank === "sequential"),
+			"Royal Hours Friday should drain sequential readings to suppressed",
+		);
+	});
+
+	test("Thu Jan 4 2024 pulls Friday's suppressed readings via TransferRulesB", () => {
+		const r = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 4 });
+		assert.equal(r.context.dow, 4);
+		const pulled = r.apostol.filter((x) => x.dowOrigin === 5);
+		assert.ok(
+			pulled.length > 0,
+			"Thursday must contain at least one apostol tagged dowOrigin=5 (Friday)",
+		);
+		for (const x of pulled) {
+			assert.equal(x.rank, "sequential");
+			assert.equal(x.type, "apostol");
+		}
+	});
+
+	test("Thu Jan 4 2024 pulled readings appear AFTER today's own readings", () => {
+		const r = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 4 });
+		const firstPulledIdx = r.apostol.findIndex((x) => x.dowOrigin === 5);
+		const lastOwnIdx = r.apostol.findLastIndex(
+			(x) => x.dowOrigin === r.context.dow,
+		);
+		assert.ok(
+			firstPulledIdx > lastOwnIdx,
+			"tomorrow's pulled refs must trail today's own refs",
+		);
+	});
+
+	test("today's own readings carry dowOrigin === context.dow", () => {
+		const r = getOrderedLiturgyReadings({ year: 2020, month: 7, day: 15 });
+		for (const x of r.apostol) {
+			if (x.dowOrigin !== r.context.dow) continue;
+			// nothing to assert; the invariant is that home-day refs match.
+		}
+		// Anchor: on a plain Wed 2020-07-15 no cross-day transfer applies.
+		for (const x of [...r.apostol, ...r.gospel]) {
+			assert.equal(x.dowOrigin, r.context.dow);
+		}
+	});
+
+	test("recursion is bounded — adjacent-day pulls do not cascade", () => {
+		// If recursion were unbounded, Thu Jan 4 2024 would pull Fri's,
+		// which would pull Sat's (empty), and Wed Jan 3 would also pull Thu's
+		// pulled Fri refs. Verify that Wed Jan 3 does NOT contain any
+		// dowOrigin=5 (Friday) refs — i.e. the recursion stops at depth 1.
+		const wed = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 3 });
+		const dowFive = wed.apostol.filter((x) => x.dowOrigin === 5);
+		assert.equal(
+			dowFive.length,
+			0,
+			"Wednesday must not transitively pull Friday's readings",
+		);
+	});
 });

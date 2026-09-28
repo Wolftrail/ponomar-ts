@@ -11,15 +11,21 @@
 //     but consumers may want to display / transfer them" (Royal Hours
 //     Friday, Exaltation, Transfiguration on non-Sundays, etc.);
 //   * apply the Saturday inversion: festal first on dow === 6,
-//     sequential first otherwise.
+//     sequential first otherwise;
+//   * evaluate the `Transfer` + `TransferRulesB` + `TransferRulesF`
+//     commands to pull sequential readings across day boundaries
+//     (upstream's "Lucan jump" recursion). Refs pulled from yesterday
+//     are prepended; refs pulled from tomorrow are appended. Every ref
+//     carries a `dowOrigin` tag naming which day it was scheduled for.
 //
-// **Not** yet implemented (deferred to a follow-up phase):
-//   * full Lucan-jump / cross-day transfer to yesterday or tomorrow
-//     (upstream `TransferRulesB` / `TransferRulesF` with recursion into
-//     the previous or next day's readings);
+// **Not** yet implemented:
 //   * rank-aware `<SERVICE Type="N">` selection (rank data too sparse
-//     across the current corpus to matter).
+//     across the current corpus to matter);
+//   * mirroring upstream's `dRank = 0` override for the recursive
+//     lookup of adjacent days. In practice only 6/3371 cIds carry a
+//     rank at all, so the deviation is inert on today's data.
 
+import { addDays } from "../core/calendar/pcalendar.ts";
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import { evaluateBool } from "../core/dsl/index.ts";
 import { DIVINE_LITURGY_COMMANDS } from "../data/index.ts";
@@ -32,6 +38,10 @@ import type { ReadingRef } from "./readings.ts";
 /** A liturgy reading tagged with its classification for ordering. */
 export interface OrderedReading extends ReadingRef {
 	readonly rank: "sequential" | "festal";
+	/** Day-of-week (0 = Sunday … 6 = Saturday) the reading was originally
+	 *  scheduled for. Equals `context.dow` for today's own readings; differs
+	 *  when the ref was cross-day-transferred from yesterday or tomorrow. */
+	readonly dowOrigin: number;
 }
 
 export interface OrderedLiturgyReadings {
@@ -55,23 +65,62 @@ export interface OrderedLiturgyReadings {
 export function getOrderedLiturgyReadings(
 	gregorian: CalendarDate,
 ): OrderedLiturgyReadings {
+	return computeOrdered(gregorian, true);
+}
+
+/** Internal worker. `crossDay=false` disables the Transfer/TransferRules
+ *  recursion so the adjacent-day lookup can't recurse further. */
+function computeOrdered(
+	gregorian: CalendarDate,
+	crossDay: boolean,
+): OrderedLiturgyReadings {
 	const day = getLiturgicalDay(gregorian);
+	const dow = day.context.dow;
 	const vars = dslContext(day.context, { dRank: day.dRank });
 	const raw = getLiturgyReadings(gregorian).refs;
 
 	const suppressAll = evalCommand("Suppress", vars);
 	const class3 = evalCommand("Class3Transfers", vars);
 
-	const apostol = classify(raw, "apostol");
-	const gospel = classify(raw, "gospel");
+	const apostol = classify(raw, "apostol", dow);
+	const gospel = classify(raw, "gospel", dow);
 
 	const suppressed: OrderedReading[] = [];
 	const apostolKept = filterAndDrain(apostol, suppressAll, class3, suppressed);
 	const gospelKept = filterAndDrain(gospel, suppressAll, class3, suppressed);
 
-	const saturday = day.context.dow === 6;
-	const apostolOrdered = orderRefs(apostolKept, saturday);
-	const gospelOrdered = orderRefs(gospelKept, saturday);
+	const saturday = dow === 6;
+	let apostolOrdered = orderRefs(apostolKept, saturday);
+	let gospelOrdered = orderRefs(gospelKept, saturday);
+
+	if (crossDay && evalCommand("Transfer", vars)) {
+		// TransferRulesF: today accepts yesterday's transferred readings
+		// (i.e. readings scheduled for yesterday but moved forward to today).
+		if (evalCommand("TransferRulesF", vars)) {
+			const yr = computeOrdered(addDays(gregorian, -1), false);
+			apostolOrdered = [
+				...pickByType(yr.suppressed, "apostol"),
+				...apostolOrdered,
+			];
+			gospelOrdered = [
+				...pickByType(yr.suppressed, "gospel"),
+				...gospelOrdered,
+			];
+		}
+		// TransferRulesB: today accepts tomorrow's transferred readings
+		// (i.e. readings scheduled for tomorrow but moved backward to today).
+		if (evalCommand("TransferRulesB", vars)) {
+			const tr = computeOrdered(addDays(gregorian, 1), false);
+			apostolOrdered = [
+				...apostolOrdered,
+				...pickByType(tr.suppressed, "apostol"),
+			];
+			gospelOrdered = [
+				...gospelOrdered,
+				...pickByType(tr.suppressed, "gospel"),
+			];
+		}
+	}
 
 	return {
 		context: day.context,
@@ -82,11 +131,15 @@ export function getOrderedLiturgyReadings(
 	};
 }
 
-function classify(refs: readonly ReadingRef[], type: string): OrderedReading[] {
+function classify(
+	refs: readonly ReadingRef[],
+	type: string,
+	dow: number,
+): OrderedReading[] {
 	const out: OrderedReading[] = [];
 	for (const r of refs) {
 		if (r.type !== type) continue;
-		out.push({ ...r, rank: rankOf(r.cId) });
+		out.push({ ...r, rank: rankOf(r.cId), dowOrigin: dow });
 	}
 	return out;
 }
@@ -115,6 +168,13 @@ function orderRefs(
 	const sequential = refs.filter((r) => r.rank === "sequential");
 	const festal = refs.filter((r) => r.rank === "festal");
 	return saturday ? [...festal, ...sequential] : [...sequential, ...festal];
+}
+
+function pickByType(
+	refs: readonly OrderedReading[],
+	type: "apostol" | "gospel",
+): OrderedReading[] {
+	return refs.filter((r) => r.type === type);
 }
 
 function rankOf(cId: string): "sequential" | "festal" {
