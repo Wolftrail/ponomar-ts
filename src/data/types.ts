@@ -118,6 +118,33 @@ export interface FastingPeriod {
 	readonly rules: readonly FastingRule[];
 }
 
+/** One `<PRIME>`/`<TERCE>`/`<SEXTE>`/`<NONE>` child rule inside a
+ * `<PERIOD>` of Commands/ServiceRules.xml. `type` is the required
+ * template name (`Paschal` / `Easter` / `Normal` / `Lenten`); the rest
+ * carry the raw template attributes to be merged into the running
+ * selection. `cmd` gates whether this rule contributes. */
+export interface ServiceRule {
+	readonly type: string;
+	readonly troparion?: string;
+	readonly pickT?: string;
+	readonly kontakion?: string;
+	readonly pickK?: string;
+	readonly lentenK?: string;
+	readonly cmd?: string;
+}
+
+/** One `<PERIOD>` block in Commands/ServiceRules.xml, gated by `cmd`.
+ * Contains the ordered rule lists for each of the four hours.
+ * `cmd` may be missing (the trailing "special cases" period upstream carries
+ * no Cmd) — an absent cmd is treated as "always applicable". */
+export interface ServicePeriod {
+	readonly cmd?: string;
+	readonly prime: readonly ServiceRule[];
+	readonly terce: readonly ServiceRule[];
+	readonly sexte: readonly ServiceRule[];
+	readonly none: readonly ServiceRule[];
+}
+
 /**
  * The `<LIFE>` element for a saint: the prose "story" plus its attribution.
  * `body` may be empty if upstream only recorded metadata (e.g. `Repose="4th Century"`).

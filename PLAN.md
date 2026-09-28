@@ -285,11 +285,21 @@ Deviations from upstream (documented in the module header):
 - Full Lucan-jump *numbering* boundary (September–November sequential-reading cycle reset) is out of scope for the ordering engine — it belongs to the sequential-reading generation, which today ships as static day XML.
 
 
-### Phase 7 — Service selection *(post-M1)*
+### Phase 7 — Service selection *(shipped as `0.1.0-alpha.5`)*
 
-- Port `ServiceInfo.java` → `src/engine/services.ts`. Determines which
-  services apply on a given day (Prime type, Kathisma numbers, etc.). Returns
-  a structured selection; does not compose the text.
+**Status: ✅ done.** Port of `Ponomar/ServiceInfo.java` + `Commands/ServiceRules.xml`. Selects the template for each of the four Little Hours (Prime, Terce, Sexte, None). Does **not** compose the actual liturgical text — that belongs to Phase 8.
+
+- **7a. ✅ Types** — [src/data/types.ts](src/data/types.ts) gains `ServiceRule` (per-hour rule with typed `type` / `troparion` / `pickT` / `kontakion` / `pickK` / `lentenK` / `cmd`) and `ServicePeriod` (optional period `cmd` + one ordered rule list per hour). Period `cmd` is optional because the trailing "special cases" period upstream ships without one.
+- **7b. ✅ Codegen** — [scripts/codegen/parseServiceRules.ts](scripts/codegen/parseServiceRules.ts) reads `Commands/ServiceRules.xml`, buckets `<PRIME>` / `<TERCE>` / `<SEXTE>` / `<NONE>` children per `<PERIOD>`, and validates every `Cmd=` as DSL at build time. [scripts/codegen/emit.ts](scripts/codegen/emit.ts) `emitServiceRules` produces `src/data/serviceRules.ts` exporting `SERVICE_RULES: ReadonlyArray<ServicePeriod>` in document order.
+- **7c. ✅ Runtime API** — [src/engine/services.ts](src/engine/services.ts) walks `SERVICE_RULES`, skipping periods whose `cmd` is false, otherwise merging every matching rule's attributes into the running `HourSelection` for that hour. Last write per attribute wins, matching upstream's `Service.put(key, value)` semantics.
+- **7d. ✅ Public API** — `getServices(gregorian): ServicesResult` on the top barrel and `ponomar-ts/engine`. Returns `{ context, prime, terce, sexte, none }`; each hour is either `HourSelection | undefined`.
+- **7e. ✅ Tests** — [tests/services.test.ts](tests/services.test.ts) covers Paschal (Bright Week), Easter (Antipascha, `{P,T}` template), Normal (Pentecost, weekday, Nativity), Lenten (Clean Monday's specific `LENTENK` numbers, Nativity Fast Wed with `WFL` kontakion), and the Great Friday special case where `Type=None` (Royal Hours) merges over prior Lenten kontakion. 201/201 total tests pass.
+
+Deviations from upstream (documented in the module header):
+
+- Upstream `ServiceInfo` has a commented-out `readLanguage` toggle keyed on `<LANGUAGE>` elements; effectively a no-op. Ignored here.
+- Rank inference klutz in `ServiceInfo.java` (a self-declared workaround that hard-coded `dRank` from doy/nday) is not ported. Ranks flow through `LiturgicalDay.dRank` from `<CHURCH Rank>` metadata, matching the upstream comment that the klutz "is unnecessary since the days can now be ranked properly."
+
 
 ### Phase 8 — Service composition & commemorations *(later)*
 

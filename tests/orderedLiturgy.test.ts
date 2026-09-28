@@ -139,9 +139,11 @@ describe("getOrderedLiturgyReadings — cross-day transfer (Phase 5.6)", () => {
 	test("Thu Jan 4 2024 pulled readings appear AFTER today's own readings", () => {
 		const r = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 4 });
 		const firstPulledIdx = r.apostol.findIndex((x) => x.dowOrigin === 5);
-		const lastOwnIdx = r.apostol.findLastIndex(
-			(x) => x.dowOrigin === r.context.dow,
-		);
+		let lastOwnIdx = -1;
+		for (let i = 0; i < r.apostol.length; i++) {
+			const x = r.apostol[i];
+			if (x !== undefined && x.dowOrigin === r.context.dow) lastOwnIdx = i;
+		}
 		assert.ok(
 			firstPulledIdx > lastOwnIdx,
 			"tomorrow's pulled refs must trail today's own refs",

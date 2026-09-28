@@ -15,6 +15,7 @@ import {
 	emitFasting,
 	emitLives,
 	emitMenaion,
+	emitServiceRules,
 	type EmittedFile,
 } from "./emit.ts";
 
@@ -50,6 +51,7 @@ const emitted: EmittedFile[] = [
 		"divineLiturgy.ts",
 	),
 	emitFasting(path.join(vendorXml, "Commands", "Fasting.xml")),
+	emitServiceRules(path.join(vendorXml, "Commands", "ServiceRules.xml")),
 	emitCommemorations([
 		path.join(vendorXml, "lives"),
 		path.join(vendorXml, "Commemorations"),

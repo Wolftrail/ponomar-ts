@@ -78,3 +78,5 @@ export type {
 	OrderedReading,
 } from "./orderedLiturgy.ts";
 export { getOrderedLiturgyReadings } from "./orderedLiturgy.ts";
+export type { HourSelection, ServicesResult } from "./services.ts";
+export { getServices } from "./services.ts";
