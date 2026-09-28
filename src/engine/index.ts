@@ -87,3 +87,8 @@ export type {
 	ProperRef,
 } from "./propers.ts";
 export { getPropers } from "./propers.ts";
+export type {
+	OrderedMatinsReading,
+	OrderedMatinsReadings,
+} from "./orderedMatins.ts";
+export { getOrderedMatinsReadings } from "./orderedMatins.ts";

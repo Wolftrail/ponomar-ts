@@ -320,14 +320,22 @@ Deferred to later Phase 8 slices:
 - `RoyalHours.java`, `UsualBeginning.java`, `{Third,Sixth,Ninth}Hour.java` (mostly thin wrappers over Service).
 - Cross-day propers transfer analogous to the Lucan jump.
 
-#### Phase 8 — remaining scope
+#### Phase 8b — Matins reading conflict resolution *(shipped as `0.1.0-alpha.7`)*
 
-- Port `Service.java`, `Commemoration1.java`, `Matins.java`, `RoyalHours.java`,
-  `UsualBeginning.java`, `{Third,Sixth,Ninth}Hour.java`.
-- These are template engines that emit ordered structural output
-  (`{ kind: 'bible', ref } | { kind: 'create', what, times } | ...`), which
-  callers can render.
-- Sequential-readings cross-day recursion (yesterday/tomorrow) added here.
+**Status: ✅ done.** Port of `Ponomar/Matins.java` `Suppress()`. Analogous to [src/engine/orderedLiturgy.ts](src/engine/orderedLiturgy.ts) but far simpler: no `Commands/Matins.xml` (upstream has none), no Class3 transfers, no cross-day recursion. All rules are hard-coded, matching upstream.
+
+- **8b.1 ✅ Runtime** — [src/engine/orderedMatins.ts](src/engine/orderedMatins.ts) exports `getOrderedMatinsReadings(gregorian): OrderedMatinsReadings`. Consumes `getDailyReadings(gregorian, { service: "matins" })`, classifies each ref as `sequential` (paschal-cycle) or `festal` (menaion), and applies the two hard-coded Sunday rules:
+  1. `dow == 0 && dRank > 6 && (nday < -49 || nday > 0)` → sequential refs move to `suppressed` (high-rank feast pre-empts the resurrection gospel).
+  2. `dow == 0 && dRank <= 6` → festal (menaion) refs move to `suppressed` (paschal resurrection gospel wins on a quiet Sunday).
+- **8b.2 ✅ Public API** — `getOrderedMatinsReadings`, `OrderedMatinsReading`, `OrderedMatinsReadings` on the top barrel and `ponomar-ts/engine`.
+- **8b.3 ✅ Tests** — [tests/orderedMatins.test.ts](tests/orderedMatins.test.ts) covers 5 real Sundays in 2020 where menaion suppression fires (Jan 19, May 24, Jun 7 Pentecost, Sep 27, Oct 4), a non-Sunday passthrough (Sat Jan 18 2020), Nativity 2021 as a weekday festal ref, a Sunday with no menaion conflict (Feb 2 2020), and DayContext preservation. 217/217 total tests pass.
+
+Deviations from upstream:
+
+- `Matins.LeapReadings()` reads a shared `Information2` map populated by `DivineLiturgy1`. In the current corpus that table's Matins-scoped entries are empty and the method is a no-op — not ported.
+- Rule 1 (high-rank Sunday feast) is exercisable in principle but inert on the current corpus, since `<CHURCH Rank>` metadata is sparse (only 6/3371 cIds carry a rank at all). Consumers who supply their own high-rank menaion data will see it fire.
+
+#### Phase 8c — Service composition & Hour classes *(later)*
 
 ### Phase 9 — Astronomy *(optional, standalone)*
 
