@@ -14,11 +14,14 @@ jobs:
         node-version: ['20.x', '22.x', '24.x']
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
+      - run: npm run codegen -- --check
       - run: npm run typecheck
       - run: npm test
       - run: npm run build

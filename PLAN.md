@@ -423,6 +423,22 @@ Deviations from upstream:
 - No UI strings — upstream's `getSunriseSunsetString` and `getLunarPhaseString` produce localised strings via `LanguagePack`; consumers handle formatting. `formatClock` covers the common `HH:MM` case.
 - No `JDate` mutation — upstream's `getNextNewMoon` / `getNextFullMoon` mutate the input in place; ours return new `JulianDate` values.
 
+### Phase 11 — 1.0 release *(shipped as `1.0.0-rc.0`)*
+
+**Status: ✅ done.** Housekeeping-only. No code changes.
+
+- **11.1 ✅ Public API frozen** — the `1.0.0-rc.0` surface is byte-identical to `0.2.0-alpha.2`; the version bump only signals stability.
+- **11.2 ✅ README rewritten** — status callout, ticked scope boxes, real usage examples for every top-level public API. Installation instructs `npm install ponomar-ts@next`.
+- **11.3 ✅ CHANGELOG.md** — Keep-a-Changelog format consolidating the phase headers above into per-release notes. Anchors linked to `github.com/wolfgangnothdurft/ponomar-ts/releases/tag/v*`.
+- **11.4 ✅ LIMITATIONS.md** — consolidates every "deferred" bullet from the phase headers into a single reference document so downstream consumers have one place to look.
+- **11.5 ✅ CI drift check** — [.github/workflows/ci.yml](.github/workflows/ci.yml) now inits `vendor/ponomar/` submodule recursively and runs `npm run codegen -- --check` on every push / PR.
+- **11.6 ✅ Release gates verified** — `codegen --check` clean, `typecheck` clean, `test` 305/305, `build` clean. `npm pack --dry-run` → 1.8 MB compressed, 10.1 MB unpacked, 219 files.
+
+Post-release (before `1.0.0` plain tag):
+
+- Tag `v1.0.0-rc.0` and publish to npm under dist-tag `next`.
+- Soak. If no blocking issues arise, cut `1.0.0`.
+
 ### Explicitly out of scope (initial port; may reconsider later)
 
 - All Swing UI: `Main`, `JCalendar`, `JDaySelector`, `IconDisplay`,
