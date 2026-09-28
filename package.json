@@ -1,0 +1,63 @@
+{
+  "name": "ponomar-ts",
+  "version": "0.0.0",
+  "description": "TypeScript port of the Ponomar Orthodox liturgics engine: paschal date math, Typicon rule dispatcher, saint & reading resolution.",
+  "keywords": [
+    "orthodox",
+    "liturgy",
+    "typicon",
+    "pascha",
+    "calendar",
+    "menaion",
+    "oktoechos",
+    "church-slavic",
+    "ponomar"
+  ],
+  "homepage": "https://github.com/wolfgangnothdurft/ponomar-ts#readme",
+  "bugs": {
+    "url": "https://github.com/wolfgangnothdurft/ponomar-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wolfgangnothdurft/ponomar-ts.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "author": "Wolfgang Nothdurft",
+  "contributors": [
+    "Ponomar Java authors: Aleksandr Andreev et al. (2006-2018)"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./paschalion": {
+      "types": "./dist/paschalion.d.ts",
+      "import": "./dist/paschalion.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "node --experimental-strip-types scripts/clean.ts",
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
