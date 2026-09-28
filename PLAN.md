@@ -144,7 +144,7 @@ Parallel-safe steps:
 Verification: `npm test` passes the Paschalion regression fixture (drawn from
 upstream Perl script output) for years 1900–2100.
 
-### Phase 2 — StringOp DSL *(M1 part 2; the engine's heart)*
+### Phase 2 — StringOp DSL *(M1 part 2; the engine's heart)* — ✅ done
 
 - **2a.** `src/core/dsl/lexer.ts` — tokenize numbers, identifiers,
   `+ - * / %`, `== != < > <= >=`, `&& ||`, `!`, `( )`, whitespace.

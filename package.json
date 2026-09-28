@@ -45,6 +45,10 @@
     "./calendar/pcalendar": {
       "types": "./dist/core/calendar/pcalendar.d.ts",
       "import": "./dist/core/calendar/pcalendar.js"
+    },
+    "./dsl": {
+      "types": "./dist/core/dsl/index.d.ts",
+      "import": "./dist/core/dsl/index.js"
     }
   },
   "files": [
