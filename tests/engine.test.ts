@@ -189,3 +189,34 @@ describe("getLiturgicalDay: rank overlay", () => {
 	});
 });
 
+describe("getLiturgicalDay: tone", () => {
+	test("Pascha 2020 → tone null (outside the eight-tone cycle)", () => {
+		const day = getLiturgicalDay({ year: 2020, month: 4, day: 19 });
+		assert.equal(day.tone, null);
+	});
+
+	test("Bright Monday 2020 → tone null", () => {
+		const day = getLiturgicalDay({ year: 2020, month: 4, day: 20 });
+		assert.equal(day.tone, null);
+	});
+
+	test("Thomas Sunday 2020 → tone 1", () => {
+		const day = getLiturgicalDay({ year: 2020, month: 4, day: 26 });
+		assert.equal(day.tone, 1);
+	});
+
+	test("Myrrhbearers Sunday 2020 → tone 2", () => {
+		const day = getLiturgicalDay({ year: 2020, month: 5, day: 3 });
+		assert.equal(day.tone, 2);
+	});
+
+	test("Ordinary time falls in 1..8", () => {
+		const day = getLiturgicalDay({ year: 2025, month: 10, day: 28 });
+		assert.ok(day.tone !== null, "expected a tone in ordinary time");
+		assert.ok(
+			day.tone >= 1 && day.tone <= 8,
+			`expected tone in 1..8, got ${day.tone}`,
+		);
+	});
+});
+

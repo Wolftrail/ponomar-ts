@@ -24,6 +24,11 @@ export interface LiturgicalDay {
 	/** Highest `church.rank` across `allSaints` (0 if none). Matches upstream
 	 * `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`. */
 	readonly dRank: number;
+	/** Resurrectional tone of the week (1..8), or `null` outside the
+	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
+	 * Matches upstream `Day.getTone()` — the last `<SAINT Tone="…">` value
+	 * encountered in paschal-then-menaion order, with `0` wrapped to `8`. */
+	readonly tone: number | null;
 }
 
 export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
@@ -34,17 +39,23 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const menaionSaints = menaion ? resolveSaints(menaion, context) : [];
 	const allSaints = [...paschalSaints, ...menaionSaints];
 	let dRank = 0;
+	let toneRaw: number | null = null;
 	for (const s of allSaints) {
 		if (s.church?.rank !== undefined && s.church.rank > dRank) {
 			dRank = s.church.rank;
 		}
+		// Upstream Day.java line 161: last SAINT with a Tone attribute wins;
+		// `-1` is the sentinel "unset" so we skip it.
+		if (s.tone !== null && s.tone !== -1) toneRaw = s.tone;
 	}
+	const tone = toneRaw === null ? null : toneRaw === 0 ? 8 : toneRaw;
 	return {
 		context,
 		paschalSaints,
 		menaionSaints,
 		allSaints,
 		dRank,
+		tone,
 	};
 }
 
