@@ -161,7 +161,7 @@ upstream Perl script output) for years 1900–2100.
 Verification: run corpus against evaluator; 100% match. Add ~30 hand-written
 unit tests covering precedence, unary ops, short-circuiting.
 
-### Phase 3 — Codegen: static rule data *(M1 part 3)*
+### Phase 3 — Codegen: static rule data *(M1 part 3)* — ✅ done
 
 - **3a.** `scripts/codegen/parse-commands-xml.ts` — read `DivineLiturgy.xml`,
   `Fasting.xml`, `ServiceRules.xml`, `ScriptureTransfers.xml`. Emit

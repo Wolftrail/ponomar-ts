@@ -49,6 +49,10 @@
     "./dsl": {
       "types": "./dist/core/dsl/index.d.ts",
       "import": "./dist/core/dsl/index.js"
+    },
+    "./data": {
+      "types": "./dist/data/index.d.ts",
+      "import": "./dist/data/index.js"
     }
   },
   "files": [
@@ -67,7 +71,7 @@
     "codegen": "node --experimental-strip-types scripts/codegen/index.ts",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+    "prepublishOnly": "npm run codegen -- --check && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

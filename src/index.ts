@@ -11,3 +11,4 @@ export * from "./paschalion.ts";
 export * as jdate from "./core/calendar/jdate.ts";
 export * as pcalendar from "./core/calendar/pcalendar.ts";
 export * as dsl from "./core/dsl/index.ts";
+export * as data from "./data/index.ts";
