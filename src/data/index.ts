@@ -12,4 +12,5 @@ export { MENAION } from "./menaion.ts";
 export { DIVINE_LITURGY_COMMANDS } from "./divineLiturgy.ts";
 export { FASTING_RULES } from "./fasting.ts";
 export { SERVICE_RULES } from "./serviceRules.ts";
+export { SERVICE_TEMPLATES } from "./serviceTemplates.ts";
 export { COMMEMORATIONS } from "./commemorations.ts";

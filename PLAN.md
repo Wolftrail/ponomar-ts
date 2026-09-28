@@ -335,7 +335,32 @@ Deviations from upstream:
 - `Matins.LeapReadings()` reads a shared `Information2` map populated by `DivineLiturgy1`. In the current corpus that table's Matins-scoped entries are empty and the method is a no-op — not ported.
 - Rule 1 (high-rank Sunday feast) is exercisable in principle but inert on the current corpus, since `<CHURCH Rank>` metadata is sparse (only 6/3371 cIds carry a rank at all). Consumers who supply their own high-rank menaion data will see it fire.
 
-#### Phase 8c — Service composition & Hour classes *(later)*
+#### Phase 8c-i — Service template composition *(shipped as `0.1.0-alpha.8`)*
+
+**Status: ✅ done.** First slice of `Ponomar/Service.java`: parses every language-neutral service template under `languages/xml/Services/` (`NinthHour`, `SixthHour`, `ThirdHour`, `Prime`, `PaschalHours`, `RoyalHours`, `UsualBeginning`, `Kathisma1`..`Kathisma20`, `Template`) into typed directive streams, and exposes a runtime that walks + filters + expands them for a given date and service-flag options. Does **not** resolve phrase text or scripture bodies — those stay opaque identifiers for consumers to render.
+
+- **8c-i.1 ✅ Types** — [src/data/types.ts](src/data/types.ts) gains `ServiceTemplate`, `ServiceTitle`, and a `ServiceDirective` union of `GetDirective` (include), `CreateDirective` (phrase), and `BibleDirective` (scripture — `verses` and `getReading` both optional to accommodate the two forms upstream ships).
+- **8c-i.2 ✅ Codegen** — [scripts/codegen/parseServiceTemplate.ts](scripts/codegen/parseServiceTemplate.ts) parses one `<SERVICES>` file, validates every `Cmd=` as DSL at build time, and normalises boolean flags (`RedFirst`, `NewLine`, `Header`, `Null`, `TwoStars` → only emitted when `="1"`). [scripts/codegen/emit.ts](scripts/codegen/emit.ts) `emitServiceTemplates` produces `src/data/serviceTemplates.ts` exporting `SERVICE_TEMPLATES: Readonly<Record<string, ServiceTemplate>>` keyed by file basename. Current corpus: **28 templates, 990 directives (683 CREATE, 270 BIBLE, 37 GET)**.
+- **8c-i.3 ✅ Runtime API** — [src/engine/compose.ts](src/engine/compose.ts) exposes `composeService(gregorian, templateName, options): ComposedService`. Options carry `PS` / `PFlag1` / `PFlag2` (defaulted to `0`) which overlay the day context for DSL guard evaluation. Walks directives in order, drops those whose `Cmd` evaluates false, and inline-expands `<GET File="…"/>` includes that resolve to another top-level template. Nested-path includes (`"Var/PTrop91"` etc., dynamically generated upstream by PrimeSelector and friends) are preserved as `get` directives so consumers can inject content post-hoc. Cycle-guarded via a `seen` set; depth-capped via `maxIncludeDepth` (default `4`).
+- **8c-i.4 ✅ Public API** — `composeService`, `ComposedService`, `ComposeServiceOptions`, and the directive types on the top barrel and `ponomar-ts/engine`.
+- **8c-i.5 ✅ Tests** — [tests/compose.test.ts](tests/compose.test.ts) covers codegen output (NinthHour title, UsualBeginning shape, Kathisma1's `TwoStars`, Prime's `getReading` form), DSL filtering (`PS` and `PFlag2` variants gate priest-only vs reader-only and Lenten vs Normal directives correctly), `<GET>` expansion (`PFlag1=0` inlines UsualBeginning, `PFlag1=1` skips it), and Var/-prefix preservation. 230/230 total tests pass.
+
+Deviations from upstream:
+
+- Phrase text lookup — Service.java resolves `What=` against `languages/<lang>/xml/Services/CommonPrayers/…`. That resolution is a per-language codegen step deferred to Phase 8c-ii.
+- Scripture bodies — `Verses=` and `getReading=` are opaque strings here; upstream loads text via `Bible.java`.
+- HTML rendering — CSS styling, header formatting, `Command` red-italic emission, etc. all belong to consumers.
+- Upstream's mutable `Analyse.dayInfo` map is replaced by an immutable per-call `dslContext`.
+
+#### Phase 8c-ii — Phrase text codegen *(later)*
+
+- Emit per-language `PHRASES_<LANG>: Readonly<Record<string, string>>` maps from `languages/<lang>/xml/Services/{CommonPrayers,Text,Header,Command,Var,Octoecheos}/*.xml`.
+- Add a runtime `resolvePhrase(directive, lang)` that maps a `CreateDirective.what` (or a `ServiceTitle.value` / `.source` / `.header`) to its language-specific `TEXT Value=`.
+- Language policy still English-only for now (`languages/en/…`); other languages ship if/when needed.
+
+#### Phase 8c-iii — Hour class wrappers *(later)*
+
+- Port `NinthHour.java`, `SixthHour.java`, `ThirdHour.java`, `RoyalHours.java`, `PaschalHours.java` as thin runtime helpers over `composeService` — mostly a matter of computing `PFlag1` / `PFlag2` / `PS` from the day context + user preference, then delegating.
 
 ### Phase 9 — Astronomy *(optional, standalone)*
 

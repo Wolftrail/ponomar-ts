@@ -182,3 +182,75 @@ export interface Life {
 	readonly translator?: string;
 	readonly repose?: string;
 }
+
+/**
+ * One `<SERVICES>` XML template under `languages/xml/Services/`
+ * (e.g. NinthHour.xml, UsualBeginning.xml, Kathisma1.xml). Represents an
+ * ordered stream of directives that compose a service.
+ *
+ * Text bodies live in per-language phrase XML and are NOT resolved by the
+ * codegen — a directive's `what` / `file` / `verses` are opaque identifiers
+ * that a consumer must map to phrase text.
+ */
+export interface ServiceTemplate {
+	/** Basename of the template file, sans `.xml` (e.g. `"NinthHour"`). */
+	readonly name: string;
+	readonly title?: ServiceTitle;
+	readonly directives: readonly ServiceDirective[];
+}
+
+/** `<TITLE>` element attributes. All fields are opaque phrase identifiers. */
+export interface ServiceTitle {
+	readonly value: string;
+	readonly source?: string;
+	readonly header?: string;
+	readonly comment?: string;
+}
+
+export type ServiceDirective =
+	| GetDirective
+	| CreateDirective
+	| BibleDirective;
+
+interface DirectiveBase {
+	/** Raw StringOp DSL guard, evaluated at compose time; missing means "always". */
+	readonly cmd?: string;
+}
+
+/** `<GET File="..." />` — include another template inline. */
+export interface GetDirective extends DirectiveBase {
+	readonly kind: "get";
+	readonly file: string;
+	/** `Null="1"` — upstream flag; consumers may treat true as "silently
+	 *  skip if target missing". */
+	readonly nullable?: boolean;
+}
+
+/** `<CREATE What="..." />` — inline a phrase from the language pack. */
+export interface CreateDirective extends DirectiveBase {
+	readonly kind: "create";
+	readonly what: string;
+	readonly who?: string;
+	readonly redFirst?: boolean;
+	readonly newLine?: boolean;
+	readonly times?: number;
+	readonly command?: string;
+	readonly commandB?: string;
+	readonly header?: boolean;
+}
+
+/** `<BIBLE Verses="..." />` — inline a scripture passage. */
+export interface BibleDirective extends DirectiveBase {
+	readonly kind: "bible";
+	/** Static passage reference (e.g. `"Psalm_5"`). Absent when
+	 *  `getReading` is supplied instead. */
+	readonly verses?: string;
+	/** Dynamic passage lookup key (e.g. `"Jerem"`) — resolved at runtime by
+	 *  the consumer against the day's scripture entries. */
+	readonly getReading?: string;
+	readonly who?: string;
+	readonly redFirst?: boolean;
+	readonly newLine?: boolean;
+	readonly header?: boolean;
+	readonly twoStars?: boolean;
+}
