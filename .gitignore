@@ -36,3 +36,8 @@ yarn-error.log*
 
 # Package outputs
 *.tgz
+
+# Vendored upstream repo is tracked as a git submodule under vendor/ponomar/;
+# no other content should be checked into vendor/.
+vendor/*
+!vendor/ponomar

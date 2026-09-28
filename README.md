@@ -46,6 +46,25 @@ Not yet published. Once released:
 npm install ponomar-ts
 ```
 
+## Development
+
+The upstream Ponomar Java repo is vendored as a git submodule under
+`vendor/ponomar/`, and its XML rule data is precompiled to typed TypeScript
+at build time by `scripts/codegen/`. The compiled library ships no XML and
+has no XML parser at runtime.
+
+```powershell
+git clone https://github.com/Wolftrail/ponomar-ts.git
+cd ponomar-ts
+git submodule update --init --recursive
+npm install
+npm run codegen      # regenerate src/data/ from vendor/ (once codegen lands)
+npm run typecheck
+npm test
+```
+
+See [PLAN.md](PLAN.md) for the port roadmap and phase breakdown.
+
 ## Usage
 
 ```ts

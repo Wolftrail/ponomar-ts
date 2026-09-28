@@ -52,6 +52,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "clean": "node --experimental-strip-types scripts/clean.ts",
+    "codegen": "node --experimental-strip-types scripts/codegen/index.ts",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"

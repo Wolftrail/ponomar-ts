@@ -1,0 +1,3 @@
+[submodule "vendor/ponomar"]
+	path = vendor/ponomar
+	url = https://github.com/typiconman/ponomar.git
