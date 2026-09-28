@@ -37,6 +37,14 @@
     "./paschalion": {
       "types": "./dist/paschalion.d.ts",
       "import": "./dist/paschalion.js"
+    },
+    "./calendar/jdate": {
+      "types": "./dist/core/calendar/jdate.d.ts",
+      "import": "./dist/core/calendar/jdate.js"
+    },
+    "./calendar/pcalendar": {
+      "types": "./dist/core/calendar/pcalendar.d.ts",
+      "import": "./dist/core/calendar/pcalendar.js"
     }
   },
   "files": [

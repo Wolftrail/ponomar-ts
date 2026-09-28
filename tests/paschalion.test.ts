@@ -2,8 +2,15 @@ import { strict as assert } from "node:assert";
 import { describe, it } from "node:test";
 import {
 	addDays,
+	getApostlesFastStart,
+	getAscension,
+	getCheesefare,
 	getJulianPascha,
+	getJulianPaschaRich,
+	getLentStart,
+	getMeatfare,
 	getOrthodoxPascha,
+	getPentecost,
 	julianToGregorianOffset,
 } from "../src/paschalion.ts";
 
@@ -104,5 +111,54 @@ describe("addDays", () => {
 			month: 12,
 			day: 29,
 		});
+	});
+});
+
+const MOVEABLE_FEAST_FIXTURES = [
+	{
+		year: 2020,
+		meatfare: { year: 2020, month: 2, day: 23 },
+		cheesefare: { year: 2020, month: 3, day: 1 },
+		lent: { year: 2020, month: 3, day: 2 },
+		pascha: { year: 2020, month: 4, day: 19 },
+		ascension: { year: 2020, month: 5, day: 28 },
+		pentecost: { year: 2020, month: 6, day: 7 },
+		apostles: { year: 2020, month: 6, day: 15 },
+	},
+	{
+		year: 2026,
+		meatfare: { year: 2026, month: 2, day: 15 },
+		cheesefare: { year: 2026, month: 2, day: 22 },
+		lent: { year: 2026, month: 2, day: 23 },
+		pascha: { year: 2026, month: 4, day: 12 },
+		ascension: { year: 2026, month: 5, day: 21 },
+		pentecost: { year: 2026, month: 5, day: 31 },
+		apostles: { year: 2026, month: 6, day: 8 },
+	},
+] as const;
+
+describe("moveable feasts", () => {
+	for (const f of MOVEABLE_FEAST_FIXTURES) {
+		it(`${f.year}: derived feasts match`, () => {
+			assert.deepEqual(getMeatfare(f.year), f.meatfare);
+			assert.deepEqual(getCheesefare(f.year), f.cheesefare);
+			assert.deepEqual(getLentStart(f.year), f.lent);
+			assert.deepEqual(getOrthodoxPascha(f.year), f.pascha);
+			assert.deepEqual(getAscension(f.year), f.ascension);
+			assert.deepEqual(getPentecost(f.year), f.pentecost);
+			assert.deepEqual(getApostlesFastStart(f.year), f.apostles);
+		});
+	}
+});
+
+describe("getJulianPaschaRich", () => {
+	it("returns Julian Y/M/D matching getJulianPascha, plus a JDN", () => {
+		const plain = getJulianPascha(2020);
+		const rich = getJulianPaschaRich(2020);
+		assert.equal(rich.year, plain.year);
+		assert.equal(rich.month, plain.month);
+		assert.equal(rich.day, plain.day);
+		assert.equal(typeof rich.jdn, "number");
+		assert.equal(Number.isInteger(rich.jdn), true);
 	});
 });

@@ -114,7 +114,7 @@ consumer date (Y/M/D)
 
 ## Phased roadmap
 
-### Phase 0 — Vendoring & scaffolding *(prerequisite; small)*
+### Phase 0 — Vendoring & scaffolding *(prerequisite; small)* — ✅ done
 
 - Add upstream as git submodule under `vendor/ponomar/` (pinned to current
   HEAD).
@@ -124,7 +124,7 @@ consumer date (Y/M/D)
 - Update [AGENTS.md](AGENTS.md) and [README.md](README.md) with the codegen
   workflow.
 
-### Phase 1 — Core calendar *(M1 part 1; foundation)*
+### Phase 1 — Core calendar *(M1 part 1; foundation)* — ✅ done
 
 Parallel-safe steps:
 
