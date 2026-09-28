@@ -56,6 +56,7 @@ export { resolveSaints } from "./resolve.ts";
 export type {
 	Church,
 	Commemoration,
+	Hymn,
 	Life,
 	SaintInfo,
 	SaintName,
@@ -80,3 +81,9 @@ export type {
 export { getOrderedLiturgyReadings } from "./orderedLiturgy.ts";
 export type { HourSelection, ServicesResult } from "./services.ts";
 export { getServices } from "./services.ts";
+export type {
+	DailyPropers,
+	GetPropersOptions,
+	ProperRef,
+} from "./propers.ts";
+export { getPropers } from "./propers.ts";

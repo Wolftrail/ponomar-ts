@@ -196,6 +196,7 @@ function mergeCommemoration(
 		...mergeOptional("church", older.church, newer.church),
 		...mergeOptional("info", older.info, newer.info),
 		scriptures: [...older.scriptures, ...newer.scriptures],
+		hymns: [...older.hymns, ...newer.hymns],
 	};
 	return merged;
 }

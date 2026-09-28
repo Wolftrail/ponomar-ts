@@ -301,7 +301,26 @@ Deviations from upstream (documented in the module header):
 - Rank inference klutz in `ServiceInfo.java` (a self-declared workaround that hard-coded `dRank` from doy/nday) is not ported. Ranks flow through `LiturgicalDay.dRank` from `<CHURCH Rank>` metadata, matching the upstream comment that the klutz "is unnecessary since the days can now be ranked properly."
 
 
-### Phase 8 — Service composition & commemorations *(later)*
+### Phase 8 — Service composition & commemorations *(in progress)*
+
+#### Phase 8a — Hymn propers *(shipped as `0.1.0-alpha.6`)*
+
+**Status: ✅ done.** First slice of `Commemoration1.java`: extract raw troparia and kontakia from lives XML into typed `Commemoration.hymns` entries, and expose them via `getPropers`. Does **not** compose full service order — that stays with `Service.java` in a later slice.
+
+- **8a.1 ✅ Types** — [src/data/types.ts](src/data/types.ts) gains `Hymn` (`kind: "troparion" | "kontakion"`, `service`, optional `type` / `tone` / `podoben` / `cmd`, `body`). `Commemoration.hymns: readonly Hymn[]`. `type` is optional because a handful of upstream XML files omit it.
+- **8a.2 ✅ Codegen** — [scripts/codegen/parseLife.ts](scripts/codegen/parseLife.ts) captures `<TROPARION>` and `<KONTAKION>` nested under `<SERVICE>` wrappers (LITURGY / MATINS / VESPERS / …), preserving inner text (HTML entities and inline tags intact). `Cmd=` is DSL-validated at build time. [scripts/codegen/emit.ts](scripts/codegen/emit.ts) `mergeCommemoration` concatenates `hymns` across the same cId's language-neutral and per-language sources, matching the existing `scriptures` merge.
+- **8a.3 ✅ Runtime API** — [src/engine/propers.ts](src/engine/propers.ts) exports `getPropers(gregorian, { service?, kind? }): DailyPropers`. Walks `LiturgicalDay.allSaints`, joins each cId with `COMMEMORATIONS[cId]`, applies the optional filters and the per-hymn DSL `Cmd` guard, and returns `{ context, troparia, kontakia }` in insertion order tagged with source (`paschal` / `menaion`).
+- **8a.4 ✅ Public API** — `getPropers`, `DailyPropers`, `ProperRef`, `GetPropersOptions`, `Hymn` exported from the top barrel and `ponomar-ts/engine`.
+- **8a.5 ✅ Tests** — [tests/propers.test.ts](tests/propers.test.ts) covers Nativity troparion + kontakion (both structurally on `COMMEMORATIONS["3174"]` and end-to-end on Jan 7 2021 Gregorian), corpus-wide hymn shape invariants, `service` / `kind` filters, and stability on ordinary weekdays / Pascha (where hymns live in Service.xml templates upstream so may be empty here). 208/208 total tests pass.
+
+Deferred to later Phase 8 slices:
+
+- `Service.java` template composition (weaving troparia / kontakia / stichera into a full service order string).
+- `Matins.java` reading conflict resolution (rank-based sequential-vs-menaion selection).
+- `RoyalHours.java`, `UsualBeginning.java`, `{Third,Sixth,Ninth}Hour.java` (mostly thin wrappers over Service).
+- Cross-day propers transfer analogous to the Lucan jump.
+
+#### Phase 8 — remaining scope
 
 - Port `Service.java`, `Commemoration1.java`, `Matins.java`, `RoyalHours.java`,
   `UsualBeginning.java`, `{Third,Sixth,Ninth}Hour.java`.

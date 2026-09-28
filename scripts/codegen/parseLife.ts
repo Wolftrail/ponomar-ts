@@ -7,6 +7,7 @@
 //   * `<CHURCH>`    → Church metadata (rank / cycle / tone)
 //   * `<INFO>`      → SaintInfo biographical anchors
 //   * `<SCRIPTURE>` → Scripture entries (Cmd guards are DSL-validated)
+//   * `<TROPARION>` / `<KONTAKION>` → Hymn entries with body text preserved
 //   * `<LIFE>`      → separate Life record (prose body + attribution)
 
 import { readFileSync } from "node:fs";
@@ -14,6 +15,7 @@ import { parse as parseDsl } from "../../src/core/dsl/parser.ts";
 import type {
 	Church,
 	Commemoration,
+	Hymn,
 	Life,
 	SaintInfo,
 	SaintName,
@@ -46,11 +48,12 @@ export function parseLifeFile(path: string, cId: string): ParsedLifeFile {
 		return { commemoration: null, life: null };
 	}
 	const scriptures: Scripture[] = [];
+	const hymns: Hymn[] = [];
 	let name: SaintName | undefined;
 	let church: Church | undefined;
 	let info: SaintInfo | undefined;
 	let life: Life | null = null;
-	visit(root, "unknown", scriptures, path, {
+	visit(root, "unknown", scriptures, hymns, path, {
 		set: (kind, v) => {
 			if (kind === "NAME") name = v as SaintName;
 			else if (kind === "CHURCH") church = v as Church;
@@ -60,6 +63,7 @@ export function parseLifeFile(path: string, cId: string): ParsedLifeFile {
 	});
 	const hasMeta =
 		scriptures.length > 0 ||
+		hymns.length > 0 ||
 		name !== undefined ||
 		church !== undefined ||
 		info !== undefined;
@@ -70,6 +74,7 @@ export function parseLifeFile(path: string, cId: string): ParsedLifeFile {
 				...(church !== undefined ? { church } : {}),
 				...(info !== undefined ? { info } : {}),
 				scriptures,
+				hymns,
 			}
 		: null;
 	return { commemoration, life };
@@ -82,13 +87,18 @@ interface Sink {
 function visit(
 	el: Element,
 	inheritedService: ServiceContext,
-	out: Scripture[],
+	scriptures: Scripture[],
+	hymns: Hymn[],
 	path: string,
 	sink: Sink,
 ): void {
 	const service = SERVICE_CONTEXTS[el.tag] ?? inheritedService;
 	if (el.tag === "SCRIPTURE") {
-		out.push(scriptureFromAttrs(el.attrs, service, path));
+		scriptures.push(scriptureFromAttrs(el.attrs, service, path));
+		return;
+	}
+	if (el.tag === "TROPARION" || el.tag === "KONTAKION") {
+		hymns.push(hymnFromElement(el, service, path));
 		return;
 	}
 	if (el.tag === "NAME") {
@@ -107,7 +117,8 @@ function visit(
 		sink.set("LIFE", lifeFromElement(el));
 		return;
 	}
-	for (const child of elementChildren(el)) visit(child, service, out, path, sink);
+	for (const child of elementChildren(el))
+		visit(child, service, scriptures, hymns, path, sink);
 }
 
 function scriptureFromAttrs(
@@ -222,6 +233,39 @@ function lifeFromElement(el: Element): Omit<Life, "cId"> {
 	pick(attrs, "Translator", out, "translator");
 	pick(attrs, "Repose", out, "repose");
 	return out as Omit<Life, "cId">;
+}
+
+function hymnFromElement(
+	el: Element,
+	service: ServiceContext,
+	path: string,
+): Hymn {
+	const kind: Hymn["kind"] =
+		el.tag === "TROPARION" ? "troparion" : "kontakion";
+	const type = el.attrs["Type"];
+	const tone = el.attrs["Tone"];
+	const podoben = el.attrs["Podoben"];
+	const cmd = el.attrs["Cmd"];
+	if (cmd !== undefined) {
+		try {
+			parseDsl(cmd);
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : String(e);
+			throw new Error(
+				`${path}: invalid DSL in ${el.tag} Cmd=${JSON.stringify(cmd)}: ${msg}`,
+			);
+		}
+	}
+	const body = collectText(el.children).trim();
+	return {
+		kind,
+		service,
+		...(type !== undefined ? { type } : {}),
+		...(tone !== undefined ? { tone } : {}),
+		...(podoben !== undefined ? { podoben } : {}),
+		...(cmd !== undefined ? { cmd } : {}),
+		body,
+	};
 }
 
 function collectText(nodes: readonly Node[]): string {

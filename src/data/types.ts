@@ -100,6 +100,29 @@ export interface Commemoration {
 	readonly church?: Church;
 	readonly info?: SaintInfo;
 	readonly scriptures: readonly Scripture[];
+	readonly hymns: readonly Hymn[];
+}
+
+/** A `<TROPARION>` or `<KONTAKION>` element from a lives XML file. */
+export interface Hymn {
+	/** Which hymn genre. Mirrors the XML element name. */
+	readonly kind: "troparion" | "kontakion";
+	/** Which service block the hymn was nested in (LITURGY / MATINS / …).
+	 *  `unknown` when the element appears outside any recognised wrapper. */
+	readonly service: ServiceContext;
+	/** Raw `Type` attribute — usually an ordinal like `"1"`, `"2"`, …
+	 *  Optional because a handful of upstream files omit it. */
+	readonly type?: string;
+	/** Raw `Tone` attribute — numeric literal or, rarely, a DSL expression. */
+	readonly tone?: string;
+	/** Melody/pattern reference (`<KONTAKION Podoben="…">`). */
+	readonly podoben?: string;
+	/** Raw StringOp DSL guard; evaluated at runtime. */
+	readonly cmd?: string;
+	/** Hymn text body. Contains HTML entities and inline tags
+	 *  (`<p>`, `<sup>`, `&#8212;`, …); consumers should sanitize before
+	 *  rendering to HTML. */
+	readonly body: string;
 }
 
 /** One `<RULE>` inside a `<PERIOD>` in Commands/Fasting.xml.
