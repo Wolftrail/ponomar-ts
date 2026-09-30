@@ -104,60 +104,6 @@ export const COMMEMORATIONS: Readonly<Record<string, Commemoration>> = {
 		"scriptures": [],
 		"hymns": []
 	},
-	"35": {
-		"cId": "35",
-		"name": {
-			"long": "Second Sunday of Lent",
-			"shortF": "for Sunday"
-		},
-		"church": {
-			"rank": 0,
-			"tone": "((ndayP - dow) / 7) % 8"
-		},
-		"scriptures": [
-			{
-				"service": "unknown",
-				"type": "matins",
-				"reading": "Lk_24:12-35",
-				"pericope": "113",
-				"cmd": "((ndayP / 7 - 7) % 11 == 5) && dRank != 6"
-			},
-			{
-				"service": "unknown",
-				"type": "matins",
-				"reading": "Lk_24:36-53",
-				"pericope": "114",
-				"cmd": "((ndayP / 7 - 7) % 11 == 6) && dRank != 6"
-			},
-			{
-				"service": "unknown",
-				"type": "matins",
-				"reading": "Jn_20:19-31",
-				"pericope": "65",
-				"cmd": "((ndayP / 7 - 7) % 11 == 9) && dRank != 6"
-			},
-			{
-				"service": "unknown",
-				"type": "matins",
-				"reading": "Jn_21:1-14",
-				"pericope": "66",
-				"cmd": "((ndayP / 7 - 7) % 11 == 10) && dRank != 6"
-			},
-			{
-				"service": "unknown",
-				"type": "apostol",
-				"reading": "Heb_1:10-2:3",
-				"pericope": "304"
-			},
-			{
-				"service": "unknown",
-				"type": "gospel",
-				"reading": "Mk_2:1-12",
-				"pericope": "7"
-			}
-		],
-		"hymns": []
-	},
 	"40": {
 		"cId": "40",
 		"name": {
@@ -452,66 +398,11 @@ export const COMMEMORATIONS: Readonly<Record<string, Commemoration>> = {
 	"134": {
 		"cId": "134",
 		"name": {
-			"long": "The Circumcision of Our Lord and Saviour Jesus Christ",
-			"shortN": "The Circumcision",
-			"shortF": "for the Circumcision",
 			"nominative": "Venerable Alexis the Man of God († 411)",
 			"short": "Venerable Alexis"
 		},
-		"church": {
-			"rank": 6
-		},
-		"scriptures": [
-			{
-				"service": "unknown",
-				"type": "vespers",
-				"reading": "Gen_17:1-7, 9-12, 14"
-			},
-			{
-				"service": "unknown",
-				"type": "vespers",
-				"reading": "Prov_8:22-30"
-			},
-			{
-				"service": "unknown",
-				"type": "vespers",
-				"reading": "Prov_10:31-32, 11:1-12"
-			},
-			{
-				"service": "unknown",
-				"type": "matins",
-				"reading": "Jn_10:9-16",
-				"pericope": "36",
-				"cmd": "dow != 0"
-			},
-			{
-				"service": "unknown",
-				"type": "apostol",
-				"reading": "Col_2:8-12",
-				"pericope": "254"
-			},
-			{
-				"service": "unknown",
-				"type": "gospel",
-				"reading": "Lk_2:20-21, 40-52",
-				"pericope": "6"
-			}
-		],
-		"hymns": [
-			{
-				"kind": "troparion",
-				"service": "unknown",
-				"tone": "1",
-				"body": "O Jesus, Who in the highest dost sit with Thine unoriginate Father and the divine Spirit upon a fiery throne, Thou wast well-pleased to be born on earth of Thy Mother, a Maiden who knew not man; wherefore, thou wast circumcised as a babe eight days of age. Glory to Thine all-good counsel! Glory to Thy dispensation! Glory to Thy condescension, O Thou Who alone lovest mankind!"
-			},
-			{
-				"kind": "kontakion",
-				"service": "unknown",
-				"tone": "3",
-				"podoben": "1",
-				"body": "The Lord of all endureth circumcision and, in that He is good, He cutteth away the transgressions of men and today granteth salvation to the world. And Basil, the high priest of the Creator, the radiant and divine initiate of the mysteries of Christ, rejoiceth on high."
-			}
-		]
+		"scriptures": [],
+		"hymns": []
 	},
 	"136": {
 		"cId": "136",
@@ -2535,21 +2426,7 @@ export const COMMEMORATIONS: Readonly<Record<string, Commemoration>> = {
 	"373": {
 		"cId": "373",
 		"name": {
-			"long": "Saint Basil the Great, Archbishop of Caesarea in Cappadocia (+376)",
-			"shortN": "Saint Basil",
-			"shortF": "for the Circumcision",
 			"nominative": "The Meeting of our Lord, God, and Saviour Jesus Christ in the Temple"
-		},
-		"church": {
-			"rank": 1
-		},
-		"info": {
-			"birthY": "330",
-			"birthN": "about",
-			"placeB": "Caesarea",
-			"deathY": "376",
-			"deathM": "1",
-			"deathD": "1"
 		},
 		"scriptures": [
 			{
@@ -2584,37 +2461,9 @@ export const COMMEMORATIONS: Readonly<Record<string, Commemoration>> = {
 				"type": "gospel",
 				"reading": "Lk_2:22b-40",
 				"pericope": "7"
-			},
-			{
-				"service": "unknown",
-				"type": "apostol",
-				"reading": "Heb_7:26-8:2",
-				"pericope": "318",
-				"cmd": "dow != 0 && dow != 6"
-			},
-			{
-				"service": "unknown",
-				"type": "gospel",
-				"reading": "Lk_6:17-23",
-				"pericope": "24",
-				"cmd": "dow != 0 && dow != 6"
 			}
 		],
-		"hymns": [
-			{
-				"kind": "troparion",
-				"service": "unknown",
-				"tone": "1",
-				"body": "Thy sound hath gone forth into all the earth, which hath received thy discourse, whereby thou didst divinely teach and make clear the nature of things, and didst adorn the ways of men. O venerable father, thou royal priesthood, entreat Christ God, that our souls be saved."
-			},
-			{
-				"kind": "kontakion",
-				"service": "unknown",
-				"tone": "4",
-				"podoben": "1",
-				"body": "Thou hast been shown to be the unshakable foundation of the Church, bestowing upon all men a dominion which cannot be taken away, and sealing them with thy precepts, O newly revealed and venerable Basil."
-			}
-		]
+		"hymns": []
 	},
 	"378": {
 		"cId": "378",
@@ -62532,56 +62381,5 @@ export const COMMEMORATIONS: Readonly<Record<string, Commemoration>> = {
 				"body": "Having forsaken the beauty of the world and the corruption therein, * thou didst take up thine abode in the Monastery of Sarov./And having lived there as an angel, thou didst become a path for many to salvation. * Wherefore, Christ hath glorified thee, O father Seraphim, * and enriched thee with the gift of healings and miracles. * Therefore, we cry out to thee: ** Rejoice, O our venerable father Seraphim!"
 			}
 		]
-	},
-	"F0": {
-		"cId": "F0",
-		"name": {
-			"shortN": "Sunday before Theophany",
-			"shortF": "for the Sunday before Theophany"
-		},
-		"church": {
-			"rank": 0
-		},
-		"scriptures": [
-			{
-				"service": "unknown",
-				"type": "apostol",
-				"reading": "II Tim_4:5-8",
-				"pericope": "298"
-			},
-			{
-				"service": "unknown",
-				"type": "gospel",
-				"reading": "Mk_1:1-8",
-				"pericope": "1"
-			}
-		],
-		"hymns": []
-	},
-	"F6": {
-		"cId": "F6",
-		"name": {
-			"long": "Sunday before Theophany",
-			"shortN": "Saturday before Theophany",
-			"shortF": "for the Saturday before Theophany"
-		},
-		"church": {
-			"rank": 0
-		},
-		"scriptures": [
-			{
-				"service": "unknown",
-				"type": "apostol",
-				"reading": "I Tim_3:14-4:5",
-				"pericope": "284"
-			},
-			{
-				"service": "unknown",
-				"type": "gospel",
-				"reading": "Mt_3:1-11",
-				"pericope": "5"
-			}
-		],
-		"hymns": []
 	}
 } as const;

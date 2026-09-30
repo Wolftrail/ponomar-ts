@@ -58,6 +58,11 @@ const emitted: EmittedFile[] = [
 	emitServiceTemplates(path.join(vendorXml, "Services")),
 	emitPhrases(path.join(vendorEnXml, "Services")),
 	emitBibleBooks(path.join(vendorXml, "bible.xml")),
+	// xml/Commemorations/<X>/<Y>.xml only contributes when X == Y (the
+	// "anchor" file per cycle group, e.g. 543/543.xml = Palamas). The
+	// cross-referenced overlay files (0/134.xml, 123/373.xml, etc.) use
+	// their basename as an inner-namespace key that collides with unrelated
+	// cIds elsewhere; emit.ts filters them out.
 	emitCommemorations([
 		path.join(vendorXml, "lives"),
 		path.join(vendorXml, "Commemorations"),

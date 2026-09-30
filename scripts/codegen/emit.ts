@@ -213,7 +213,8 @@ export function emitBibleBooks(file: string): EmittedFile {
  */
 export function emitCommemorations(roots: readonly string[]): EmittedFile {
 	const map: Record<string, Commemoration> = {};
-	for (const root of roots) collectXmlFiles(root, (file, cId) => {
+	for (const root of roots) collectXmlFiles(root, (file, cId, parentDir) => {
+		if (!acceptCommemorationsFile(root, cId, parentDir)) return;
 		const { commemoration } = parseLifeFile(file, cId);
 		if (commemoration !== null) {
 			map[cId] = mergeCommemoration(map[cId], commemoration);
@@ -232,7 +233,8 @@ export function emitCommemorations(roots: readonly string[]): EmittedFile {
  * wins and any missing attribution fields fill from other sources. */
 export function emitLives(roots: readonly string[]): EmittedFile {
 	const map: Record<string, Life> = {};
-	for (const root of roots) collectXmlFiles(root, (file, cId) => {
+	for (const root of roots) collectXmlFiles(root, (file, cId, parentDir) => {
+		if (!acceptCommemorationsFile(root, cId, parentDir)) return;
 		const { life } = parseLifeFile(file, cId);
 		if (life !== null) map[cId] = mergeLife(map[cId], life);
 	});
@@ -242,6 +244,21 @@ export function emitLives(roots: readonly string[]): EmittedFile {
 		`export const LIVES: Readonly<Record<string, Life>> = ${json(sortKeys(map))} as const;\n`,
 	].join("\n");
 	return { relPath: "lives.ts", content: body };
+}
+
+/** For files under `xml/Commemorations/<X>/<Y>.xml`, only accept when
+ *  `X == Y`. Upstream stores cross-referenced overlays in that tree using
+ *  the child basename as an inner-namespace key (not a real cId), which
+ *  collides with unrelated cIds elsewhere and corrupts them via field
+ *  merge (e.g. `Commemorations/0/134.xml` is Circumcision text but menaion
+ *  cId 134 is Alexis). Files outside `Commemorations/` are always accepted. */
+function acceptCommemorationsFile(
+	root: string,
+	cId: string,
+	parentDir: string,
+): boolean {
+	if (!root.includes("Commemorations")) return true;
+	return parentDir === cId;
 }
 
 function mergeCommemoration(
@@ -297,7 +314,7 @@ function pickDefined<T extends object>(o: T): Partial<T> {
 
 function collectXmlFiles(
 	root: string,
-	onFile: (fullPath: string, cId: string) => void,
+	onFile: (fullPath: string, cId: string, parentDir: string) => void,
 ): void {
 	if (!existsSync(root)) return;
 	const stack: string[] = [root];
@@ -312,7 +329,7 @@ function collectXmlFiles(
 			}
 			if (!/\.xml$/.test(entry)) continue;
 			const cId = entry.replace(/\.xml$/, "");
-			onFile(full, cId);
+			onFile(full, cId, path.basename(dir));
 		}
 	}
 }
