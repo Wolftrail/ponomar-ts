@@ -90,6 +90,7 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "node --experimental-strip-types scripts/clean.ts",
     "codegen": "node --experimental-strip-types scripts/codegen/index.ts",
+    "scrape:htoc": "node --experimental-strip-types scripts/scrape-htoc.ts",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run codegen -- --check && npm run typecheck && npm test && npm run build"

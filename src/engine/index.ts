@@ -8,6 +8,8 @@
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
+import { getHtocDayRank, getHtocSaintsFor } from "./htocSaints.ts";
+import type { HtocSaint } from "./htocSaints.ts";
 import { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
 import type { ResolvedSaint } from "./resolve.ts";
 import { resolveSaints } from "./resolve.ts";
@@ -21,9 +23,17 @@ export interface LiturgicalDay {
 	readonly menaionSaints: readonly ResolvedSaint[];
 	/** Union of paschalSaints then menaionSaints, in that order. */
 	readonly allSaints: readonly ResolvedSaint[];
+	/** HTOC (ROCOR / Jordanville) saint commemorations for this date, or
+	 *  `[]` outside the vendored 2025–2027 coverage window. Parallel to
+	 *  `allSaints`; not deduped against Ponomar entries. */
+	readonly htocSaints: readonly HtocSaint[];
 	/** Highest `church.rank` across `allSaints` (0 if none). Matches upstream
 	 * `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`. */
 	readonly dRank: number;
+	/** Highest rank across `htocSaints` on Ponomar's numeric scale (via
+	 *  `mapHtocRank`). `0` when HTOC has no ranked commemoration or the
+	 *  date is outside coverage. */
+	readonly htocDRank: number;
 	/** Resurrectional tone of the week (1..8), or `null` outside the
 	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
 	 * Matches upstream `Day.getTone()` — the last `<SAINT Tone="…">` value
@@ -38,6 +48,8 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const paschalSaints = paschal ? resolveSaints(paschal, context) : [];
 	const menaionSaints = menaion ? resolveSaints(menaion, context) : [];
 	const allSaints = [...paschalSaints, ...menaionSaints];
+	const htocSaints = getHtocSaintsFor(gregorian) ?? [];
+	const htocDRank = getHtocDayRank(gregorian);
 	let dRank = 0;
 	let toneRaw: number | null = null;
 	for (const s of allSaints) {
@@ -54,7 +66,9 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 		paschalSaints,
 		menaionSaints,
 		allSaints,
+		htocSaints,
 		dRank,
+		htocDRank,
 		tone,
 	};
 }
@@ -78,6 +92,23 @@ export type {
 	ReadingRef,
 } from "./readings.ts";
 export { getDailyReadings, getLiturgyReadings } from "./readings.ts";
+export type { ResurrectionMatinsGospel } from "./matinsGospel.ts";
+export {
+	RESURRECTION_MATINS_GOSPELS,
+	getResurrectionMatinsGospel,
+} from "./matinsGospel.ts";
+export type { HtocDailyLectionaryEntry } from "./dailyLectionary.ts";
+export {
+	HTOC_DAILY_LECTIONARY,
+	getHtocDailyLectionary,
+} from "./dailyLectionary.ts";
+export type { HtocSaint } from "./htocSaints.ts";
+export {
+	HTOC_SAINTS_BY_ISO,
+	getHtocSaintsFor,
+	getHtocDayRank,
+	mapHtocRank,
+} from "./htocSaints.ts";
 export type {
 	FastingCase,
 	FastingLevel,
@@ -108,9 +139,10 @@ export { composeService } from "./compose.ts";
 export type {
 	GetHourServiceOptions,
 	HourName,
+	HourReadings,
 	HourServiceResult,
 } from "./hours.ts";
-export { getHourService } from "./hours.ts";
+export { getHourReadings, getHourService } from "./hours.ts";
 export type { ResolvedTitle } from "./phrases.ts";
 export {
 	getPhrase,

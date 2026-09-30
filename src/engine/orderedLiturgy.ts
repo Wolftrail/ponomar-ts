@@ -178,6 +178,11 @@ function pickByType(
 }
 
 function rankOf(cId: string): "sequential" | "festal" {
+	// HTOC daily-lectionary override picks are the rjadovoje readings — the
+	// direct analogue of the 9xxx sequential placeholders — and must sort
+	// under the "sequential" bucket for Saturday inversion and Suppress /
+	// Class3Transfers evaluation to behave correctly.
+	if (cId === "htoc:daily-lectionary") return "sequential";
 	if (!/^\d+$/.test(cId)) return "festal";
 	const n = parseInt(cId, 10);
 	return n >= 9000 && n < 9900 && cId.length === 4 ? "sequential" : "festal";

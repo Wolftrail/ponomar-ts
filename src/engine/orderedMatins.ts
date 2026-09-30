@@ -54,7 +54,9 @@ export function getOrderedMatinsReadings(
 
 	const classified: OrderedMatinsReading[] = raw.map((r) => ({
 		...r,
-		rank: r.source === "paschal" ? "sequential" : "festal",
+		rank: r.source === "paschal" || r.source === "cycle"
+			? "sequential"
+			: "festal",
 	}));
 
 	const refs: OrderedMatinsReading[] = [];

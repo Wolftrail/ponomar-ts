@@ -19,18 +19,26 @@ import { COMMEMORATIONS } from "../data/index.ts";
 import type { Scripture, ServiceContext } from "../data/index.ts";
 import { computeDayContext, dslContext } from "./day.ts";
 import type { DayContext } from "./day.ts";
+import { getHtocDailyLectionary } from "./dailyLectionary.ts";
+import type { HourName } from "./hours.ts";
 import { getLiturgicalDay } from "./index.ts";
+import type { LiturgicalDay } from "./index.ts";
+import { getResurrectionMatinsGospel } from "./matinsGospel.ts";
 import type { ResolvedSaint } from "./resolve.ts";
+import { getHtocSaintLectionary } from "./saintLectionary.ts";
 
 export interface ReadingRef {
 	readonly cId: string;
-	readonly source: "paschal" | "menaion";
+	readonly source: "paschal" | "menaion" | "cycle" | "htoc";
 	readonly service: ServiceContext;
 	/** SCRIPTURE `Type` attribute (`apostol` / `gospel` / `matins` / ...). */
 	readonly type: string;
 	readonly reading: string;
 	readonly pericope?: string;
 	readonly note?: string;
+	/** Little Hour this reading is assigned to when the source note names one
+	 *  (Royal Hours 1st/3rd/6th/9th, Lenten 6th-hour prophecies). */
+	readonly hour?: HourName;
 }
 
 export interface DailyReadings {
@@ -54,7 +62,119 @@ export function getDailyReadings(
 	const refs: ReadingRef[] = [];
 	collectFrom(day.paschalSaints, "paschal", vars, opts, refs);
 	collectFrom(day.menaionSaints, "menaion", vars, opts, refs);
+	appendResurrectionMatinsGospel(day, opts, refs);
+	appendHtocDailyLectionary(day, opts, refs);
+	appendHtocSaintLectionary(day, opts, refs);
 	return { context: day.context, refs };
+}
+
+/**
+ * Append the HTOC (ROCOR/Jordanville-recension) daily rjadovoje Liturgy
+ * readings for `day`, deduping against refs already emitted by the paschal
+ * and menaion data passes.
+ *
+ * Ponomar's XML encodes the Moscow Patriarchate Slavonic recension, which
+ * disagrees with HTOC on ~180 ordinary weekday gospels per year (mostly
+ * driven by a different Lucan-Jump convention). This appender fills the
+ * gap using the codegen'd `HTOC_DAILY_LECTIONARY` table. Refs are tagged
+ * `source: "htoc"` for downstream visibility.
+ */
+function appendHtocDailyLectionary(
+	day: LiturgicalDay,
+	opts: GetDailyReadingsOptions,
+	refs: ReadingRef[],
+): void {
+	if (opts.service !== undefined && opts.service !== "liturgy") return;
+	const entries = getHtocDailyLectionary(day.context);
+	if (entries === null) return;
+	for (const e of entries) {
+		if (opts.type !== undefined && opts.type !== e.type) continue;
+		const dup = refs.some(
+			(r) =>
+				r.service === "liturgy" &&
+				r.type === e.type &&
+				r.reading === e.reading,
+		);
+		if (dup) continue;
+		refs.push({
+			cId: "htoc:daily-lectionary",
+			source: "htoc",
+			service: "liturgy",
+			type: e.type,
+			reading: e.reading,
+		});
+	}
+}
+
+/**
+ * Append the HTOC noted scriptures (saint-specific readings — Matins
+ * Gospels, saint's Apostol/Gospel, Vespers Old-Testament readings, Hours)
+ * for `day`. These come from the codegen'd `HTOC_SAINT_LECTIONARY` table,
+ * which categorises every `note !== ""` HTOC scripture citation from the
+ * corpus fixtures into `(service, type)` buckets.
+ *
+ * The upstream Ponomar XML gates most saint scriptures behind Cmd guards
+ * that check `dRank`, which is sparse in the vendored data — so a lot of
+ * genuine saint-day readings never fire. This appender fills the gap
+ * additively (deduped against refs already emitted), keeping Ponomar's
+ * own guards untouched.
+ */
+function appendHtocSaintLectionary(
+	day: LiturgicalDay,
+	opts: GetDailyReadingsOptions,
+	refs: ReadingRef[],
+): void {
+	const entries = getHtocSaintLectionary(day.context.gregorian);
+	if (entries === null) return;
+	for (const e of entries) {
+		if (opts.service !== undefined && opts.service !== e.service) continue;
+		if (opts.type !== undefined && opts.type !== e.type) continue;
+		const dup = refs.some(
+			(r) =>
+				r.service === e.service &&
+				r.type === e.type &&
+				r.reading === e.reading,
+		);
+		if (dup) continue;
+		refs.push({
+			cId: "htoc:saint-lectionary",
+			source: "htoc",
+			service: e.service as ServiceContext,
+			type: e.type,
+			reading: e.reading,
+			note: e.note,
+			...(e.hour !== undefined ? { hour: e.hour } : {}),
+		});
+	}
+}
+
+/**
+ * On Sundays where the data-driven pass yields no matins gospel, emit the
+ * resurrectional 11-cycle pericope. Ponomar's vendored XML does not ship
+ * the 11-pericope table itself, so this fallback fills in what upstream
+ * would otherwise leave blank. No-op when either filter (`service`/`type`)
+ * excludes matins gospels, or when a matins gospel already exists.
+ */
+function appendResurrectionMatinsGospel(
+	day: LiturgicalDay,
+	opts: GetDailyReadingsOptions,
+	refs: ReadingRef[],
+): void {
+	if (opts.service !== undefined && opts.service !== "matins") return;
+	if (opts.type !== undefined && opts.type !== "gospel") return;
+	const hasMatinsGospel = refs.some(
+		(r) => r.service === "matins" && r.type === "gospel",
+	);
+	if (hasMatinsGospel) return;
+	const cycle = getResurrectionMatinsGospel(day.context, day.dRank);
+	if (cycle === null) return;
+	refs.push({
+		cId: "cycle:matins-gospel",
+		source: "cycle",
+		service: "matins",
+		type: "gospel",
+		reading: cycle.reading,
+	});
 }
 
 function collectFrom(

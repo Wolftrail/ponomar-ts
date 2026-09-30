@@ -41,3 +41,12 @@ yarn-error.log*
 # no other content should be checked into vendor/.
 vendor/*
 !vendor/ponomar
+
+# Third-party research corpora (scraped for reverse-engineering only, not
+# redistributed). See scripts/scrape-htoc.ts and scripts/scrape-htoc-full.ts.
+tests/fixtures/htoc.json
+tests/fixtures/htoc-full-*.json
+
+# Analysis outputs (see scripts/analysis/).
+scratch/
+

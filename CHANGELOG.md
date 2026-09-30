@@ -9,6 +9,21 @@ The public API is anything re-exported from
 `package.json` `exports`. Anything else is internal and may change without
 notice.
 
+## [Unreleased]
+
+### Added
+
+- HTOC saint-lectionary override: noted HTOC scripture citations (Matins
+  Gospels, saint-specific Liturgy Apostol/Gospel pairs, Vespers OT
+  readings, etc.) are now appended to `getDailyReadings` output as
+  `source: "htoc"` refs, deduped against the paschal / menaion / daily-
+  lectionary passes. Backed by the codegen'd `HTOC_SAINT_LECTIONARY`
+  table (2162 refs across 710 dates in the 2025–2027 corpus window) and
+  exposed via `getHtocSaintLectionary` on the `ponomar-ts/engine/saint-
+  lectionary` deep import. Reading coverage against the HTOC corpus rose
+  from 88.8% to **97.9%**; average per-day HTOC-only readings fell from
+  0.42 to 0.08.
+
 ## [1.0.0-rc.0] — 2026-09-28
 
 First release candidate. The engine is feature-complete against the ported

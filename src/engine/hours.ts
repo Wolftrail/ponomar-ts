@@ -23,9 +23,12 @@
 // auto-derived from `HourSelection.type` when the caller doesn't set it.
 
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
+import type { ServiceContext } from "../data/types.ts";
 import type { ComposedService } from "./compose.ts";
 import { composeService } from "./compose.ts";
 import type { DayContext } from "./day.ts";
+import { getDailyReadings } from "./readings.ts";
+import type { ReadingRef } from "./readings.ts";
 import { getServices } from "./services.ts";
 import type { HourSelection, ServicesResult } from "./services.ts";
 
@@ -122,4 +125,41 @@ function pickSelection(
 		case "ninth":
 			return services.none;
 	}
+}
+
+/** Ponomar `ServiceContext` tag for each Little Hour. */
+const HOUR_SERVICE: Readonly<Record<HourName, ServiceContext>> = {
+	prime: "primes",
+	third: "terce",
+	sixth: "sexte",
+	ninth: "none",
+};
+
+export interface HourReadings {
+	readonly context: DayContext;
+	readonly hour: HourName;
+	readonly refs: readonly ReadingRef[];
+}
+
+/** Scripture readings prescribed for a specific Little Hour on `gregorian`.
+ *
+ *  Sources combined via the `HourName → ServiceContext` mapping
+ *  (`prime → primes`, `third → terce`, `sixth → sexte`, `ninth → none`):
+ *   - Ponomar SCRIPTURE entries wrapped in the matching hour service —
+ *     e.g. Holy Week Ezekiel prophecies at the Sixth Hour.
+ *   - HTOC noted readings whose `hour` matches (the codegen routes them to
+ *     the same `ServiceContext` bucket): Royal Hours (Nativity Eve,
+ *     Theophany Eve, Great Friday) and Lenten sixth-hour Isaiah prophecies.
+ *
+ *  Returns readings regardless of whether the corresponding
+ *  `getHourService(...)` composition would run today; callers already
+ *  gate presentation on that. */
+export function getHourReadings(
+	gregorian: CalendarDate,
+	hour: HourName,
+): HourReadings {
+	const { context, refs } = getDailyReadings(gregorian, {
+		service: HOUR_SERVICE[hour],
+	});
+	return { context, hour, refs };
 }

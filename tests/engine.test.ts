@@ -11,6 +11,8 @@ import {
 	selectMenaionEntry,
 	selectPaschalCycleEntry,
 } from "../src/engine/index.ts";
+import { getOrthodoxPascha } from "../src/paschalion.ts";
+import { addDays } from "../src/core/calendar/pcalendar.ts";
 
 describe("computeDayContext", () => {
 	test("Pascha 2020 falls on nday=0 with dow=0 (Sunday)", () => {
@@ -127,7 +129,9 @@ describe("getLiturgicalDay", () => {
 describe("getLiturgicalDay: rank overlay", () => {
 	// Upstream ships <CHURCH Rank=...> on only ~6 XML files; the overlay
 	// (src/data/rankOverlay.ts) supplies ranks for Pascha, the Twelve Great
-	// Feasts, Bright Week, and a handful of vigil-rank saints.
+	// Feasts, and a handful of vigil-rank saints. Bright Week days are
+	// intentionally *not* in the overlay — they are paschal continuation, not
+	// individual Great Feasts.
 
 	test("Pascha 2020 → dRank 8, cId 9001 carries rank 8", () => {
 		const day = getLiturgicalDay({ year: 2020, month: 4, day: 19 });
@@ -137,11 +141,11 @@ describe("getLiturgicalDay: rank overlay", () => {
 		assert.equal(pascha.church?.rank, 8);
 	});
 
-	test("Bright Monday 2020 → dRank 7 via cId 9002", () => {
+	test("Bright Monday 2020 → dRank 0 (paschal continuation, no overlay)", () => {
 		// Julian Apr 7 2020 = Gregorian Apr 20 2020, day after Pascha.
 		const day = getLiturgicalDay({ year: 2020, month: 4, day: 20 });
-		assert.equal(day.dRank, 7);
 		assert.ok(day.paschalSaints.some((s) => s.cId === "9002"));
+		assert.equal(day.dRank, 0);
 	});
 
 	test("Nativity of Christ → dRank 7 via cId 3174", () => {
@@ -179,13 +183,78 @@ describe("getLiturgicalDay: rank overlay", () => {
 	test("overlay preserves non-rank <CHURCH> attributes when present", () => {
 		// cId 373 is one of the six upstream-ranked records: it also carries
 		// no cycle/tone, so the safest assertion is that after overlay it
-		// carries the overlaid rank (7 = Meeting of the Lord).
+		// carries the overlaid rank. Slavic Typikon convention places the
+		// Meeting on the Theotokos side of the ladder at 6 (not 7).
 		// Julian Feb 2 = Gregorian Feb 15 2024.
 		const day = getLiturgicalDay({ year: 2024, month: 2, day: 15 });
 		const meeting = day.menaionSaints.find((s) => s.cId === "373");
 		assert.ok(meeting, "expected cId 373 in menaion saints");
-		assert.equal(meeting.church?.rank, 7);
-		assert.equal(day.dRank, 7);
+		assert.equal(meeting.church?.rank, 6);
+		assert.equal(day.dRank, 6);
+	});
+
+	test("Protection of the Theotokos → dRank 6 via cId 1638", () => {
+		// Julian Oct 1 = Gregorian Oct 14 2024. HTOC / Russian tradition
+		// elevates Protection to Great-Feast rank.
+		const day = getLiturgicalDay({ year: 2024, month: 10, day: 14 });
+		const protection = day.menaionSaints.find((s) => s.cId === "1638");
+		assert.equal(protection?.church?.rank, 6);
+		assert.equal(day.dRank, 6);
+	});
+
+	test("Circumcision + St. Basil → dRank 4 via cId 010101", () => {
+		// Julian Jan 1 = Gregorian Jan 14 2024. Polyeleos rank reflects that
+		// the Slavic service is dominated by St. Basil's Polyeleos rather
+		// than the Lord's Middle Feast.
+		const day = getLiturgicalDay({ year: 2024, month: 1, day: 14 });
+		const feast = day.menaionSaints.find((s) => s.cId === "010101");
+		assert.equal(feast?.church?.rank, 4);
+		assert.equal(day.dRank, 4);
+	});
+});
+
+describe("getLiturgicalDay: movable Great Feasts (long range)", () => {
+	// Palm Sunday / Ascension / Pentecost are computed off Pascha (Gauss'
+	// formula) and their DayEntries live in fixed positions in the triodion
+	// / pentecostarion arrays. Walk a 56-year span to lock in the invariant
+	// that the rank overlay resolves the same across arbitrary years.
+	const startYear = 2020;
+	const endYear = 2076;
+
+	for (const year of [startYear, 2033, 2050, 2075, endYear]) {
+		const pascha = getOrthodoxPascha(year);
+
+		test(`Palm Sunday ${year} → dRank 7 via cId 9807`, () => {
+			const palm = addDays(pascha, -7);
+			const day = getLiturgicalDay(palm);
+			assert.equal(day.context.nday, -7);
+			assert.ok(day.paschalSaints.some((s) => s.cId === "9807"));
+			assert.equal(day.dRank, 7);
+		});
+
+		test(`Ascension ${year} → dRank 7 via cId 9040`, () => {
+			const asc = addDays(pascha, 39);
+			const day = getLiturgicalDay(asc);
+			assert.equal(day.context.nday, 39);
+			assert.ok(day.paschalSaints.some((s) => s.cId === "9040"));
+			assert.equal(day.dRank, 7);
+		});
+
+		test(`Pentecost ${year} → dRank 7 via cId 9050`, () => {
+			const pent = addDays(pascha, 49);
+			const day = getLiturgicalDay(pent);
+			assert.equal(day.context.nday, 49);
+			assert.ok(day.paschalSaints.some((s) => s.cId === "9050"));
+			assert.equal(day.dRank, 7);
+		});
+	}
+
+	test(`Pascha itself → dRank 8 across the ${endYear - startYear + 1}-year span`, () => {
+		for (let y = startYear; y <= endYear; y++) {
+			const day = getLiturgicalDay(getOrthodoxPascha(y));
+			assert.equal(day.dRank, 8, `Pascha ${y} should be dRank 8`);
+			assert.equal(day.context.nday, 0);
+		}
 	});
 });
 

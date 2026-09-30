@@ -11,10 +11,11 @@
 // Convention (higher = more festive, matching upstream DSL usage in
 // `DivineLiturgy.xml`, `Fasting.xml`, `Matins.java`):
 //   8 — Pascha
-//   7 — Great Feast of the Lord / Bright Week
-//   6 — Great Feast of the Theotokos
+//   7 — Great Feast of the Lord (Bright Week days omitted — see note below)
+//   6 — Great Feast of the Theotokos (incl. Meeting per Slavic Typikon,
+//       Protection per Russian / ROCOR elevation)
 //   5 — Vigil-rank (major polyeleos saint / lesser dominical feast)
-//   4 — Polyeleos    (unused by this overlay; upstream data owns these)
+//   4 — Polyeleos (Circumcision + Basil; upstream data owns the rest)
 //   3 — Doxology     (unused)
 //   2 — Six-stichera (unused)
 //   1 — Simple daily (unused)
@@ -32,16 +33,13 @@ export const RANK_OVERLAY: Readonly<Record<string, number>> = Object.freeze({
 	// ── Rank 8 — Pascha ────────────────────────────────────────────────
 	"9001": 8, // PASCHA
 
-	// ── Rank 7 — Great Feasts of the Lord + Bright Week ────────────────
-	"9002": 7, // Bright Monday
-	"9003": 7, // Bright Tuesday
-	"9004": 7, // Bright Wednesday
-	"9005": 7, // Bright Thursday
-	"9006": 7, // Bright Friday (Life-Giving Spring)
-	"9007": 7, // Bright Saturday
+	// ── Rank 7 — Great Feasts of the Lord ──────────────────────────────
+	// Bright Week days (9002-9007) are intentionally omitted: HTOC and most
+	// calendars treat the week following Pascha as paschal continuation, not
+	// as individual Great Feasts. Bright-Week festal behavior in the engine
+	// flows from `nday ∈ [0, 6]` guards in the service DSL, not from `dRank`.
 	"3174": 7, // Nativity of Christ (Dec 25 Julian)
 	"163": 7, // Theophany (Jan 6 Julian)
-	"373": 7, // Meeting of the Lord (Feb 2 Julian)
 	"9807": 7, // Palm Sunday / Entry into Jerusalem
 	"9040": 7, // Ascension (nday +39)
 	"9050": 7, // Pentecost (nday +49)
@@ -49,17 +47,28 @@ export const RANK_OVERLAY: Readonly<Record<string, number>> = Object.freeze({
 	"1529": 7, // Elevation of the Cross (Sep 14 Julian)
 
 	// ── Rank 6 — Great Feasts of the Theotokos ─────────────────────────
+	// Meeting (373) follows the Slavic Typikon which places the Feb 2 Julian
+	// feast on the Theotokos side of the ladder despite it being a Feast of
+	// the Lord in the Byzantine reckoning. Protection (1638) is elevated to
+	// Great-Feast rank in the Russian / ROCOR tradition — matching HTOC's
+	// rank-6 tag — even though the Byzantine typikon files it as Vigil (5).
+	"373": 6, // Meeting of the Lord (Feb 2 Julian)
 	"1479": 6, // Nativity of the Theotokos (Sep 8 Julian)
 	"2575": 6, // Entry of the Theotokos (Nov 21 Julian)
 	"707": 6, // Annunciation (Mar 25 Julian)
 	"4444": 6, // Dormition (Aug 15 Julian)
+	"1638": 6, // Protection of the Theotokos (Oct 1 Julian)
 
 	// ── Rank 5 — Vigil-rank / lesser dominical & major-saint feasts ────
-	"010101": 5, // Circumcision of the Lord (Jan 1 Julian)
 	"3050": 5, // Nativity of the Forerunner (Jun 24 Julian)
 	"09785": 5, // Ss. Peter and Paul (Jun 29 Julian)
 	"91007": 5, // Beheading of the Forerunner (Aug 29 Julian)
-	"1638": 5, // Protection of the Theotokos (Oct 1 Julian)
+
+	// ── Rank 4 — Polyeleos ─────────────────────────────────────────────
+	// Circumcision (010101) is a Feast of the Lord of Middle Rank, but the
+	// Slavic Typikon service is dominated by the Polyeleos co-celebration of
+	// St. Basil the Great; net rank sits at Polyeleos (4) rather than Vigil.
+	"010101": 4, // Circumcision of the Lord (Jan 1 Julian) + Basil the Great
 });
 
 /** Lookup helper: returns the overlaid rank for `cId`, or `undefined`. */
