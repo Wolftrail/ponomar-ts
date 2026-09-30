@@ -220,25 +220,33 @@ function refKey(ref: BibleRef): string {
  * Parse an HTOC-style citation like `"II Peter 1:10-19"` or
  * `"Genesis 5:32-6:8"` into a `BibleRef`.
  *
- * HTOC / typical English rendering has three quirks Ponomar's ref DSL does
- * not accept directly:
+ * HTOC / typical English rendering has quirks Ponomar's ref DSL does not
+ * accept directly:
  *   - Multi-word book names use spaces (`II Peter`). Ponomar tolerates this
  *     because `parseBibleRef` looks up `BIBLE_BOOK_ALIASES["II Peter"]`.
  *   - Arabic-numeral prefixes (`1 Corinthians`, `2 Peter`, `3 John`) are
  *     translated to Roman for alias lookup.
  *   - Multi-chapter ranges use `;` (`Titus 2:11-14; 3:4-7`); Ponomar uses
  *     `,` to separate ranges.
+ *   - Some HTOC pages drop the trailing `s` on plural book names
+ *     (`Colossian 1:24-29`, `Ephesian 5:8`); we alias the singular forms.
+ *   - HTOC occasionally renders a cross-chapter range with a redundant
+ *     start-of-chapter marker (`Titus 1:15-2:1-10` = "1:15 through 2:10");
+ *     we collapse the tri-part `-N:1-M` pattern to `-N:M`.
+ *   - HTOC alternative-reading citations parenthesize the alternate
+ *     (`John 20:1-10 (or Luke 24:36-53)`); we drop the parenthetical and
+ *     keep the primary reference.
  */
 export function tryParseCitation(citation: string): BibleRef | null {
 	let cleaned = citation.trim().replace(/\s+/g, " ");
-	// Arabic → Roman for the book prefix.
+	cleaned = cleaned.replace(/\s*\(or [^)]+\)\s*$/i, "");
 	cleaned = cleaned.replace(
 		/^([123])\s+(?=[A-Z])/,
 		(_m, n: string) => `${({ "1": "I", "2": "II", "3": "III" } as Record<string, string>)[n]!} `,
 	);
-	// HTOC's "; " separates ranges — Ponomar wants ", ".
 	cleaned = cleaned.replace(/;\s*/g, ", ");
-	// Book name = everything up to the first space-then-digit boundary.
+	cleaned = cleaned.replace(/^(Colossian|Ephesian|Philippian|Thessalonian|Galatian|Roman|Hebrew)(\s+\d)/i, "$1s$2");
+	cleaned = cleaned.replace(/(\d):(\d+)-(\d+):1-(\d+)(?=\D|$)/g, "$1:$2-$3:$4");
 	const m = /^(.+?)\s+(\d)/.exec(cleaned);
 	if (m === null) return null;
 	const book = m[1]!;
@@ -270,11 +278,15 @@ export function compareReadings(
 	});
 	const usedEngine = new Set<number>();
 	const matchedIndices = new Set<number>();
+	// Allow one engine ref to satisfy multiple identical HTOC entries: HTOC
+	// often lists the same reading under two different `note` tags when two
+	// saints commemorated on the same day share it (e.g. Jan 2 Heb 4:14-5:6
+	// is listed once for St John and again for Hieromartyr Ignatius). One
+	// canonical engine emission covers both intentions.
 	for (let hi = 0; hi < htoc.length; hi++) {
 		const k = htocKeys[hi];
 		if (k === null) continue;
 		for (let ei = 0; ei < engine.length; ei++) {
-			if (usedEngine.has(ei)) continue;
 			if (engineKeys[ei] === k) {
 				usedEngine.add(ei);
 				matchedIndices.add(hi);
