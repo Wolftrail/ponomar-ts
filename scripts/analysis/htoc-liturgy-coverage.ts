@@ -8,7 +8,7 @@ import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../../src/engine/orderedMatins.ts";
 import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
-import { compareReadings, tryParseCitation } from "./comparators.ts";
+import { compareReadings, readingRefMatchesCitation, tryParseCitation } from "./comparators.ts";
 import { iterCorpus } from "./corpus.ts";
 import type { HtocScriptureReading } from "./corpus.ts";
 
@@ -109,16 +109,29 @@ for (const { iso, day } of iterCorpus()) {
 		const e = engineByBucket.get(b) ?? [];
 		if (h.length === 0 && e.length === 0) continue;
 		const cmp = compareReadings(h, e);
-		perBucket[b].matched += cmp.matched;
-		perBucket[b].htocOnly += cmp.htocOnly.length;
+		let matched = cmp.matched;
+		let htocOnly = cmp.htocOnly.length;
+		if (b === "liturgy" && cmp.htocOnly.length > 0) {
+			// Rescue Great-Feast Matins gospels HTOC leaves untagged; engine
+			// tags them with a Matins Gospel ordinal (`"1".."11"`), not `"gospel"`.
+			const matinsGospels = (engineByBucket.get("matins") ?? []).filter((r) => /^(Mt|Mk|Lk|Jn)_/.test(r.reading));
+			for (const m of cmp.htocOnly) {
+				if (matinsGospels.some((g) => readingRefMatchesCitation(g, m.citation))) {
+					matched++;
+					htocOnly--;
+				}
+			}
+		}
+		perBucket[b].matched += matched;
+		perBucket[b].htocOnly += htocOnly;
 		perBucket[b].engineOnly += cmp.engineOnly.length;
 		if (b === "liturgy") {
-			const delta = cmp.htocOnly.length + cmp.engineOnly.length;
+			const delta = htocOnly + cmp.engineOnly.length;
 			if (delta > 0) {
 				worstLiturgyDays.push({
 					iso,
 					delta,
-					htocOnly: cmp.htocOnly.length,
+					htocOnly,
 					engineOnly: cmp.engineOnly.length,
 				});
 			}

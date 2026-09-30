@@ -6,7 +6,7 @@ import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../../src/engine/orderedMatins.ts";
 import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
-import { compareReadings, tryParseCitation } from "./comparators.ts";
+import { compareReadings, readingRefMatchesCitation, tryParseCitation } from "./comparators.ts";
 import { iterCorpus } from "./corpus.ts";
 import type { HtocScriptureReading } from "./corpus.ts";
 
@@ -59,13 +59,21 @@ const misses: Miss[] = [];
 
 for (const { iso, day } of iterCorpus()) {
 	const cal = toCal(iso);
-	const engineBag = collectEngineReadings(cal).filter((r) => bucketEngine(r) === "liturgy");
+	const engineBag = collectEngineReadings(cal);
+	const engineLiturgy = engineBag.filter((r) => bucketEngine(r) === "liturgy");
+	// Great-Feast Matins gospels (Nativity, Theophany) are untagged in HTOC
+	// and land in the Liturgy bucket; the engine emits them under `matins`
+	// with type `"1".."11"` (Matins Gospel ordinal), not `"gospel"`.
+	const engineMatinsGospels = engineBag.filter((r) => r.service === "matins" && /^(Mt|Mk|Lk|Jn)_/.test(r.reading));
 	const htocLiturgy: HtocScriptureReading[] = [];
 	for (const r of day.scripture) {
 		if (bucketHtoc(r.note ?? "") === "liturgy") htocLiturgy.push(r);
 	}
-	const cmp = compareReadings(htocLiturgy, engineBag);
+	const cmp = compareReadings(htocLiturgy, engineLiturgy);
 	for (const m of cmp.htocOnly) {
+		if (engineMatinsGospels.some((g) => readingRefMatchesCitation(g, m.citation))) {
+			continue;
+		}
 		misses.push({ iso, citation: m.citation, note: m.note ?? "" });
 	}
 }
