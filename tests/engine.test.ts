@@ -109,9 +109,11 @@ describe("getLiturgicalDay", () => {
 		const day = getLiturgicalDay({ year: 2024, month: 1, day: 7 });
 		const nativity = day.menaionSaints.find((s) => s.cId === "3174");
 		assert.ok(nativity, "expected cId 3174 in menaion saints");
+		// `nominative` is overlaid with the HTOC canonical wording, which
+		// expands to "The Nativity according to the Flesh of Our Lord…".
 		assert.match(
 			nativity.name?.nominative ?? "",
-			/Nativity of our Lord/i,
+			/Nativity.*Our Lord/i,
 		);
 		assert.equal(nativity.name?.short, "Nativity");
 	});
@@ -163,10 +165,13 @@ describe("getLiturgicalDay: rank overlay", () => {
 		assert.equal(dormition?.church?.rank, 6);
 	});
 
-	test("Beheading of the Forerunner → dRank 5 via cId 91007", () => {
-		// Julian Aug 29 = Gregorian Sep 11 2024.
+	test("Beheading of the Forerunner → dRank 6 via cId 91007", () => {
+		// Julian Aug 29 = Gregorian Sep 11 2024. One of the three Great-Feast
+		// tier saint commemorations in Russian usage (alongside Nativity &
+		// Beheading of the Forerunner and Ss. Peter & Paul); HTOC tags it
+		// with the Great-Feast glyph.
 		const day = getLiturgicalDay({ year: 2024, month: 9, day: 11 });
-		assert.equal(day.dRank, 5);
+		assert.equal(day.dRank, 6);
 	});
 
 	test("Ordinary Tuesday → dRank 0 (no overlay hit)", () => {
@@ -202,14 +207,15 @@ describe("getLiturgicalDay: rank overlay", () => {
 		assert.equal(day.dRank, 6);
 	});
 
-	test("Circumcision + St. Basil → dRank 4 via cId 010101", () => {
-		// Julian Jan 1 = Gregorian Jan 14 2024. Polyeleos rank reflects that
-		// the Slavic service is dominated by St. Basil's Polyeleos rather
-		// than the Lord's Middle Feast.
+	test("Circumcision + St. Basil → dRank 6 via cId 010101", () => {
+		// Julian Jan 1 = Gregorian Jan 14 2024. HTOC tags Circumcision with
+		// rank-glyph 6 (Great-Feast tier) in Russian / Slavic usage, so the
+		// overlay rank sits at 6 despite the service structure resembling
+		// a Polyeleos co-celebration of St. Basil.
 		const day = getLiturgicalDay({ year: 2024, month: 1, day: 14 });
 		const feast = day.menaionSaints.find((s) => s.cId === "010101");
-		assert.equal(feast?.church?.rank, 4);
-		assert.equal(day.dRank, 4);
+		assert.equal(feast?.church?.rank, 6);
+		assert.equal(day.dRank, 6);
 	});
 });
 

@@ -17,3 +17,4 @@ export { PHRASES } from "./phrases.ts";
 export { BIBLE_BOOKS, BIBLE_BOOK_ALIASES } from "./bibleBooks.ts";
 export { COMMEMORATIONS } from "./commemorations.ts";
 export { RANK_OVERLAY, getOverlayRank } from "./rankOverlay.ts";
+export { HTOC_NAME_OVERLAY } from "./htocNameOverlay.ts";

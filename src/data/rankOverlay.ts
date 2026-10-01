@@ -12,8 +12,9 @@
 // `DivineLiturgy.xml`, `Fasting.xml`, `Matins.java`):
 //   8 — Pascha
 //   7 — Great Feast of the Lord (Bright Week days omitted — see note below)
-//   6 — Great Feast of the Theotokos (incl. Meeting per Slavic Typikon,
-//       Protection per Russian / ROCOR elevation)
+//   6 — Great Feast of the Theotokos / Great-Feast tier major-saint feasts
+//       (Peter & Paul, Nativity + Beheading of the Forerunner — HTOC
+//       tags them with rank glyph "6" in Russian / Slavic usage)
 //   5 — Vigil-rank (major polyeleos saint / lesser dominical feast)
 //   4 — Polyeleos (Circumcision + Basil; upstream data owns the rest)
 //   3 — Doxology     (unused)
@@ -46,29 +47,37 @@ export const RANK_OVERLAY: Readonly<Record<string, number>> = Object.freeze({
 	"4386": 7, // Transfiguration (Aug 6 Julian)
 	"1529": 7, // Elevation of the Cross (Sep 14 Julian)
 
-	// ── Rank 6 — Great Feasts of the Theotokos ─────────────────────────
+	// ── Rank 6 — Great Feasts of the Theotokos + major-saint feasts ────
 	// Meeting (373) follows the Slavic Typikon which places the Feb 2 Julian
 	// feast on the Theotokos side of the ladder despite it being a Feast of
 	// the Lord in the Byzantine reckoning. Protection (1638) is elevated to
 	// Great-Feast rank in the Russian / ROCOR tradition — matching HTOC's
 	// rank-6 tag — even though the Byzantine typikon files it as Vigil (5).
+	// The three Forerunner / Peter-and-Paul feasts (3050, 09785, 91007) are
+	// not among the Twelve but are traditionally celebrated at Great-Feast
+	// tier in Russian / HTOC usage ("три великих праздника святых"), so we
+	// put them here rather than at rank 5.
 	"373": 6, // Meeting of the Lord (Feb 2 Julian)
 	"1479": 6, // Nativity of the Theotokos (Sep 8 Julian)
 	"2575": 6, // Entry of the Theotokos (Nov 21 Julian)
 	"707": 6, // Annunciation (Mar 25 Julian)
 	"4444": 6, // Dormition (Aug 15 Julian)
 	"1638": 6, // Protection of the Theotokos (Oct 1 Julian)
+	"3050": 6, // Nativity of the Forerunner (Jun 24 Julian)
+	"09785": 6, // Ss. Peter and Paul (Jun 29 Julian)
+	"91007": 6, // Beheading of the Forerunner (Aug 29 Julian)
+	// Circumcision is a dominical feast co-celebrated with St. Basil the
+	// Great; HTOC tags it rank-glyph "6" (Great-Feast tier) despite the
+	// service structure resembling a Polyeleos. We follow HTOC.
+	"010101": 6, // Circumcision of the Lord (Jan 1 Julian) + Basil the Great
 
 	// ── Rank 5 — Vigil-rank / lesser dominical & major-saint feasts ────
-	"3050": 5, // Nativity of the Forerunner (Jun 24 Julian)
-	"09785": 5, // Ss. Peter and Paul (Jun 29 Julian)
-	"91007": 5, // Beheading of the Forerunner (Aug 29 Julian)
+	// (Upstream Ponomar XML owns these ranks for the few saints it marks;
+	// nothing to curate here right now.)
 
 	// ── Rank 4 — Polyeleos ─────────────────────────────────────────────
-	// Circumcision (010101) is a Feast of the Lord of Middle Rank, but the
-	// Slavic Typikon service is dominated by the Polyeleos co-celebration of
-	// St. Basil the Great; net rank sits at Polyeleos (4) rather than Vigil.
-	"010101": 4, // Circumcision of the Lord (Jan 1 Julian) + Basil the Great
+	// (Upstream Ponomar XML owns these ranks for the few saints it marks;
+	// nothing to curate here right now.)
 });
 
 /** Lookup helper: returns the overlaid rank for `cId`, or `undefined`. */

@@ -75,6 +75,10 @@ export function tokens(input: string): Set<string> {
 		.replace(/<[^>]+>/g, " ")
 		.replace(/&nbsp;/g, " ")
 		.replace(/&amp;/g, "&")
+		// Drop parenthesized asides so e.g. HTOC's movable-feast annotations
+		// like "(movable holiday on the Trinity Sunday)" don't leak tokens
+		// into the match (false-positive on Pentecost).
+		.replace(/\([^)]*\)/g, " ")
 		.replace(/[\d(),.:;!?—–\-'`"“”]/g, " ")
 		.toLowerCase();
 	const out = new Set<string>();
@@ -145,7 +149,17 @@ export function compareCommemorations(
 			if (et.size === 0) continue;
 			let overlap = 0;
 			for (const t of et) if (ht.has(t)) overlap++;
-			if (overlap >= 2) cands.push({ hi, ei, overlap });
+			// Match if ≥2 content tokens overlap, OR either side is a subset
+			// of the other with ≥1 overlap. The subset rule rescues short
+			// feast titles like "Circumcision of our Lord" where stop-wording
+			// leaves just `{circumcision}` on the engine side.
+			if (overlap === 0) continue;
+			if (overlap < 2) {
+				const engineSubset = overlap === et.size;
+				const htocSubset = overlap === ht.size;
+				if (!engineSubset && !htocSubset) continue;
+			}
+			cands.push({ hi, ei, overlap });
 		}
 	}
 	cands.sort((a, b) => b.overlap - a.overlap);

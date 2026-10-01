@@ -12,7 +12,7 @@ import type {
 	SaintInfo,
 	SaintName,
 } from "../data/index.ts";
-import { COMMEMORATIONS, RANK_OVERLAY } from "../data/index.ts";
+import { COMMEMORATIONS, HTOC_NAME_OVERLAY, RANK_OVERLAY } from "../data/index.ts";
 import type { DayContext } from "./day.ts";
 import { dslContext } from "./day.ts";
 
@@ -45,17 +45,30 @@ export function resolveSaints(
 		if (s.cmd !== undefined && !evaluateBool(s.cmd, vars)) continue;
 		const meta = COMMEMORATIONS[s.cId];
 		const church = applyRankOverlay(s.cId, meta?.church);
+		const name = applyNameOverlay(s.cId, meta?.name);
 		out.push({
 			sIds: s.sIds,
 			cId: s.cId,
 			...(s.src !== undefined ? { src: s.src } : {}),
 			tone: resolveTone(s, vars),
-			...(meta?.name !== undefined ? { name: meta.name } : {}),
+			...(name !== undefined ? { name } : {}),
 			...(church !== undefined ? { church } : {}),
 			...(meta?.info !== undefined ? { info: meta.info } : {}),
 		});
 	}
 	return out;
+}
+
+// Overlay HTOC's canonical English wording onto `name.nominative` when
+// present. All other `SaintName` fields (short/long/shortN/shortF/index)
+// are preserved from upstream; nominative is treated as HTOC-authoritative.
+function applyNameOverlay(
+	cId: string,
+	meta: SaintName | undefined,
+): SaintName | undefined {
+	const overlay = HTOC_NAME_OVERLAY[cId];
+	if (overlay === undefined) return meta;
+	return { ...(meta ?? {}), nominative: overlay };
 }
 
 // The overlay authoritatively supplies `rank` for the curated cIds. If the
