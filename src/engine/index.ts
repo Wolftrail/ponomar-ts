@@ -8,6 +8,8 @@
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
+import { getHtocDayFacts } from "./htocDayFacts.ts";
+import type { HtocHymn } from "./htocDayFacts.ts";
 import { getHtocDayRank, getHtocSaintsFor, unmapHtocRank } from "./htocSaints.ts";
 import type { HtocSaint } from "./htocSaints.ts";
 import { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
@@ -23,6 +25,20 @@ export interface LiturgicalDay {
 	 *  structural lists below (with the HTOC name overlay applied to
 	 *  `text`). Prefer this for display. */
 	readonly saints: readonly HtocSaint[];
+	/** HTOC's header line, e.g. `"28 th Week after Pentecost. Tone two."`.
+	 *  Empty string for dates outside the vendored HTOC coverage window. */
+	readonly headerText: string;
+	/** HTOC's fast-rule display string. Empty on non-fast days and for
+	 *  dates outside the vendored HTOC coverage window; see `getFasting`
+	 *  for the structured `FastingPermissions`. */
+	readonly fastText: string;
+	/** Day's troparia as published by HTOC (titles + text + saint linkage
+	 *  via `slug` to `saints[].slug`). Empty for dates outside the
+	 *  vendored HTOC coverage window. */
+	readonly troparia: readonly HtocHymn[];
+	/** Day's kontakia as published by HTOC. See the note on
+	 *  {@link LiturgicalDay.troparia}. */
+	readonly kontakia: readonly HtocHymn[];
 	/** Structural saints from the paschal cycle (pentecostarion / triodion),
 	 *  Cmd-filtered. Keyed by Ponomar `cId`; carries `tone` and `church.rank`.
 	 *  Used internally for `dRank`, `tone`, readings, and propers; prefer
@@ -60,6 +76,11 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 		? htocCovered
 		: projectPonomarSaints(paschalSaints, menaionSaints);
 	const htocDRank = htocCovered !== null ? getHtocDayRank(gregorian) : 0;
+	const htocFacts = getHtocDayFacts(gregorian);
+	const headerText = htocFacts?.headerText ?? "";
+	const fastText = htocFacts?.fastText ?? "";
+	const troparia = htocFacts?.troparia ?? [];
+	const kontakia = htocFacts?.kontakia ?? [];
 	let dRank = 0;
 	let toneRaw: number | null = null;
 	for (const s of allSaints) {
@@ -74,6 +95,10 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	return {
 		context,
 		saints,
+		headerText,
+		fastText,
+		troparia,
+		kontakia,
 		paschalSaints,
 		menaionSaints,
 		allSaints,
@@ -150,6 +175,8 @@ export {
 	mapHtocRank,
 	unmapHtocRank,
 } from "./htocSaints.ts";
+export type { HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
+export { HTOC_DAY_FACTS_BY_ISO, getHtocDayFacts } from "./htocDayFacts.ts";
 export type {
 	FastingCase,
 	FastingLevel,

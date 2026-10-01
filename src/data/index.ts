@@ -18,3 +18,9 @@ export { BIBLE_BOOKS, BIBLE_BOOK_ALIASES } from "./bibleBooks.ts";
 export { COMMEMORATIONS } from "./commemorations.ts";
 export { RANK_OVERLAY, getOverlayRank } from "./rankOverlay.ts";
 export { HTOC_NAME_OVERLAY } from "./htocNameOverlay.ts";
+export {
+	HTOC_DAY_FACTS_BY_ISO,
+	HTOC_DAY_FACTS_TROPARIA_COUNT,
+	HTOC_DAY_FACTS_KONTAKIA_COUNT,
+} from "./htocDayFacts.ts";
+export type { HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
