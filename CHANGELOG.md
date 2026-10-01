@@ -11,6 +11,13 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] — 2026-10-01
+
+Second release candidate. Reorients the user-facing data layer around
+HTOC (Jordanville / ROCOR) as the single source of truth for tone,
+propers, readings, and the day's commemoration list, and documents the
+Russian Orthodox jurisdictional scope.
+
 ### Added
 
 - `LiturgicalDay.commemorations` — the full HTOC day-page commemoration
@@ -68,6 +75,17 @@ notice.
   lectionary` deep import. Reading coverage against the HTOC corpus rose
   from 88.8% to **97.9%**; average per-day HTOC-only readings fell from
   0.42 to 0.08.
+
+### Documented
+
+- README.md and LIMITATIONS.md now state explicitly that ponomar-ts
+  follows **Russian Orthodox** usage (Jerusalem Typicon, Slavic
+  recension) as published by Holy Trinity Monastery, Jordanville
+  (ROCOR). Julian ("Old Calendar") menaion, Russian monastic charter
+  fasting, Russian-recension commemorations (including twentieth-century
+  New Hieromartyrs), English display text. Greek / Antiochian /
+  New-Calendar / Old Rite / Athonite variant usage are explicitly out
+  of scope.
 
 ## [1.0.0-rc.0] — 2026-09-28
 
