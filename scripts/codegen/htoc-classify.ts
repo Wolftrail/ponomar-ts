@@ -51,7 +51,14 @@ export interface ClassifiedOccurrence extends Occurrence {
 }
 
 function textKey(c: HtocCommemoration): string {
-	return `${c.rank}|${c.minor ? 1 : 0}|${c.text}|${c.lives.map((l) => l.slug).join(",")}`;
+	// Normalize interior whitespace so variants like "September 3rd" and
+	// "September 3 rd" land in a single group (otherwise a 1-occurrence
+	// whitespace variant looks like a fixed-julian 1×1 feast).
+	const normText = c.text
+		.replace(/\s+/g, " ")
+		.replace(/(\d)\s+(st|nd|rd|th)\b/gi, "$1$2")
+		.trim();
+	return `${c.rank}|${c.minor ? 1 : 0}|${normText}|${c.lives.map((l) => l.slug).join(",")}`;
 }
 
 function matchesAny(text: string, patterns: readonly RegExp[]): boolean {
@@ -92,13 +99,21 @@ export function classifyAll(): ClassifiedOccurrence[] {
 			textClass.set(k, "transferred");
 			continue;
 		}
+		// HTOC self-identifies movable entries with a "movable" parenthetical.
+		// Protect these from accidental fixed-julian classification caused by
+		// 1-year/1-key singletons (sometimes HTOC drops the parenthetical in
+		// other years' listings or shifts the rank, splitting the text group).
+		const isSelfDescribedMovable = /\bmovable\b/i.test(sample);
 		const julianKeys = new Set(group.map((o) => o.julianKey));
 		const ndays = new Set(group.map((o) => o.nday));
 		const years = new Set(group.map((o) => o.year));
+		// Dedupe to one entry per (year, julianKey) pair so upstream duplicate
+		// listings on a single day don't throw off the stability math.
+		const yearJulianPairs = new Set(group.map((o) => `${o.year}|${o.julianKey}`));
 		// Multi-day fixed feasts: every (year × julianKey) combination is
 		// occupied. Includes the single-Julian case (julianKeys.size===1) and
 		// shared-text-across-saints case (one entry per date per year).
-		if (group.length === years.size * julianKeys.size) {
+		if (!isSelfDescribedMovable && yearJulianPairs.size === years.size * julianKeys.size) {
 			textClass.set(k, "fixed-julian");
 			continue;
 		}

@@ -219,6 +219,7 @@ export {
 export { renderHtocHeaderText } from "./headerText.ts";
 export {
 	getCommemorationsForAnyYear,
+	getDowMovables,
 	getFixedCommemorations,
 	getPaschalMovables,
 	getSeasonCommemorations,
