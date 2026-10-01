@@ -59,8 +59,10 @@ export interface LiturgicalDay {
 	readonly htocDRank: number;
 	/** Resurrectional tone of the week (1..8), or `null` outside the
 	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
-	 * Matches upstream `Day.getTone()` — the last `<SAINT Tone="…">` value
-	 * encountered in paschal-then-menaion order, with `0` wrapped to `8`. */
+	 * For dates in the vendored HTOC coverage window (2025–2027) this is
+	 * HTOC's printed tone verbatim; outside, it falls back to upstream
+	 * `Day.getTone()` — the last `<SAINT Tone="…">` value encountered in
+	 * paschal-then-menaion order, with `0` wrapped to `8`. */
 	readonly tone: number | null;
 }
 
@@ -91,7 +93,10 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 		// `-1` is the sentinel "unset" so we skip it.
 		if (s.tone !== null && s.tone !== -1) toneRaw = s.tone;
 	}
-	const tone = toneRaw === null ? null : toneRaw === 0 ? 8 : toneRaw;
+	const engineTone = toneRaw === null ? null : toneRaw === 0 ? 8 : toneRaw;
+	// Prefer HTOC's printed tone within the vendored window; fall back to
+	// the engine computation outside.
+	const tone = htocFacts !== null ? htocFacts.tone : engineTone;
 	return {
 		context,
 		saints,

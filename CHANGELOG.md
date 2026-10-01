@@ -13,6 +13,18 @@ notice.
 
 ### Changed
 
+- `LiturgicalDay.tone` now returns HTOC's printed tone verbatim for dates
+  within the vendored HTOC coverage window (2025–2027). Outside the
+  window the engine's `Day.getTone()` port (last `<SAINT Tone="…">`
+  value, `0 → 8`) remains the fallback. This aligns `ponomar-ts` with
+  HTOC's pastoral display convention — in particular, the engine's
+  behaviour of printing a tone on Ascension / Trinity Saturday /
+  Pentecost week (24 days/3-year corpus) and on Thomas Sunday
+  (3 days/3-year corpus) is now suppressed in favour of HTOC's choice
+  (background weekly tone / null respectively). There are no
+  algorithmic mismatches between HTOC and the engine on days where
+  both print a tone; the overlay only changes which days are printed
+  as `null`.
 - `getPropers(date)` now sources troparia and kontakia verbatim from HTOC
   (via `htocDayFacts.ts`) instead of composing them from upstream Ponomar
   `<TROPARION>` / `<KONTAKION>` XML. HTOC is the single source of truth
