@@ -11,6 +11,8 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.2] — 2026-10-01
+
 ### Fixed
 
 - `getOrderedLiturgyReadings` no longer surfaces Ponomar's structural
