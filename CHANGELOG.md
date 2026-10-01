@@ -11,6 +11,26 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.10] — 2026-10-01
+
+### Changed
+
+- **HTOC data-file size reduction via codegen interning.** The two
+  largest vendored data modules now emit interned pools instead of
+  flat object literals, and rehydrate the public `ReadonlyMap` shapes
+  at module load. No public API, type, or value changes — every
+  consumer sees identical `HtocDayFacts` / `HtocSaint` instances.
+  - [src/data/htocDayFacts.ts](src/data/htocDayFacts.ts): 3.81 MB →
+    1.20 MB (−68.5%). Pools: 200 header lines, 23 fast rules, 908
+    hymn titles, 993 hymn texts, 5,286 commemoration texts, 2,927
+    shared `[name, slug]` life/saint refs.
+  - [src/data/htocSaints.ts](src/data/htocSaints.ts): 1.17 MB →
+    0.44 MB (−62.4%). Each canonical saint commemoration is interned
+    once (2,331 entries) and referenced by integer index from the
+    per-day buckets.
+  - Published tarball: 4.4 MB → 3.7 MB (−16%); unpacked install:
+    25.2 MB → 21.9 MB (−13%).
+
 ## [1.0.0-rc.9] — 2026-10-01
 
 ### Removed
