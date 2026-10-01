@@ -1,80 +1,15 @@
-// Codegen: decomposes `HTOC_DAY_FACTS_BY_ISO.commemorations` into a
-// Julian-cycle fixed table that works for ANY year. Season markers that
-// are synthesized at runtime from the season classifier are excluded here,
-// as are movable overlays (handled in later phases).
+// Codegen: emits the fixed-Julian commemoration cycle.
+// Consumes the shared classifier in `htoc-classify.ts`.
 //
 // Run:   node --experimental-strip-types scripts/codegen/htoc-fixed-commemorations.ts
-// Reads: src/data/htocDayFacts.ts (indirectly, via HTOC_DAY_FACTS_BY_ISO)
 // Emits: src/data/htocFixedCommemorations.ts
 
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../../src/data/htocDayFacts.ts";
-import type { HtocCommemoration } from "../../src/data/htocDayFacts.ts";
-import { computeDayContext } from "../../src/engine/day.ts";
+import { classifyAll } from "./htoc-classify.ts";
 
 const OUTPUT = resolve(process.cwd(), "src/data/htocFixedCommemorations.ts");
-
-// Text patterns for entries that are NOT fixed-Julian commemorations.
-// These are either synthesized at runtime from the season classifier or
-// belong to a later layer (paschal/triodion/DOW-shift movables).
-const EXCLUDE_PATTERNS: readonly RegExp[] = [
-	// Season markers synthesized by getSeasonCommemorations.
-	/^Clean Monday\.$/,
-	/^From December 25 till January 5 is a Fast-free period/,
-	/^Beginning of Apostles'/,
-	/^Beginning of the Dormition Fast/,
-	/^Beginning of Nativity Fast/,
-	/^Beginning of the Nativity Fast/,
-	// Movable overlays (Phase C2+).
-	/\(\s*movable holiday on/i,
-	/\(\s*movable feast on/i,
-	/\(\s*celebration on/i,
-	// DOW-shift movables (Phase C2+).
-	/^(Saturday|Sunday) (before|after) the (Nativity|Theophany|Baptism)/i,
-	/^(Saturday|Sunday) (before|after) the Universal Elevation/i,
-	/^(Saturday|Sunday) the (Nativity|Theophany|Baptism)/i,
-	// Paschal-cycle day-level entries (Phase C2+).
-	/^The Bright Resurrection of Christ/,
-	/^The Entry of the Lord into Jerusalem/,
-	/^Passion Week:/,
-	/^Bright (Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)\.$/,
-	/^Pentecost – Trinity Sunday\.$/,
-	/^Day Of the Holy Spirit\./,
-	/^Third Day of the Holy Trinity\./,
-	/^Afterfeast of Pentecost\./,
-	/^Apodosis of Pentecost\./,
-	/^(First|Second|Third|Fourth|Fifth|Sixth|Seventh) (Sunday|Week) of Pascha/,
-	/^(Second|Third|Fourth|Fifth|Sixth|Seventh) Sunday of Pascha:/,
-	/^Radonitsa, or Day of Rejoicing/,
-	/^Mid-Pentecost or Prepolovenie/,
-	/^Apodosis of Prepolovenie/,
-	/^Apodosis of Pascha\./,
-	/^The Ascension of our Lord/,
-	/^Afterfeast of the Ascension/,
-	/^Apodosis of the Ascension/,
-	/^Commemoration of the Dead\./,
-	/^All Saints/,
-	/^All Russian Saints/,
-	/^Synaxis of New Martyrs/,
-	// Triodion-cycle entries (Phase C2+).
-	/^Sunday of the (Publican and the Pharisee|Prodigal Son|Last Judgment)/,
-	/^The Saturday of the Dead/,
-	/^The Sunday of Forgiveness/,
-	/^Beginning of the Great Lent/,
-	/^(First|Second|Third|Fourth|Fifth|Sixth) (Sunday|Saturday|Week) of the Great Lent/,
-	/^Lazarus Saturday/,
-	/^Maslenitsa, entire week\.$/,
-	/^Entire week, fast-free\s*\.$/,
-	/^Week of (Holy Forefathers|Holy Fathers)/,
-	/^Parents['’] Saturday/,
-	/^Demetrius \(Parental\) Saturday/,
-	/^Remembrance of all the departed who suffered/,
-	/^Commemoration of the Holy Fathers of the Seventh Ecumenical Council/,
-	// Per-year transferred-commemoration composites (Phase C2+).
-	/is transferred from .+ to this day\.?$/,
-];
 
 interface FixedEntry {
 	readonly rank: string;
@@ -83,89 +18,70 @@ interface FixedEntry {
 	readonly lives: readonly { readonly name: string; readonly slug: string }[];
 }
 
-type JulianKey = string; // "MM-DD"
-const byJulian = new Map<JulianKey, Map<string, FixedEntry>>();
+const byJulian = new Map<string, Map<string, FixedEntry>>();
 
-function entryKey(c: HtocCommemoration): string {
-	const livesStr = c.lives.map((l) => `${l.slug}`).join(",");
-	return `${c.rank}|${c.minor ? 1 : 0}|${c.text}|${livesStr}`;
+function entryKey(e: FixedEntry): string {
+	return `${e.rank}|${e.minor ? 1 : 0}|${e.text}|${e.lives.map((l) => l.slug).join(",")}`;
 }
 
-function julianKey(month: number, day: number): JulianKey {
-	return `${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+const counts = { "fixed-julian": 0, "paschal-movable": 0, "dow-shift": 0, "season-synth": 0, transferred: 0 };
+
+for (const o of classifyAll()) {
+	counts[o.classification]++;
+	if (o.classification !== "fixed-julian") continue;
+	if (!byJulian.has(o.julianKey)) byJulian.set(o.julianKey, new Map());
+	const bucket = byJulian.get(o.julianKey)!;
+	const entry: FixedEntry = {
+		rank: o.commem.rank,
+		text: o.commem.text,
+		minor: o.commem.minor,
+		lives: o.commem.lives.map((l) => ({ name: l.name, slug: l.slug })),
+	};
+	const k = entryKey(entry);
+	if (!bucket.has(k)) bucket.set(k, entry);
 }
 
-let total = 0;
-let kept = 0;
-let excluded = 0;
+const sortedKeys = [...byJulian.keys()].sort();
 
-for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
-	const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
-	const ctx = computeDayContext({ year: y, month: m, day: d });
-	const jkey = julianKey(ctx.julian.month, ctx.julian.day);
-	if (!byJulian.has(jkey)) byJulian.set(jkey, new Map());
-	const perText = byJulian.get(jkey)!;
-
-	for (const c of facts.commemorations) {
-		total++;
-		if (EXCLUDE_PATTERNS.some((re) => re.test(c.text))) {
-			excluded++;
-			continue;
-		}
-		kept++;
-		const key = entryKey(c);
-		if (!perText.has(key)) {
-			perText.set(key, {
-				rank: c.rank,
-				text: c.text,
-				minor: c.minor,
-				lives: c.lives.map((l) => ({ name: l.name, slug: l.slug })),
-			});
-		}
-	}
-}
-
-// Sort Julian keys for deterministic output.
-const sortedJulianKeys = [...byJulian.keys()].sort();
-
-// Emit TS source.
 const lines: string[] = [];
 lines.push(`// AUTO-GENERATED by scripts/codegen/htoc-fixed-commemorations.ts — do not edit by hand.`);
 lines.push(`// Decomposed from HTOC_DAY_FACTS_BY_ISO (2025-2027 vendored window).`);
 lines.push(`// Generated: ${new Date().toISOString()}`);
-lines.push(`// Total commemorations examined: ${total}`);
-lines.push(`// Fixed-Julian retained:          ${kept}`);
-lines.push(`// Excluded (movable/season/etc.): ${excluded}`);
+lines.push(`// Fixed-Julian occurrences:    ${counts["fixed-julian"]}`);
+lines.push(`// Paschal-movable (Phase C2):  ${counts["paschal-movable"]}`);
+lines.push(`// DOW-shift (Phase C4):        ${counts["dow-shift"]}`);
+lines.push(`// Season-synth (runtime):      ${counts["season-synth"]}`);
+lines.push(`// Transferred (Phase C5):      ${counts.transferred}`);
 lines.push(``);
 lines.push(`import type { HtocCommemoration } from "./htocDayFacts.ts";`);
 lines.push(``);
 lines.push(`/** Fixed-Julian commemoration cycle: keyed by Julian \`"MM-DD"\`.`);
-lines.push(` *  Union of the 2025-2027 vendored window, with movable overlays,`);
-lines.push(` *  DOW-shift markers, paschal/triodion-cycle entries, and`);
-lines.push(` *  synthesized season markers removed. Suitable for any year via`);
-lines.push(` *  a Julian-month-day lookup. */`);
+lines.push(` *  Includes multi-day fixed feasts (one entry per Julian date in their`);
+lines.push(` *  span). Movable overlays and season markers live elsewhere. */`);
 lines.push(
 	`export const HTOC_FIXED_COMMEMORATIONS_CYCLE: ReadonlyMap<string, readonly HtocCommemoration[]> = new Map([`,
 );
-for (const jkey of sortedJulianKeys) {
-	const entries = [...byJulian.get(jkey)!.values()];
-	if (entries.length === 0) continue;
-	lines.push(`\t[${JSON.stringify(jkey)}, [`);
+let total = 0;
+for (const k of sortedKeys) {
+	const entries = [...byJulian.get(k)!.values()].sort((a, b) => a.text.localeCompare(b.text));
+	total += entries.length;
+	lines.push(`\t[${JSON.stringify(k)}, [`);
 	for (const e of entries) {
 		const livesJson = JSON.stringify(e.lives);
-		lines.push(`\t\t{ rank: ${JSON.stringify(e.rank)}, text: ${JSON.stringify(e.text)}, minor: ${e.minor}, lives: ${livesJson} },`);
+		lines.push(
+			`\t\t{ rank: ${JSON.stringify(e.rank)}, text: ${JSON.stringify(e.text)}, minor: ${e.minor}, lives: ${livesJson} },`,
+		);
 	}
 	lines.push(`\t]],`);
 }
 lines.push(`]);`);
 lines.push(``);
 lines.push(`/** Total number of fixed-Julian commemoration entries across the cycle. */`);
-lines.push(`export const HTOC_FIXED_COMMEMORATIONS_COUNT = ${kept};`);
+lines.push(`export const HTOC_FIXED_COMMEMORATIONS_COUNT = ${total};`);
 lines.push(``);
 
 writeFileSync(OUTPUT, lines.join("\n"), "utf8");
 console.log(`Wrote ${OUTPUT}`);
-console.log(`  ${sortedJulianKeys.length} Julian keys`);
-console.log(`  ${total} total commemorations examined`);
-console.log(`  ${kept} fixed-Julian retained`);
-console.log(`  ${excluded} excluded (movable/season/etc.)`);
+console.log(`  ${sortedKeys.length} Julian keys`);
+console.log(`  ${total} fixed-Julian unique entries`);
+console.log(`  occurrences: fixed=${counts["fixed-julian"]} paschal=${counts["paschal-movable"]} dowShift=${counts["dow-shift"]} season=${counts["season-synth"]} transferred=${counts.transferred}`);

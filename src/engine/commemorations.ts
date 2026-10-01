@@ -5,6 +5,7 @@
 
 import type { HtocCommemoration } from "../data/htocDayFacts.ts";
 import { HTOC_FIXED_COMMEMORATIONS_CYCLE } from "../data/htocFixedCommemorations.ts";
+import { HTOC_PASCHAL_MOVABLES_CYCLE } from "../data/htocPaschalMovables.ts";
 import type { DayContext } from "./day.ts";
 import { getLiturgicalSeason } from "./season.ts";
 
@@ -75,11 +76,24 @@ export function getFixedCommemorations(ctx: DayContext): readonly HtocCommemorat
 }
 
 /**
- * Compose season markers + fixed-Julian commemorations into a single list.
- * Phase C1 ships without the paschal/triodion/DOW-shift movable overlays, so
- * for days in those cycles the output is intentionally a strict subset of
- * HTOC's full list. See `scripts/analysis/commem-validate.ts` for coverage.
+ * Paschal/triodion-cycle movable commemoration lookup. Returns entries
+ * anchored to this day's `nday` (days from Pascha), works for any year.
+ * Covers Pentecostarion Sundays, Bright Week weekdays, Ascension-anchored
+ * feasts, Lenten Saturday/Sunday commemorations, Cheese-fare Week, etc.
+ */
+export function getPaschalMovables(ctx: DayContext): readonly HtocCommemoration[] {
+	return HTOC_PASCHAL_MOVABLES_CYCLE.get(ctx.nday) ?? [];
+}
+
+/**
+ * Compose season markers + fixed-Julian + paschal-movable commemorations
+ * into a single list. Phase C2 handles everything except DOW-nearest-Julian
+ * movables (Phase C4) and per-year transferred composites (Phase C5).
  */
 export function getCommemorationsForAnyYear(ctx: DayContext): readonly HtocCommemoration[] {
-	return [...getSeasonCommemorations(ctx), ...getFixedCommemorations(ctx)];
+	return [
+		...getSeasonCommemorations(ctx),
+		...getFixedCommemorations(ctx),
+		...getPaschalMovables(ctx),
+	];
 }
