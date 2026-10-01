@@ -25,7 +25,7 @@ import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../../src/engine/orderedMatins.ts";
 import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
-import { compareCommemorations, compareReadings } from "./comparators.ts";
+import { compareCommemorations, compareReadings, tokens } from "./comparators.ts";
 import type { CommResult, ReadingResult } from "./comparators.ts";
 import { iterCorpus, SCRATCH_DIR } from "./corpus.ts";
 import type { HtocDay } from "./corpus.ts";
@@ -89,6 +89,11 @@ interface Aggregate {
 	rankObservations: Map<string, number>;
 	worstCommDays: DayMetric[];
 	worstReadingDays: DayMetric[];
+	/** HTOC rank-glyph bucket → {matched, htocOnly} for commemorations. */
+	commByBucket: Map<string, { matched: number; htocOnly: number }>;
+	/** Normalized token signature → {count, sample, bucket} for recurring
+	 *  htocOnly commemorations (the long tail — mostly New Hieromartyrs). */
+	commHtocOnlyRecurring: Map<string, { count: number; sample: string; bucket: string }>;
 }
 
 function newAggregate(): Aggregate {
@@ -108,6 +113,8 @@ function newAggregate(): Aggregate {
 		rankObservations: new Map(),
 		worstCommDays: [],
 		worstReadingDays: [],
+		commByBucket: new Map(),
+		commHtocOnlyRecurring: new Map(),
 	};
 }
 
@@ -123,6 +130,10 @@ function collectEngineReadings(cal: CalendarDate): ReadingRef[] {
 	const lit = getOrderedLiturgyReadings(cal);
 	for (const r of lit.apostol) bag.push(r);
 	for (const r of lit.gospel) bag.push(r);
+	// Include suppressed Liturgy readings — HTOC still lists them (e.g. the
+	// ordinary Saturday reading on a festal Saturday) so excluding them
+	// manufactures htocOnly misses.
+	for (const r of lit.suppressed) bag.push(r);
 	const matins = getOrderedMatinsReadings(cal);
 	for (const r of matins.refs) bag.push(r);
 	// Suppressed refs stay in HTOC's view when they're festal Matins
@@ -214,6 +225,32 @@ function aggregate(agg: Aggregate, metric: DayMetric, comm: CommResult): void {
 		if (m.engineRank === undefined) continue;
 		const key = `${m.htocRank}->${normalizeEngineRankToHtocGlyph(m.engineRank)}`;
 		agg.rankObservations.set(key, (agg.rankObservations.get(key) ?? 0) + 1);
+		const bucket = m.htocRank === "" ? "(blank)" : m.htocRank;
+		const row = agg.commByBucket.get(bucket) ?? { matched: 0, htocOnly: 0 };
+		row.matched++;
+		agg.commByBucket.set(bucket, row);
+	}
+	// Count matched comms where engineRank is undefined too (bucket by htoc).
+	for (const m of comm.matched) {
+		if (m.engineRank !== undefined) continue;
+		const bucket = m.htocRank === "" ? "(blank)" : m.htocRank;
+		const row = agg.commByBucket.get(bucket) ?? { matched: 0, htocOnly: 0 };
+		row.matched++;
+		agg.commByBucket.set(bucket, row);
+	}
+	for (const h of comm.htocOnly) {
+		const bucket = h.rank === "" ? "(blank)" : h.rank;
+		const row = agg.commByBucket.get(bucket) ?? { matched: 0, htocOnly: 0 };
+		row.htocOnly++;
+		agg.commByBucket.set(bucket, row);
+		const sig = [...tokens(h.text)].sort().join(" ");
+		if (sig === "") continue;
+		const r = agg.commHtocOnlyRecurring.get(sig);
+		if (r === undefined) {
+			agg.commHtocOnlyRecurring.set(sig, { count: 1, sample: h.text, bucket });
+		} else {
+			r.count++;
+		}
 	}
 	// Keep the top-20 worst days per axis.
 	const insertSorted = (
@@ -267,6 +304,41 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 	l.push(
 		`- Coverage ratio: matched / (matched + htocOnly) = ${((agg.commemorationMatched / (agg.commemorationMatched + agg.commemorationHtocOnly)) * 100).toFixed(1)}%`,
 	);
+	l.push("");
+	l.push("#### Commemorations by HTOC rank-glyph bucket");
+	l.push("");
+	l.push("HTOC's rank glyphs: `6` Great Feast / `4` Vigil-Polyeleos / `3` Doxology (red cross) / `2` Six-stich / `1` Simple commemoration / `0` No sign / `o` Octoechos (weekday saints, including most New Hieromartyrs).");
+	l.push("");
+	l.push("| bucket | matched | htocOnly | coverage% |");
+	l.push("| --- | ---:| ---:| ---:|");
+	const bucketOrder = ["6", "4", "3", "2", "1", "0", "o", "(blank)"];
+	const seenBuckets = new Set<string>();
+	const printBucket = (b: string) => {
+		const row = agg.commByBucket.get(b);
+		if (row === undefined) return;
+		seenBuckets.add(b);
+		const denom = row.matched + row.htocOnly;
+		const pct = denom === 0 ? "n/a" : `${((row.matched / denom) * 100).toFixed(1)}%`;
+		l.push(`| \`${b}\` | ${row.matched} | ${row.htocOnly} | ${pct} |`);
+	};
+	for (const b of bucketOrder) printBucket(b);
+	for (const b of agg.commByBucket.keys()) {
+		if (!seenBuckets.has(b)) printBucket(b);
+	}
+	l.push("");
+	l.push("#### Top 20 recurring HTOC-only commemorations");
+	l.push("");
+	l.push("These are the saints HTOC lists most often that the engine never surfaces. The long tail is dominated by New Hieromartyrs (20th-century Russian martyrs) — they live in a separate HTOC addendum rather than the vendored Ponomar `xml/` corpus.");
+	l.push("");
+	l.push("| count | rank | text |");
+	l.push("| ---:| --- | --- |");
+	const recRows = [...agg.commHtocOnlyRecurring.entries()]
+		.sort((a, b) => b[1].count - a[1].count)
+		.slice(0, 20);
+	for (const [, row] of recRows) {
+		const txt = row.sample.replace(/\s+/g, " ").trim().slice(0, 110).replace(/\|/g, "\\|");
+		l.push(`| ${row.count} | \`${row.bucket}\` | ${txt} |`);
+	}
 	l.push("");
 	l.push("### Readings");
 	l.push("");
