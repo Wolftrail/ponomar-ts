@@ -78,6 +78,15 @@ export function getDailyReadings(
  * driven by a different Lucan-Jump convention). This appender fills the
  * gap using the codegen'd `HTOC_DAILY_LECTIONARY` table. Refs are tagged
  * `source: "htoc"` for downstream visibility.
+ *
+ * The HTOC pick for a given `(liturgy, type)` slot is authoritative under
+ * Russian / ROCOR practice. Where the Ponomar paschal/menaion sequential
+ * (cId in 9000..9899) emitted earlier disagrees with HTOC — i.e. its
+ * reading isn't among HTOC's published picks for that type — the Ponomar
+ * ref is evicted so the two don't appear side by side as duplicate
+ * "ordinary" liturgy readings. When Ponomar's sequential reading does
+ * match one of HTOC's picks (common on days where HTOC publishes multiple
+ * pairs — the ordinary + a transferred one), the Ponomar ref is kept.
  */
 function appendHtocDailyLectionary(
 	day: LiturgicalDay,
@@ -87,6 +96,24 @@ function appendHtocDailyLectionary(
 	if (opts.service !== undefined && opts.service !== "liturgy") return;
 	const entries = getHtocDailyLectionary(day.context);
 	if (entries === null) return;
+	const htocByType = new Map<string, Set<string>>();
+	for (const e of entries) {
+		let s = htocByType.get(e.type);
+		if (s === undefined) {
+			s = new Set();
+			htocByType.set(e.type, s);
+		}
+		s.add(e.reading);
+	}
+	for (let i = refs.length - 1; i >= 0; i--) {
+		const r = refs[i]!;
+		if (r.service !== "liturgy") continue;
+		if (!isPonomarSequentialCid(r.cId)) continue;
+		const htocReadings = htocByType.get(r.type);
+		if (htocReadings === undefined) continue;
+		if (htocReadings.has(r.reading)) continue;
+		refs.splice(i, 1);
+	}
 	for (const e of entries) {
 		if (opts.type !== undefined && opts.type !== e.type) continue;
 		const dup = refs.some(
@@ -104,6 +131,14 @@ function appendHtocDailyLectionary(
 			reading: e.reading,
 		});
 	}
+}
+
+/** Mirrors `orderedLiturgy.ts#rankOf` — 4-digit cIds in 9000..9899 are the
+ *  movable-cycle sequential placeholders. */
+function isPonomarSequentialCid(cId: string): boolean {
+	if (cId.length !== 4 || !/^\d+$/.test(cId)) return false;
+	const n = parseInt(cId, 10);
+	return n >= 9000 && n < 9900;
 }
 
 /**

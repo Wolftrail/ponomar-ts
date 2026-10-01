@@ -203,6 +203,33 @@ describe("HTOC keystones", () => {
 	}
 });
 
+describe("HTOC daily-lectionary eviction", () => {
+	test("Thu 2026-10-01: HTOC's Mt_24:13-28 evicts Ponomar sequential Mk_11:27-33", () => {
+		const ord = getOrderedLiturgyReadings({ year: 2026, month: 10, day: 1 });
+		const gospels = ord.gospel.map((r) => r.reading);
+		assert.deepEqual(
+			gospels,
+			["Mt_24:13-28"],
+			`expected only HTOC's Mt_24:13-28; got [${gospels.join(", ")}]`,
+		);
+		assert.equal(ord.gospel[0]?.source, "htoc");
+	});
+
+	test("Fri 2025-02-14: both HTOC pairs survive — Ponomar sequential I Jn+Mk kept because HTOC also lists them", () => {
+		const ord = getOrderedLiturgyReadings({ year: 2025, month: 2, day: 14 });
+		const apostol = ord.apostol.map((r) => r.reading).sort();
+		const gospel = ord.gospel.map((r) => r.reading).sort();
+		assert.ok(
+			apostol.includes("I Jn_2:7-17") && apostol.includes("II Tim_3:1-9"),
+			`expected both apostol pairs; got [${apostol.join(", ")}]`,
+		);
+		assert.ok(
+			gospel.includes("Mk_14:3-9") && gospel.includes("Lk_20:46-21:4"),
+			`expected both gospel pairs; got [${gospel.join(", ")}]`,
+		);
+	});
+});
+
 // ---------- corpus-wide budgets ----------
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
@@ -215,12 +242,13 @@ const CORPUS_PRESENT = CORPUS_PATHS.every((p) => existsSync(p));
 
 // Budgets — these are the current baseline minus a small slack. Improve
 // the engine to nudge these upward; do not relax them without justification.
-// Measured 2026-<HTOC daily-lectionary override landed> on 1095 days.
+// Measured 2026-10-01 on 1095 days after the HTOC daily-lectionary
+// eviction fix for conflicting Ponomar sequential readings.
 const BUDGET = {
 	commemorationCoveragePct: 34.5, // measured: 35.6%
-	readingCoveragePct: 97.5, // measured: 97.93% (up from 88.8% pre-htoc-saint-lectionary, 83.4% pre-htoc-daily-lectionary)
+	readingCoveragePct: 99.5, // measured: 100% (up from 97.9% pre-eviction-fix, 88.8% pre-htoc-saint-lectionary, 83.4% pre-htoc-daily-lectionary)
 	toneMatchPctOfBothPresent: 100.0, // measured: 100% when both non-null
-	perDayReadingHtocOnlyMaxAvg: 0.1, // measured: 85/1095 ≈ 0.078 (was 0.417 pre-htoc-saint-lectionary)
+	perDayReadingHtocOnlyMaxAvg: 0.02, // measured: 0/1095 = 0 (was 0.08 pre-eviction-fix, 0.42 pre-htoc-saint-lectionary)
 } as const;
 
 function collectEngineReadings(cal: CalendarDate): ReadingRef[] {

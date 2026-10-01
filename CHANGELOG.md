@@ -11,6 +11,23 @@ notice.
 
 ## [Unreleased]
 
+### Fixed
+
+- `getOrderedLiturgyReadings` no longer surfaces Ponomar's structural
+  sequential-cycle gospel (cId `9000..9899`) alongside HTOC's published
+  daily-lectionary pick when the two disagree. On e.g. Thursday
+  2026-10-01 (Julian Sept 18), upstream Ponomar's week-18 slot schedules
+  Mark 11:27–33, but HTOC publishes Matthew 24:13–28 — the Russian /
+  ROCOR convention for the Lucan-Jump handoff. The engine previously
+  returned both as `rank: "sequential"`, implying two "ordinary" gospels
+  for the day; it now evicts the Ponomar ref when its reading is not
+  among HTOC's picks for that type. On days where HTOC publishes
+  multiple apostol/gospel pairs (ordinary + transferred) and Ponomar's
+  sequential happens to match one of them, both are kept. Corpus-wide
+  reading coverage against HTOC rose from 97.9% to **100%** (4097/4097
+  matched, zero HTOC-only). The `getOrderedLiturgyReadings` regression
+  budget in `tests/htoc.test.ts` is tightened accordingly.
+
 ## [1.0.0-rc.1] — 2026-10-01
 
 Second release candidate. Reorients the user-facing data layer around
