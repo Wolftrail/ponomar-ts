@@ -11,6 +11,42 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.13] — 2026-10-01
+
+### Changed
+
+- **`htocDayFacts.ts` slimmed via tuple + array + triplet pool
+  interning.** The vendored per-ISO day-facts corpus now stores unique
+  hymn tuples, commemoration tuples, index arrays, and
+  propers-triplets `[commemArrIdx, tropArrIdx, kontArrIdx]` once each
+  and references them from a four-field compact day row
+  `[headerIdx, tone, fastIdx, triIdx]`. No change to the exported
+  `HTOC_DAY_FACTS_BY_ISO: ReadonlyMap<string, HtocDayFacts>` shape,
+  keys, values, or ordering; byte-identical hydration verified across
+  all 1,095 vendored days.
+  - `src/data/htocDayFacts.ts`: 1.20 MB → 1.05 MB (−12.5 %);
+    1,740 unique hymn tuples (56 % dedup), 5,334 unique commemoration
+    tuples (67 % dedup), 1,730 unique index arrays (49 % dedup),
+    651 unique propers-triplets (40 % dedup).
+  - The remaining 66 % of the file is irreducible hymn-text and
+    commemoration-text content (already string-pooled: 993 unique
+    hymn texts, 5,286 unique commemoration texts).
+- Codegen script (`scripts/codegen/htoc-day-facts.ts`) emits the new
+  pooled layout deterministically; downstream consumers see
+  byte-identical `HTOC_DAY_FACTS_BY_ISO` values.
+
+### Documented
+
+- Added `scripts/analysis/htoc-day-facts-decomp.ts` and
+  `htoc-day-facts-drift-sample.ts` recording the cycle-decomposition
+  analysis that scoped this release. Finding: unlike the saint corpus
+  (rc.11), day facts are not cleanly decomposable into rc.11-style
+  fixed + movable cycle tables — the HTOC header is a template, fast
+  rules follow season boundaries, and movable commemorations overlay
+  the Julian cycle. A proper any-year `getHtocDayFactsForAnyYear` is
+  deferred as a future engine subsystem (Pentecost-week counter +
+  Octoechos tone computer + movable-commem overlay + header renderer).
+
 ## [1.0.0-rc.12] — 2026-10-01
 
 ### Changed

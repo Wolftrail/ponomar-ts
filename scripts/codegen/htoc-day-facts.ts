@@ -187,14 +187,31 @@ const refs = new Pool<readonly [string, string]>();
 
 type CompactHymn = readonly [titleIdx: number, textIdx: number, group: number, saintRefIdxs: readonly number[]];
 type CompactCommem = readonly [rank: string, textIdx: number, minor: 0 | 1, livesRefIdxs: readonly number[]];
+/** Compact per-day record. All six fields index into pools:
+ *  - `headerIdx` → `H`, `fastIdx` → `F`
+ *  - `commemArrIdx` → `A` (array of `CC`-pool indices)
+ *  - `tropArrIdx`, `kontArrIdx` → `A` (array of `CH`-pool indices)
+ */
 type CompactDay = readonly [
 	headerIdx: number,
 	tone: number | null,
 	fastIdx: number,
-	commemorations: readonly CompactCommem[],
-	troparia: readonly CompactHymn[],
-	kontakia: readonly CompactHymn[],
+	commemArrIdx: number,
+	tropArrIdx: number,
+	kontArrIdx: number,
 ];
+
+/** Pool of unique hymn tuples. Day records point into this via `tropArrIdx`
+ *  and `kontArrIdx` → `A` → list of CH indices. */
+const hymnPool = new Pool<CompactHymn>();
+/** Pool of unique commemoration tuples. Day records point into this via
+ *  `commemArrIdx` → `A` → list of CC indices. */
+const commemPool = new Pool<CompactCommem>();
+/** Shared pool of index arrays. Used by all three per-day lists
+ *  (`commemorations`, `troparia`, `kontakia`). The empty array lives here
+ *  too (interned once) so a day with no kontakia costs the same as any
+ *  other day. */
+const arrPool = new Pool<readonly number[]>();
 
 function compactHymn(h: EmittedHymn): CompactHymn {
 	return [
@@ -212,6 +229,23 @@ function compactCommem(c: EmittedCommemoration): CompactCommem {
 		c.lives.map((l) => refs.intern([l.name, l.slug], l.name + "\x01" + l.slug)),
 	];
 }
+function internHymn(h: EmittedHymn): number {
+	const c = compactHymn(h);
+	return hymnPool.intern(
+		c,
+		c[0] + "\x01" + c[1] + "\x01" + c[2] + "\x01" + c[3].join(","),
+	);
+}
+function internCommem(c: EmittedCommemoration): number {
+	const cc = compactCommem(c);
+	return commemPool.intern(
+		cc,
+		cc[0] + "\x01" + cc[1] + "\x01" + cc[2] + "\x01" + cc[3].join(","),
+	);
+}
+function internArr(ii: readonly number[]): number {
+	return arrPool.intern(ii, ii.join(","));
+}
 
 const compactDays: (readonly [string, CompactDay])[] = sortedDates.map((iso) => {
 	const f = emitted.get(iso)!;
@@ -219,11 +253,26 @@ const compactDays: (readonly [string, CompactDay])[] = sortedDates.map((iso) => 
 		headers.intern(f.headerText),
 		f.tone,
 		fasts.intern(f.fastText),
-		f.commemorations.map(compactCommem),
-		f.troparia.map(compactHymn),
-		f.kontakia.map(compactHymn),
+		internArr(f.commemorations.map(internCommem)),
+		internArr(f.troparia.map(internHymn)),
+		internArr(f.kontakia.map(internHymn)),
 	];
 	return [iso, cd];
+});
+
+/** Pool of unique inner propers-triplets `[commemArrIdx, tropArrIdx,
+ *  kontArrIdx]`. ~40 % of days in the 3-year window share an identical
+ *  triplet (same saint commemorations + same propers), e.g. 2025-01-01
+ *  and 2026-01-01 both commemorate the Circumcision + St. Basil the Great
+ *  with byte-identical propers; only the `[headerIdx, tone, fastIdx]`
+ *  prefix differs between the two years. */
+type InnerTriplet = readonly [number, number, number];
+const triPool = new Pool<InnerTriplet>();
+type CompactDayRow = readonly [headerIdx: number, tone: number | null, fastIdx: number, triIdx: number];
+const dayRows: (readonly [string, CompactDayRow])[] = compactDays.map(([iso, cd]) => {
+	const tri: InnerTriplet = [cd[3], cd[4], cd[5]];
+	const triIdx = triPool.intern(tri, tri.join(","));
+	return [iso, [cd[0], cd[1], cd[2], triIdx]];
 });
 
 // ---------------------------------------------------------------------------
@@ -316,51 +365,89 @@ lines.push(emitStringPool("HX", "/** Unique hymn texts (troparia + kontakia). */
 lines.push(emitStringPool("CT", "/** Unique commemoration display texts. */", cTexts.items));
 lines.push(emitRefPool(refs.items));
 
+// ---------------------------------------------------------------------------
+// Compact tuple pools
+// ---------------------------------------------------------------------------
+// Beyond the string pools, each unique hymn and commemoration *tuple*
+// recurs across many days (the same saint's troparion is sung on his
+// feast every year; the "Christ is Risen" paschal troparion is sung on
+// 50+ days per year; the common forefeast commemorations repeat for a
+// whole week). We intern each unique CH / CC tuple once into these
+// pools and refer to it by integer index.
 lines.push(
 	"",
-	"/** Compact per-day record. Integer fields index into the pools above:",
-	" *  `[headerIdx, tone, fastIdx, commemorations, troparia, kontakia]`.",
-	" *  Hymns are `[titleIdx, textIdx, group, saintRefIdxs]`, commemorations",
-	" *  are `[rankChar, textIdx, minor01, livesRefIdxs]`. Hydrated by `h()`",
-	" *  below into the public `HtocDayFacts` shape with no behavioral change. */",
-	"type CH = readonly [number, number, number, readonly number[]];",
-	"type CC = readonly [string, number, 0 | 1, readonly number[]];",
-	"type CD = readonly [number, number | null, number, readonly CC[], readonly CH[], readonly CH[]];",
+	"/** Pool of unique compact hymns `[titleIdx, textIdx, group, saintRefIdxs]`.",
+	" *  Trop/kont lists reference entries here by integer index. */",
+	"const CH: readonly (readonly [number, number, number, readonly number[]])[] = [",
+);
+for (const h of hymnPool.items) lines.push(`\t${JSON.stringify(h)},`);
+lines.push("];", "");
+lines.push(
+	"/** Pool of unique compact commemorations `[rank, textIdx, minor01, livesRefIdxs]`.",
+	" *  Commemoration lists reference entries here by integer index. */",
+	"const CC: readonly (readonly [string, number, 0 | 1, readonly number[]])[] = [",
+);
+for (const c of commemPool.items) lines.push(`\t${JSON.stringify(c)},`);
+lines.push("];", "");
+lines.push(
+	"/** Shared pool of index arrays. Day records reference `A[i]` with the",
+	" *  interpretation determined by position: the `commemArrIdx` slot",
+	" *  resolves `A[i]` as a list of `CC`-pool indices, while `tropArrIdx`",
+	" *  and `kontArrIdx` resolve `A[i]` as a list of `CH`-pool indices. */",
+	"const A: readonly (readonly number[])[] = [",
+);
+for (const a of arrPool.items) lines.push(`\t${JSON.stringify(a)},`);
+lines.push("];", "");
+
+lines.push(
+	"/** Pool of unique propers-triplets `[commemArrIdx, tropArrIdx, kontArrIdx]`.",
+	" *  See the comment on the codegen's `triPool`. */",
+	"const T: readonly (readonly [number, number, number])[] = [",
+);
+for (const t of triPool.items) lines.push(`\t${JSON.stringify(t)},`);
+lines.push("];", "");
+
+lines.push(
+	"/** Compact per-day row. `[headerIdx, tone, fastIdx, triIdx]` where",
+	" *  `triIdx` indexes into `T` for the day's propers. Hydrated by `hyDay()`",
+	" *  into the public `HtocDayFacts` shape with no behavioral change. */",
+	"type CD = readonly [number, number | null, number, number];",
 	"",
 	"const D: readonly (readonly [string, CD])[] = [",
 );
-for (const [iso, cd] of compactDays) {
-	// Keep each day on one line but use the compact tuple shape — this is
-	// typically a few hundred bytes vs. ~3 KB in the pre-dedup emit.
-	lines.push(`\t[${JSON.stringify(iso)}, ${JSON.stringify(cd)}],`);
+for (const [iso, row] of dayRows) {
+	lines.push(`\t[${JSON.stringify(iso)},${JSON.stringify(row)}],`);
 }
 lines.push(
 	"];",
 	"",
-	"function hyHymn(c: CH): HtocHymn {",
+	"function hyHymn(i: number): HtocHymn {",
+	"\tconst c = CH[i]!;",
 	"\treturn {",
 	"\t\ttitle: HT[c[0]]!,",
 	"\t\ttext: HX[c[1]]!,",
 	"\t\tgroup: c[2],",
-	"\t\tsaints: c[3].map((i) => ({ name: R[i]![0], slug: R[i]![1] })),",
+	"\t\tsaints: c[3].map((j) => ({ name: R[j]![0], slug: R[j]![1] })),",
 	"\t};",
 	"}",
-	"function hyCommem(c: CC): HtocCommemoration {",
+	"function hyCommem(i: number): HtocCommemoration {",
+	"\tconst c = CC[i]!;",
 	"\treturn {",
 	"\t\trank: c[0],",
 	"\t\ttext: CT[c[1]]!,",
 	"\t\tminor: c[2] === 1,",
-	"\t\tlives: c[3].map((i) => ({ name: R[i]![0], slug: R[i]![1] })),",
+	"\t\tlives: c[3].map((j) => ({ name: R[j]![0], slug: R[j]![1] })),",
 	"\t};",
 	"}",
 	"function hyDay(c: CD): HtocDayFacts {",
+	"\tconst tri = T[c[3]]!;",
 	"\treturn {",
 	"\t\theaderText: H[c[0]]!,",
 	"\t\ttone: c[1],",
 	"\t\tfastText: F[c[2]]!,",
-	"\t\tcommemorations: c[3].map(hyCommem),",
-	"\t\ttroparia: c[4].map(hyHymn),",
-	"\t\tkontakia: c[5].map(hyHymn),",
+	"\t\tcommemorations: A[tri[0]]!.map(hyCommem),",
+	"\t\ttroparia: A[tri[1]]!.map(hyHymn),",
+	"\t\tkontakia: A[tri[2]]!.map(hyHymn),",
 	"\t};",
 	"}",
 	"",
@@ -386,5 +473,7 @@ console.log(
 		`${totalKontakia} kontakia; pools: ` +
 		`H=${headers.items.length} F=${fasts.items.length} ` +
 		`HT=${hTitles.items.length} HX=${hTexts.items.length} ` +
-		`CT=${cTexts.items.length} R=${refs.items.length}`,
+		`CT=${cTexts.items.length} R=${refs.items.length} ` +
+		`CH=${hymnPool.items.length} CC=${commemPool.items.length} ` +
+		`A=${arrPool.items.length} T=${triPool.items.length}`,
 );
