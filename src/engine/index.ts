@@ -204,6 +204,11 @@ export type {
 	FastingResult,
 } from "./fasting.ts";
 export { getFasting } from "./fasting.ts";
+export {
+	getOctoechosTone,
+	isToneSuppressed,
+	rawOctoechosTone,
+} from "./tone.ts";
 export type {
 	BibleDirective,
 	CreateDirective,
