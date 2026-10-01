@@ -192,6 +192,28 @@ export {
 } from "./htocSaints.ts";
 export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
 export { HTOC_DAY_FACTS_BY_ISO, getHtocDayFacts } from "./htocDayFacts.ts";
+
+export type { HtocSaintLectionaryEntry } from "./saintLectionary.ts";
+export {
+	HTOC_SAINT_LECTIONARY,
+	getHtocSaintLectionary,
+} from "./saintLectionary.ts";
+
+// --- HTOC-first unprefixed facade (Stage 1 of the HTOC-centric API). The
+// prefixed names above remain as deprecated-but-working aliases.
+export type { SaintCommemoration, SaintProfile } from "./saints.ts";
+export {
+	cIdToSlug,
+	getLifeBySlug,
+	getSaint,
+	getSaintByCId,
+	slugToCId,
+} from "./saints.ts";
+export { getHtocReadings as getReadings } from "./htocReadings.ts";
+export { getHtocDayFacts as getDay } from "./htocDayFacts.ts";
+export { getHtocSaintsFor as getSaints } from "./htocSaints.ts";
+export { getHtocDailyLectionary as getDailyLectionary } from "./dailyLectionary.ts";
+export { getHtocSaintLectionary as getSaintLectionary } from "./saintLectionary.ts";
 export type {
 	FastingCase,
 	FastingLevel,

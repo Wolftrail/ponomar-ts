@@ -11,6 +11,40 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.7] — 2026-10-01
+
+### Added
+
+- **Stage 1 of the HTOC-first API refactor.** HTOC is becoming the
+  canonical public surface; Ponomar (paschalion, menaion, lives
+  corpus, fasting DSL) stays as an internal engine.
+
+- `getSaint(slug)` — saint-centric facade for `/saints/<slug>` routes.
+  Returns `{ slug, cId, names, commemorations, life }` where
+  `commemorations` is every Gregorian ISO date in 2025–2027 where the
+  saint appears, with HTOC rank + display text.
+
+- `getSaintByCId(cId)` — same shape, keyed by Ponomar `cId` for apps
+  that already route on legacy numeric ids (e.g. `/saints/437`).
+
+- `getLifeBySlug(slug)` — biographical prose via the HTOC slug (joins
+  the slug ↔ cId bridge to the lives corpus).
+
+- `slugToCId(slug)` / `cIdToSlug(cId)` — the explicit bridge. Covers
+  fixed-cycle slugs (`Month/DD-NN`, menaion-positional) at ~89% HTOC
+  slug coverage; movable-cycle slugs (`Epiphany/p±N`, etc.) and
+  HTOC-only entries (icons without a Ponomar counterpart) return
+  `null`.
+
+- **Unprefixed aliases** for the HTOC day-page lookup functions:
+  `getReadings` → `getHtocReadings`,
+  `getDay` → `getHtocDayFacts`,
+  `getSaints` → `getHtocSaintsFor`,
+  `getDailyLectionary` → `getHtocDailyLectionary`,
+  `getSaintLectionary` → `getHtocSaintLectionary`.
+  Prefixed names remain functional; prefer the unprefixed form for new
+  code.
+
 ## [1.0.0-rc.6] — 2026-10-01
 
 ### Changed

@@ -15,7 +15,7 @@ export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
 export * as bible from "./bible/index.ts";
 export * as astronomy from "./astronomy/index.ts";
-export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle, getResurrectionMatinsGospel, RESURRECTION_MATINS_GOSPELS, getHtocDailyLectionary, HTOC_DAILY_LECTIONARY, getHtocReadings, getHtocSaintsFor, getHtocDayRank, mapHtocRank, unmapHtocRank, HTOC_SAINTS_BY_ISO, getHtocDayFacts, HTOC_DAY_FACTS_BY_ISO } from "./engine/index.ts";
+export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle, getResurrectionMatinsGospel, RESURRECTION_MATINS_GOSPELS, getHtocDailyLectionary, HTOC_DAILY_LECTIONARY, getHtocReadings, getHtocSaintsFor, getHtocDayRank, mapHtocRank, unmapHtocRank, HTOC_SAINTS_BY_ISO, getHtocDayFacts, HTOC_DAY_FACTS_BY_ISO, HTOC_SAINT_LECTIONARY, getHtocSaintLectionary, cIdToSlug, getLifeBySlug, getSaint, getSaintByCId, slugToCId, getReadings, getDay, getSaints, getDailyLectionary, getSaintLectionary } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
 	DailyReadings,
@@ -46,6 +46,8 @@ export type {
 	HtocCommemoration,
 	HtocDayFacts,
 	HtocHymn,
+	SaintCommemoration,
+	SaintProfile,
 } from "./engine/index.ts";
 export { parseBibleRef, formatBibleRef, findBook, BibleRefError } from "./bible/index.ts";
 export type { BibleBook, BibleRef, VerseEndpoint, VerseRange } from "./bible/index.ts";
