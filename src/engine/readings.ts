@@ -103,7 +103,7 @@ function appendHtocDailyLectionary(
 			s = new Set();
 			htocByType.set(e.type, s);
 		}
-		s.add(e.reading);
+		s.add(normalizeReadingForDedup(e.reading));
 	}
 	for (let i = refs.length - 1; i >= 0; i--) {
 		const r = refs[i]!;
@@ -111,16 +111,17 @@ function appendHtocDailyLectionary(
 		if (!isPonomarSequentialCid(r.cId)) continue;
 		const htocReadings = htocByType.get(r.type);
 		if (htocReadings === undefined) continue;
-		if (htocReadings.has(r.reading)) continue;
+		if (htocReadings.has(normalizeReadingForDedup(r.reading))) continue;
 		refs.splice(i, 1);
 	}
 	for (const e of entries) {
 		if (opts.type !== undefined && opts.type !== e.type) continue;
+		const normalized = normalizeReadingForDedup(e.reading);
 		const dup = refs.some(
 			(r) =>
 				r.service === "liturgy" &&
 				r.type === e.type &&
-				r.reading === e.reading,
+				normalizeReadingForDedup(r.reading) === normalized,
 		);
 		if (dup) continue;
 		refs.push({
@@ -139,6 +140,31 @@ function isPonomarSequentialCid(cId: string): boolean {
 	if (cId.length !== 4 || !/^\d+$/.test(cId)) return false;
 	const n = parseInt(cId, 10);
 	return n >= 9000 && n < 9900;
+}
+
+/** Strip Ponomar's `a`/`b`/… verse-part suffixes so e.g.
+ *  `Jn_19:6-11a, 13-20, 25-28a, 30b-35a` and HTOC's
+ *  `Jn_19:6-11, 13-20, 25-28, 30-35` compare equal for dedup. */
+function normalizeReadingForDedup(reading: string): string {
+	return reading.replace(/(\d)[a-z]+/g, "$1");
+}
+
+/** Menaion/triodion/pentecostarion encode festal matins gospels as
+ *  `type="1"`; HTOC's saint-lectionary and the resurrection-cycle
+ *  fallback use `type="gospel"`. Treat them as the same slot for
+ *  matins dedup so the two sources don't both surface. */
+function isMatinsGospelType(type: string): boolean {
+	return type === "gospel" || type === "1";
+}
+
+function typesEquivalent(
+	service: string,
+	a: string,
+	b: string,
+): boolean {
+	if (a === b) return true;
+	if (service === "matins") return isMatinsGospelType(a) && isMatinsGospelType(b);
+	return false;
 }
 
 /**
@@ -164,11 +190,12 @@ function appendHtocSaintLectionary(
 	for (const e of entries) {
 		if (opts.service !== undefined && opts.service !== e.service) continue;
 		if (opts.type !== undefined && opts.type !== e.type) continue;
+		const normalized = normalizeReadingForDedup(e.reading);
 		const dup = refs.some(
 			(r) =>
 				r.service === e.service &&
-				r.type === e.type &&
-				r.reading === e.reading,
+				typesEquivalent(r.service, r.type, e.type) &&
+				normalizeReadingForDedup(r.reading) === normalized,
 		);
 		if (dup) continue;
 		refs.push({
@@ -198,7 +225,7 @@ function appendResurrectionMatinsGospel(
 	if (opts.service !== undefined && opts.service !== "matins") return;
 	if (opts.type !== undefined && opts.type !== "gospel") return;
 	const hasMatinsGospel = refs.some(
-		(r) => r.service === "matins" && r.type === "gospel",
+		(r) => r.service === "matins" && isMatinsGospelType(r.type),
 	);
 	if (hasMatinsGospel) return;
 	const cycle = getResurrectionMatinsGospel(day.context, day.dRank);

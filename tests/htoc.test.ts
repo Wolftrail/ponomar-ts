@@ -228,6 +228,44 @@ describe("HTOC daily-lectionary eviction", () => {
 			`expected both gospel pairs; got [${gospel.join(", ")}]`,
 		);
 	});
+
+	test("Sun 2026-09-27 (Exaltation of the Cross): verse-part suffix dedup — HTOC Jn_19:6-11... doesn't duplicate menaion Jn_19:6-11a...", () => {
+		const ord = getOrderedLiturgyReadings({ year: 2026, month: 9, day: 27 });
+		assert.equal(
+			ord.gospel.length,
+			1,
+			`expected single festal gospel; got [${ord.gospel.map((r) => r.reading).join(", ")}]`,
+		);
+		assert.equal(
+			ord.apostol.length,
+			1,
+			`expected single festal apostol; got [${ord.apostol.map((r) => r.reading).join(", ")}]`,
+		);
+		assert.ok(ord.gospel[0]?.reading.startsWith("Jn_19:"));
+		assert.equal(ord.apostol[0]?.reading, "I Cor_1:18-24");
+	});
+
+	test("Sun 2026-09-27 (Exaltation): festal matins gospel displaces the resurrection cycle gospel", () => {
+		// Universal Exaltation of the Cross — the festal menaion matins
+		// gospel (type="1" Jn 12:28-36) must displace the Sunday-cycle
+		// resurrection matins gospel (Mk 16:1-8).
+		const matins = getDailyReadings(
+			{ year: 2026, month: 9, day: 27 },
+			{ service: "matins" },
+		).refs;
+		const gospels = matins.filter(
+			(r) => r.reading.startsWith("Jn_12:28-36") || r.reading.startsWith("Mk_16:"),
+		);
+		assert.equal(
+			gospels.length,
+			1,
+			`expected exactly one matins gospel (festal Jn 12:28-36); got [${gospels
+				.map((r) => `${r.type}:${r.reading} (${r.source})`)
+				.join(", ")}]`,
+		);
+		assert.ok(gospels[0]?.reading.startsWith("Jn_12:28-36"));
+		assert.notEqual(gospels[0]?.source, "cycle");
+	});
 });
 
 // ---------- corpus-wide budgets ----------

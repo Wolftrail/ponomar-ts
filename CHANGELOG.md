@@ -11,6 +11,28 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.3] — 2026-10-01
+
+### Fixed
+
+- Reading dedup now strips Ponomar's `a`/`b` verse-part suffixes before
+  comparing, so e.g. menaion `Jn_19:6-11a, 13-20, 25-28a, 30b-35a`
+  (Universal Exaltation liturgy gospel) is correctly recognised as the
+  same reading as HTOC's `Jn_19:6-11, 13-20, 25-28, 30-35`. Previously
+  both forms surfaced side by side.
+- The resurrection-cycle matins gospel fallback (`appendResurrection­MatinsGospel`)
+  now recognises menaion `matins/1` entries as filling the "matins gospel"
+  slot. Twelve Great Feasts falling on a Sunday (e.g. 2026-09-27 Universal
+  Exaltation) no longer surface Mk 16:1-8 alongside the festal Jn 12:28-36.
+- The HTOC saint-lectionary appender now dedups menaion `matins/1`
+  against HTOC `matins/gospel` so e.g. 2026-09-27 doesn't emit the same
+  Jn 12:28-36 reading twice.
+
+### Changed
+
+- Corpus-wide reading engine-only count dropped from 2658 to **2355**
+  (−303 spurious duplicate refs) after these dedup fixes.
+
 ## [1.0.0-rc.2] — 2026-10-01
 
 ### Fixed
