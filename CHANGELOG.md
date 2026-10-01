@@ -11,6 +11,22 @@ notice.
 
 ## [Unreleased]
 
+### Changed
+
+- `getPropers(date)` now sources troparia and kontakia verbatim from HTOC
+  (via `htocDayFacts.ts`) instead of composing them from upstream Ponomar
+  `<TROPARION>` / `<KONTAKION>` XML. HTOC is the single source of truth
+  for user-facing propers; running two translations side-by-side produced
+  wording drift (41.9% / 46.1% token overlap under the metrics comparator)
+  with no benefit to consumers. `DailyPropers.troparia` and
+  `DailyPropers.kontakia` are now `readonly HtocHymn[]`; `ProperRef` is
+  removed from the public API. The `service` filter option is dropped
+  (HTOC data has no service-block tagging); the `kind` filter is kept.
+  Dates outside the vendored HTOC coverage window (2025–2027) return
+  empty arrays. The upstream XML hymn data is still vendored and still
+  populates `Commemoration.hymns` in the data layer for codegen and
+  analysis, but no public API surfaces it.
+
 ### Added
 
 - HTOC saint-lectionary override: noted HTOC scripture citations (Matins

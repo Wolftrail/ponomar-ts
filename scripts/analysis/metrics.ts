@@ -22,11 +22,8 @@ import { resolve } from "node:path";
 import type { CalendarDate } from "../../src/core/calendar/pcalendar.ts";
 import { getLiturgicalDay } from "../../src/engine/index.ts";
 import { getHtocDayFacts } from "../../src/engine/htocDayFacts.ts";
-import type { HtocHymn } from "../../src/engine/htocDayFacts.ts";
 import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../../src/engine/orderedMatins.ts";
-import { getPropers } from "../../src/engine/propers.ts";
-import type { ProperRef } from "../../src/engine/propers.ts";
 import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
 import { compareCommemorations, compareReadings, tokens } from "./comparators.ts";
@@ -59,20 +56,8 @@ interface DayMetric {
 		htocOnly: number;
 		engineOnly: number;
 	};
-	troparia: {
-		htoc: number;
-		engine: number;
-		matched: number;
-		htocOnly: number;
-		engineOnly: number;
-	};
-	kontakia: {
-		htoc: number;
-		engine: number;
-		matched: number;
-		htocOnly: number;
-		engineOnly: number;
-	};
+	troparionCount: number;
+	kontakionCount: number;
 }
 
 interface CommemorationRankObs {
@@ -103,12 +88,8 @@ interface Aggregate {
 	readingHtocOnly: number;
 	readingEngineOnly: number;
 	readingMatched: number;
-	troparionHtocOnly: number;
-	troparionEngineOnly: number;
-	troparionMatched: number;
-	kontakionHtocOnly: number;
-	kontakionEngineOnly: number;
-	kontakionMatched: number;
+	htocTroparionTotal: number;
+	htocKontakionTotal: number;
 	htocFactsCoverage: number;
 	perfectDays: number;
 	rankObservations: Map<string, number>;
@@ -131,12 +112,8 @@ function newAggregate(): Aggregate {
 		readingHtocOnly: 0,
 		readingEngineOnly: 0,
 		readingMatched: 0,
-		troparionHtocOnly: 0,
-		troparionEngineOnly: 0,
-		troparionMatched: 0,
-		kontakionHtocOnly: 0,
-		kontakionEngineOnly: 0,
-		kontakionMatched: 0,
+		htocTroparionTotal: 0,
+		htocKontakionTotal: 0,
 		htocFactsCoverage: 0,
 		perfectDays: 0,
 		rankObservations: new Map(),
@@ -150,57 +127,6 @@ function newAggregate(): Aggregate {
 function toCal(iso: string): CalendarDate {
 	const [y, m, d] = iso.split("-").map((s) => Number.parseInt(s, 10));
 	return { year: y!, month: m!, day: d! };
-}
-
-interface HymnMatchResult {
-	htoc: number;
-	engine: number;
-	matched: number;
-	htocOnly: number;
-	engineOnly: number;
-}
-
-/** Greedy best-first text-token match between HTOC-published hymns and the
- *  engine's `getPropers` output of the same kind. Skips HTOC placeholder
- *  rows (`"No Troparion is given…"` etc.) and empty-body engine rows so the
- *  comparison is apples-to-apples. */
-function compareHymns(
-	htocHymns: readonly HtocHymn[],
-	engineHymns: readonly ProperRef[],
-): HymnMatchResult {
-	const htocReal = htocHymns.filter(
-		(h) => !/^No (Troparion|Kontakion) is given/i.test(h.text) && h.text.trim() !== "",
-	);
-	const engineReal = engineHymns.filter((h) => h.body.trim() !== "");
-	const engineUsed = new Set<number>();
-	let matched = 0;
-	for (const h of htocReal) {
-		const htocToks = tokens(h.text);
-		if (htocToks.size === 0) continue;
-		let bestIdx = -1;
-		let bestOverlap = 0;
-		for (let i = 0; i < engineReal.length; i++) {
-			if (engineUsed.has(i)) continue;
-			const engToks = tokens(engineReal[i]!.body);
-			let overlap = 0;
-			for (const t of htocToks) if (engToks.has(t)) overlap++;
-			if (overlap > bestOverlap) {
-				bestOverlap = overlap;
-				bestIdx = i;
-			}
-		}
-		if (bestOverlap >= 3 && bestIdx >= 0) {
-			engineUsed.add(bestIdx);
-			matched++;
-		}
-	}
-	return {
-		htoc: htocReal.length,
-		engine: engineReal.length,
-		matched,
-		htocOnly: htocReal.length - matched,
-		engineOnly: engineReal.length - matched,
-	};
 }
 
 function collectEngineReadings(cal: CalendarDate): ReadingRef[] {
@@ -245,9 +171,8 @@ function processOne(iso: string, htoc: HtocDay): {
 	const comm = compareCommemorations(htoc.commemorations, day.allSaints);
 	const read = compareReadings(htoc.scripture, readings);
 	const htocFacts = getHtocDayFacts(cal);
-	const propers = getPropers(cal);
-	const troparionCmp = compareHymns(htocFacts?.troparia ?? [], propers.troparia);
-	const kontakionCmp = compareHymns(htocFacts?.kontakia ?? [], propers.kontakia);
+	const troparionCount = htocFacts?.troparia.length ?? 0;
+	const kontakionCount = htocFacts?.kontakia.length ?? 0;
 	let rankMismatch = 0;
 	for (const m of comm.matched) {
 		if (m.engineRank === undefined) continue;
@@ -281,8 +206,8 @@ function processOne(iso: string, htoc: HtocDay): {
 			htocOnly: read.htocOnly.length,
 			engineOnly: read.engineOnly.length,
 		},
-		troparia: troparionCmp,
-		kontakia: kontakionCmp,
+		troparionCount,
+		kontakionCount,
 	};
 	return { metric, comm, read };
 }
@@ -299,13 +224,9 @@ function aggregate(agg: Aggregate, metric: DayMetric, comm: CommResult): void {
 	agg.readingHtocOnly += metric.readings.htocOnly;
 	agg.readingEngineOnly += metric.readings.engineOnly;
 	agg.readingMatched += metric.readings.matched;
-	agg.troparionMatched += metric.troparia.matched;
-	agg.troparionHtocOnly += metric.troparia.htocOnly;
-	agg.troparionEngineOnly += metric.troparia.engineOnly;
-	agg.kontakionMatched += metric.kontakia.matched;
-	agg.kontakionHtocOnly += metric.kontakia.htocOnly;
-	agg.kontakionEngineOnly += metric.kontakia.engineOnly;
-	if (metric.troparia.htoc + metric.kontakia.htoc > 0) agg.htocFactsCoverage++;
+	agg.htocTroparionTotal += metric.troparionCount;
+	agg.htocKontakionTotal += metric.kontakionCount;
+	if (metric.troparionCount + metric.kontakionCount > 0) agg.htocFactsCoverage++;
 	if (
 		metric.commemorations.htocOnly === 0 &&
 		metric.commemorations.engineOnly === 0 &&
@@ -442,36 +363,16 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 		`- Coverage ratio: matched / (matched + htocOnly) = ${((agg.readingMatched / (agg.readingMatched + agg.readingHtocOnly)) * 100).toFixed(1)}%`,
 	);
 	l.push("");
-	l.push("### Propers (HTOC-published troparia & kontakia vs. engine `getPropers`)");
+	l.push("### Propers (HTOC-published troparia & kontakia)");
 	l.push("");
 	l.push(
 		`- Days with HTOC propers data: **${agg.htocFactsCoverage}** / ${agg.days}`,
 	);
-	l.push("");
-	l.push("Troparia:");
-	l.push("");
-	l.push(`- Matched (text-token overlap ≥3): **${agg.troparionMatched}**`);
-	l.push(`- HTOC-only: **${agg.troparionHtocOnly}**`);
-	l.push(`- Engine-only: **${agg.troparionEngineOnly}**`);
-	{
-		const denom = agg.troparionMatched + agg.troparionHtocOnly;
-		const pct = denom === 0 ? "n/a" : `${((agg.troparionMatched / denom) * 100).toFixed(1)}%`;
-		l.push(`- Coverage ratio: matched / (matched + htocOnly) = ${pct}`);
-	}
-	l.push("");
-	l.push("Kontakia:");
-	l.push("");
-	l.push(`- Matched (text-token overlap ≥3): **${agg.kontakionMatched}**`);
-	l.push(`- HTOC-only: **${agg.kontakionHtocOnly}**`);
-	l.push(`- Engine-only: **${agg.kontakionEngineOnly}**`);
-	{
-		const denom = agg.kontakionMatched + agg.kontakionHtocOnly;
-		const pct = denom === 0 ? "n/a" : `${((agg.kontakionMatched / denom) * 100).toFixed(1)}%`;
-		l.push(`- Coverage ratio: matched / (matched + htocOnly) = ${pct}`);
-	}
+	l.push(`- Total troparia (HTOC publication order): **${agg.htocTroparionTotal}**`);
+	l.push(`- Total kontakia (HTOC publication order): **${agg.htocKontakionTotal}**`);
 	l.push("");
 	l.push(
-		"HTOC publishes propers verbatim; the engine computes them from upstream Ponomar `<TROPARION>` / `<KONTAKION>` XML (English wording may differ in style). An overlap of three or more content tokens is counted as a match; placeholder rows (`\"No Troparion is given…\"`) and empty-body engine rows are excluded from both sides. For HTOC-faithful display, consumers should prefer `day.troparia` / `day.kontakia` (sourced directly from `htocDayFacts.ts`) rather than engine-computed propers.",
+		"`getPropers(date)` is a thin filter over `LiturgicalDay.troparia` / `kontakia`, both sourced verbatim from HTOC via `htocDayFacts.ts`. There is no XML-vs-HTOC comparison here: the two API channels are the same data. Dates outside the vendored HTOC coverage window return empty arrays.",
 	);
 	l.push("");
 	l.push("### Rank glyph ↔ engine rank observations");
@@ -572,12 +473,8 @@ function main(): void {
 			readingHtocOnly: agg.readingHtocOnly,
 			readingEngineOnly: agg.readingEngineOnly,
 			readingMatched: agg.readingMatched,
-			troparionHtocOnly: agg.troparionHtocOnly,
-			troparionEngineOnly: agg.troparionEngineOnly,
-			troparionMatched: agg.troparionMatched,
-			kontakionHtocOnly: agg.kontakionHtocOnly,
-			kontakionEngineOnly: agg.kontakionEngineOnly,
-			kontakionMatched: agg.kontakionMatched,
+			htocTroparionTotal: agg.htocTroparionTotal,
+			htocKontakionTotal: agg.htocKontakionTotal,
 			htocFactsCoverage: agg.htocFactsCoverage,
 			rankObservations: Object.fromEntries(agg.rankObservations),
 		},

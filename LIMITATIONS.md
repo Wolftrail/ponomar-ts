@@ -32,8 +32,17 @@ Consumers who supply richer rank data may see divergence.
 `Commemoration.hymns` collects every `<TROPARION>` / `<KONTAKION>`, regardless
 of the day's `dRank`. Upstream `Service.java` would filter by
 `<SERVICE Type="…">` matching the current rank. Same reason as above: rank
-data is too sparse for the filter to be meaningful. `getPropers` returns
-all matching hymns; consumers can filter downstream if needed.
+data is too sparse for the filter to be meaningful. `Commemoration.hymns` is
+no longer a public-API source — `getPropers` returns HTOC's published
+propers verbatim — so this filter never runs in practice.
+
+### Propers outside the HTOC coverage window
+
+`getPropers(date)` and `LiturgicalDay.troparia` / `.kontakia` return HTOC
+day-facts verbatim. The vendored window is 2025–2027 (1095 days). Dates
+outside return empty arrays. Composing an order of service via
+`composeService` still works for any date, but the hymn text slots emit
+opaque `create` directives for consumers to fill from a language pack.
 
 ### `Matins.LeapReadings`
 

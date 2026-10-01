@@ -194,7 +194,6 @@ export { getServices } from "./services.ts";
 export type {
 	DailyPropers,
 	GetPropersOptions,
-	ProperRef,
 } from "./propers.ts";
 export { getPropers } from "./propers.ts";
 export type {

@@ -28,7 +28,6 @@ export type {
 	HourSelection,
 	ServicesResult,
 	DailyPropers,
-	ProperRef,
 	OrderedMatinsReading,
 	OrderedMatinsReadings,
 	ComposedService,
