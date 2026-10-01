@@ -11,6 +11,21 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.6] — 2026-10-01
+
+### Changed
+
+- `getHtocReadings(date)` is now a pure derivation on top of
+  `getDailyReadings` — it filters the main engine's output down to
+  the HTOC day-page surface (liturgy apostol+gospel, matins gospel,
+  Royal Hours and any noted saint-lectionary entry) rather than
+  dictionary-looking-up the vendored fixtures. Signature is now
+  `(date) => readonly ReadingRef[]` (no more `| null`); the fixture
+  window no longer gates coverage. Inside 2025–2027 the HTOC overlay
+  still provides ground-truth output; outside that window the Ponomar
+  algorithm fills in from menaion / triodion / pentecostarion /
+  paschalion data using the same rules HTOC's team applies.
+
 ## [1.0.0-rc.5] — 2026-10-01
 
 ### Added
