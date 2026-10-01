@@ -13,6 +13,8 @@
 // Consumers who need the canonical Divine Liturgy sequence should treat the
 // result as unordered until Phase 5+ lands the ordering logic.
 
+import { BibleRefError, parseBibleRef } from "../bible/parse.ts";
+import type { BibleRef } from "../bible/types.ts";
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import { evaluateBool } from "../core/dsl/index.ts";
 import { COMMEMORATIONS } from "../data/index.ts";
@@ -144,17 +146,47 @@ function isPonomarSequentialCid(cId: string): boolean {
 
 /** Strip Ponomar's `a`/`b`/… verse-part suffixes so e.g.
  *  `Jn_19:6-11a, 13-20, 25-28a, 30b-35a` and HTOC's
- *  `Jn_19:6-11, 13-20, 25-28, 30-35` compare equal for dedup. */
+ *  `Jn_19:6-11, 13-20, 25-28, 30-35` compare equal for dedup.
+ *
+ *  When the resulting string parses as a `BibleRef`, we canonicalize
+ *  further by returning `book|ranges` using the parser's resolved book id
+ *  and expanded same-chapter ranges. This makes the two Ponomar book-name
+ *  styles that otherwise defeat dedup compare equal:
+ *    - menaion XML uses `id` (e.g. `Philip_2:5-11`, `I_Cor_...`);
+ *    - the HTOC saint-lectionary codegen uses `short`
+ *      (e.g. `Phil_2:5-11`, `I Cor_...`);
+ *  and the shorthand/explicit chapter-prefix variants that HTOC emits
+ *  (e.g. `Lk_10:38-42, 11:27-28` vs `Lk_10:38-42, 11:27-11:28`). */
 function normalizeReadingForDedup(reading: string): string {
-	return reading.replace(/(\d)[a-z]+/g, "$1");
+	const stripped = reading.replace(/(\d)[a-z]+/g, "$1");
+	try {
+		const ref = parseBibleRef(stripped);
+		return canonicalRefKey(ref);
+	} catch (e) {
+		if (e instanceof BibleRefError) return stripped;
+		throw e;
+	}
+}
+
+/** Dedup-only key: `book|whole:C` for whole-chapter refs, or
+ *  `book|C1:V1-C2:V2,...` for ranged refs. Matches
+ *  `scripts/analysis/comparators.ts#refKey`. */
+function canonicalRefKey(ref: BibleRef): string {
+	if (ref.ranges.length === 0) return `${ref.book}|whole:${ref.chapter}`;
+	const parts = ref.ranges.map(
+		(r) =>
+			`${r.start.chapter}:${r.start.verse}-${r.end.chapter}:${r.end.verse}`,
+	);
+	return `${ref.book}|${parts.join(",")}`;
 }
 
 /** Menaion/triodion/pentecostarion encode festal matins gospels as
- *  `type="1"`; HTOC's saint-lectionary and the resurrection-cycle
- *  fallback use `type="gospel"`. Treat them as the same slot for
- *  matins dedup so the two sources don't both surface. */
+ *  `type="1"` and resurrection-cycle Sunday matins gospels (9057, 9064, …)
+ *  as `type="matins"`; HTOC's saint-lectionary and the resurrection-cycle
+ *  fallback use `type="gospel"`. Treat all three as the same slot for
+ *  matins dedup so the sources don't both surface. */
 function isMatinsGospelType(type: string): boolean {
-	return type === "gospel" || type === "1";
+	return type === "gospel" || type === "1" || type === "matins";
 }
 
 /**

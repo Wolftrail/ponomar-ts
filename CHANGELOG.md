@@ -11,6 +11,43 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.15] — 2026-10-01
+
+### Changed
+
+- **Dedup normalization now canonicalizes book id + verse ranges.**
+  `getDailyReadings` dedups HTOC-saint-lectionary / HTOC-daily-lectionary
+  refs against pre-existing menaion / paschal / triodion refs using
+  `normalizeReadingForDedup(reading)`. Previously that function only
+  stripped `a` / `b` / `c` half-verse markers (e.g. `30b-35a → 30-35`),
+  which left two systematic leaks:
+  - **Book-name variants**: Ponomar menaion XML uses the `id` form
+    (`Philip_2:5-11`, `I_Cor_...`), while the HTOC saint-lectionary
+    codegen writes the `short` form (`Phil_2:5-11`, `I Cor_...`). The
+    HTOC ref would re-surface as an additional emission on every
+    Theotokos / apostle feast.
+  - **Chapter-prefix shorthand**: HTOC renders cross-chapter continuations
+    with a redundant chapter marker (`Lk_10:38-42, 11:27-11:28`), while
+    Ponomar's `Reading=` attributes abbreviate (`Lk_10:38-42, 11:27-28`).
+    Identical ceremonial pericopes, non-identical strings → dedup miss.
+
+  The function now parses the stripped reading with `parseBibleRef` and,
+  on success, returns `${book}|${canonical ranges}` using the resolved
+  book id and fully-expanded same-chapter range endpoints. When parsing
+  fails (free-text refs, composites), it falls back to the stripped
+  string — matching the prior behavior. HTOC-corpus engine overflow
+  drops from 1,745 → 1,603 refs (−142 across 2025–2027), with the
+  `liturgy / htoc` bucket shrinking 134 → 10 (fixed Phil_ ↔ Philip_
+  cases on Theotokos liturgies).
+- **Matins Gospel dedup now recognizes `type="matins"`.**
+  `isMatinsGospelType` previously accepted only `"gospel"` and `"1"`.
+  The pentecostarion-sourced resurrection-cycle matins gospels (cIds
+  9057 All Saints, 9064 All Russian Saints, et al.) are tagged
+  `type="matins"`; without this, `appendResurrectionMatinsGospel`
+  would re-emit the 11-cycle matins gospel as a cycle-source
+  duplicate. HTOC-corpus engine overflow drops 1,841 → 1,745 refs
+  (−96 across 2025–2027).
+
 ## [1.0.0-rc.14] — 2026-10-01
 
 ### Changed
