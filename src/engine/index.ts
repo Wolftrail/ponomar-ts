@@ -8,7 +8,7 @@
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
-import { getHtocDayFacts } from "./htocDayFacts.ts";
+import { getHtocDayFacts, isHtocVendoredDate } from "./htocDayFacts.ts";
 import type { HtocCommemoration, HtocHymn } from "./htocDayFacts.ts";
 import { getHtocDayRank, getHtocSaintsFor, unmapHtocRank } from "./htocSaints.ts";
 import type { HtocSaint } from "./htocSaints.ts";
@@ -30,10 +30,15 @@ export interface LiturgicalDay {
 	 *  a navigable life page (e.g. New Hieromartyrs, Fast Day markers, minor
 	 *  Greek/Celtic/Russian commemorations). Superset of
 	 *  {@link LiturgicalDay.saints}, which is the cId-linked navigable subset.
-	 *  Empty for dates outside the vendored HTOC coverage window. */
+	 *  Within the vendored HTOC window (2025–2027) this is HTOC's own list
+	 *  verbatim; outside the window it is composed algorithmically via
+	 *  `getCommemorationsForAnyYear` (fixed-Julian + paschal/triodion-movable
+	 *  + DOW-shift + season markers + per-year transfer overlays). */
 	readonly commemorations: readonly HtocCommemoration[];
 	/** HTOC's header line, e.g. `"28 th Week after Pentecost. Tone two."`.
-	 *  Empty string for dates outside the vendored HTOC coverage window. */
+	 *  Within the vendored HTOC window (2025–2027) this is HTOC's printed
+	 *  header verbatim; outside the window it is composed algorithmically
+	 *  via `renderHtocHeaderText`. */
 	readonly headerText: string;
 	/** HTOC's fast-rule display string. Empty on non-fast days and for
 	 *  dates outside the vendored HTOC coverage window; see `getFasting`
@@ -66,10 +71,10 @@ export interface LiturgicalDay {
 	readonly htocDRank: number;
 	/** Resurrectional tone of the week (1..8), or `null` outside the
 	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
-	 * For dates in the vendored HTOC coverage window (2025–2027) this is
-	 * HTOC's printed tone verbatim; outside, it falls back to upstream
-	 * `Day.getTone()` — the last `<SAINT Tone="…">` value encountered in
-	 * paschal-then-menaion order, with `0` wrapped to `8`. */
+	 * Within the vendored HTOC window (2025–2027) this is HTOC's printed
+	 * tone verbatim; outside the window it is the algorithmic
+	 * `getOctoechosTone` (validated 100% against the vendored corpus),
+	 * with upstream `Day.getTone()` as a final fallback. */
 	readonly tone: number | null;
 }
 
@@ -86,11 +91,11 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 		: projectPonomarSaints(paschalSaints, menaionSaints);
 	const htocDRank = htocCovered !== null ? getHtocDayRank(gregorian) : 0;
 	const htocFacts = getHtocDayFacts(gregorian);
-	const headerText = htocFacts?.headerText ?? "";
-	const fastText = htocFacts?.fastText ?? "";
-	const commemorations = htocFacts?.commemorations ?? [];
-	const troparia = htocFacts?.troparia ?? [];
-	const kontakia = htocFacts?.kontakia ?? [];
+	const headerText = htocFacts.headerText;
+	const fastText = htocFacts.fastText;
+	const commemorations = htocFacts.commemorations;
+	const troparia = htocFacts.troparia;
+	const kontakia = htocFacts.kontakia;
 	let dRank = 0;
 	let toneRaw: number | null = null;
 	for (const s of allSaints) {
@@ -102,9 +107,15 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 		if (s.tone !== null && s.tone !== -1) toneRaw = s.tone;
 	}
 	const engineTone = toneRaw === null ? null : toneRaw === 0 ? 8 : toneRaw;
-	// Prefer HTOC's printed tone within the vendored window; fall back to
-	// the engine computation outside.
-	const tone = htocFacts !== null ? htocFacts.tone : engineTone;
+	// Within the vendored HTOC window, use the published tone verbatim
+	// (including `null` on Bright Week / Great Feasts). Outside the window,
+	// `htocFacts.tone` is the algorithmic `getOctoechosTone`, which matches
+	// HTOC on the entire vendored corpus; we still fall through to
+	// `engineTone` as a last resort for parity with the pre-Phase-D
+	// behaviour on sparse menaion days.
+	const tone = isHtocVendoredDate(gregorian)
+		? htocFacts.tone
+		: (htocFacts.tone ?? engineTone);
 	return {
 		context,
 		saints,
@@ -173,7 +184,7 @@ export { HTOC_DAILY_LECTIONARY } from "./dailyLectionary.ts";
 export type { HtocSaint } from "./htocSaints.ts";
 export { HTOC_SAINTS_BY_ISO } from "./htocSaints.ts";
 export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
-export { HTOC_DAY_FACTS_BY_ISO } from "./htocDayFacts.ts";
+export { HTOC_DAY_FACTS_BY_ISO, isHtocVendoredDate } from "./htocDayFacts.ts";
 export type { HtocSaintLectionaryEntry } from "./saintLectionary.ts";
 export { HTOC_SAINT_LECTIONARY } from "./saintLectionary.ts";
 
