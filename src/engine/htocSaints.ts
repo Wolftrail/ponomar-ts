@@ -59,6 +59,21 @@ export function mapHtocRank(glyph: string): number {
 	}
 }
 
+/** Inverse of {@link mapHtocRank}: Ponomar's 0..8 scale → HTOC glyph. Used
+ *  when projecting Ponomar `ResolvedSaint`s into `HtocSaint` shape for
+ *  dates outside the vendored HTOC coverage window. Pascha (8) and the
+ *  Great Feasts of the Lord (7) both collapse onto HTOC's top glyph "6"
+ *  since HTOC does not distinguish them in its ranking. */
+export function unmapHtocRank(rank: number): string {
+	if (rank >= 6) return "6";
+	if (rank === 5) return "4";
+	if (rank === 4) return "3";
+	if (rank === 3) return "2";
+	if (rank === 2) return "1";
+	if (rank === 1) return "o";
+	return "0";
+}
+
 /** Max HTOC-derived rank across all saints on `gregorian` (0 if none). */
 export function getHtocDayRank(gregorian: CalendarDate): number {
 	const saints = getHtocSaintsFor(gregorian);

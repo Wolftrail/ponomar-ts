@@ -15,7 +15,7 @@ export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
 export * as bible from "./bible/index.ts";
 export * as astronomy from "./astronomy/index.ts";
-export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle, getResurrectionMatinsGospel, RESURRECTION_MATINS_GOSPELS, getHtocDailyLectionary, HTOC_DAILY_LECTIONARY, getHtocSaintsFor, getHtocDayRank, mapHtocRank, HTOC_SAINTS_BY_ISO } from "./engine/index.ts";
+export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOrderedLiturgyReadings, getServices, getPropers, getOrderedMatinsReadings, composeService, getHourService, getPhrase, resolveCreate, resolveCommand, resolveBibleHeader, resolveTitle, getResurrectionMatinsGospel, RESURRECTION_MATINS_GOSPELS, getHtocDailyLectionary, HTOC_DAILY_LECTIONARY, getHtocSaintsFor, getHtocDayRank, mapHtocRank, unmapHtocRank, HTOC_SAINTS_BY_ISO } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
 	DailyReadings,

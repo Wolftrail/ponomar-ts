@@ -66,9 +66,9 @@ describe("getHtocSaintsFor + getHtocDayRank", () => {
 });
 
 describe("LiturgicalDay htoc channel", () => {
-	test("Nativity 2025 exposes htocSaints + htocDRank", () => {
+	test("Nativity 2025 exposes saints + htocDRank", () => {
 		const day = getLiturgicalDay({ year: 2025, month: 1, day: 7 });
-		assert.ok(day.htocSaints.length > 0);
+		assert.ok(day.saints.length > 0);
 		assert.equal(day.htocDRank, 7);
 	});
 
@@ -80,11 +80,14 @@ describe("LiturgicalDay htoc channel", () => {
 		assert.ok(day.dRank > 0, "Ponomar dRank should still be set for Nativity");
 	});
 
-	test("out-of-window date has htocSaints=[] but Ponomar data intact", () => {
+	test("out-of-window date falls back to Ponomar-projected saints", () => {
 		const day = getLiturgicalDay({ year: 2030, month: 7, day: 15 });
-		assert.deepEqual(day.htocSaints, []);
 		assert.equal(day.htocDRank, 0);
-		// Ponomar data should still be populated.
+		// Ponomar structural data should still be populated...
 		assert.ok(day.menaionSaints.length > 0 || day.paschalSaints.length > 0);
+		// ...and `saints` should mirror it (projected from `allSaints`),
+		// not be empty — the engine must remain usable outside HTOC coverage.
+		assert.equal(day.saints.length, day.allSaints.length);
+		for (const s of day.saints) assert.match(s.slug, /^ponomar\//);
 	});
 });

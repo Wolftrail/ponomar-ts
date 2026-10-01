@@ -8,7 +8,7 @@
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
-import { getHtocDayRank, getHtocSaintsFor } from "./htocSaints.ts";
+import { getHtocDayRank, getHtocSaintsFor, unmapHtocRank } from "./htocSaints.ts";
 import type { HtocSaint } from "./htocSaints.ts";
 import { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
 import type { ResolvedSaint } from "./resolve.ts";
@@ -17,22 +17,29 @@ import { resolveSaints } from "./resolve.ts";
 /** Result of `getLiturgicalDay`. */
 export interface LiturgicalDay {
 	readonly context: DayContext;
-	/** Saints from the paschal cycle (pentecostarion or triodion), Cmd-filtered. */
+	/** Primary saint commemoration list, HTOC-faithful. For dates in the
+	 *  vendored HTOC coverage window (2025–2027) this is HTOC's own list
+	 *  verbatim. For dates outside, it is projected from the Ponomar
+	 *  structural lists below (with the HTOC name overlay applied to
+	 *  `text`). Prefer this for display. */
+	readonly saints: readonly HtocSaint[];
+	/** Structural saints from the paschal cycle (pentecostarion / triodion),
+	 *  Cmd-filtered. Keyed by Ponomar `cId`; carries `tone` and `church.rank`.
+	 *  Used internally for `dRank`, `tone`, readings, and propers; prefer
+	 *  {@link LiturgicalDay.saints} for user-facing display. */
 	readonly paschalSaints: readonly ResolvedSaint[];
-	/** Saints from the fixed Menaion at Julian MM-DD, Cmd-filtered. */
+	/** Structural saints from the fixed Menaion at Julian MM-DD, Cmd-filtered.
+	 *  See the note on {@link LiturgicalDay.paschalSaints}. */
 	readonly menaionSaints: readonly ResolvedSaint[];
-	/** Union of paschalSaints then menaionSaints, in that order. */
+	/** Union of {@link LiturgicalDay.paschalSaints} then
+	 *  {@link LiturgicalDay.menaionSaints}, in that order. Structural; see
+	 *  the note on {@link LiturgicalDay.paschalSaints}. */
 	readonly allSaints: readonly ResolvedSaint[];
-	/** HTOC (ROCOR / Jordanville) saint commemorations for this date, or
-	 *  `[]` outside the vendored 2025–2027 coverage window. Parallel to
-	 *  `allSaints`; not deduped against Ponomar entries. */
-	readonly htocSaints: readonly HtocSaint[];
 	/** Highest `church.rank` across `allSaints` (0 if none). Matches upstream
 	 * `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`. */
 	readonly dRank: number;
-	/** Highest rank across `htocSaints` on Ponomar's numeric scale (via
-	 *  `mapHtocRank`). `0` when HTOC has no ranked commemoration or the
-	 *  date is outside coverage. */
+	/** Highest rank across `saints` on Ponomar's numeric scale (via
+	 *  `mapHtocRank`). `0` when HTOC has no ranked commemoration. */
 	readonly htocDRank: number;
 	/** Resurrectional tone of the week (1..8), or `null` outside the
 	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
@@ -48,8 +55,11 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const paschalSaints = paschal ? resolveSaints(paschal, context) : [];
 	const menaionSaints = menaion ? resolveSaints(menaion, context) : [];
 	const allSaints = [...paschalSaints, ...menaionSaints];
-	const htocSaints = getHtocSaintsFor(gregorian) ?? [];
-	const htocDRank = getHtocDayRank(gregorian);
+	const htocCovered = getHtocSaintsFor(gregorian);
+	const saints: readonly HtocSaint[] = htocCovered !== null
+		? htocCovered
+		: projectPonomarSaints(paschalSaints, menaionSaints);
+	const htocDRank = htocCovered !== null ? getHtocDayRank(gregorian) : 0;
 	let dRank = 0;
 	let toneRaw: number | null = null;
 	for (const s of allSaints) {
@@ -63,13 +73,43 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const tone = toneRaw === null ? null : toneRaw === 0 ? 8 : toneRaw;
 	return {
 		context,
+		saints,
 		paschalSaints,
 		menaionSaints,
 		allSaints,
-		htocSaints,
 		dRank,
 		htocDRank,
 		tone,
+	};
+}
+
+/** Project Ponomar `ResolvedSaint`s into the HTOC `HtocSaint` shape so that
+ *  `LiturgicalDay.saints` is populated for dates outside HTOC's vendored
+ *  coverage window. `text` uses the HTOC-overlaid `nominative` wording when
+ *  available (otherwise upstream Ponomar wording), and the slug is a
+ *  synthetic `ponomar/<cId>` to make the projection round-trippable. */
+function projectPonomarSaints(
+	paschalSaints: readonly ResolvedSaint[],
+	menaionSaints: readonly ResolvedSaint[],
+): HtocSaint[] {
+	const out: HtocSaint[] = [];
+	for (const s of paschalSaints) out.push(toHtocSaint(s, "movable"));
+	for (const s of menaionSaints) out.push(toHtocSaint(s, "fixed"));
+	return out;
+}
+
+function toHtocSaint(
+	s: ResolvedSaint,
+	cycle: "fixed" | "movable",
+): HtocSaint {
+	const text = s.name?.nominative ?? s.name?.short ?? "";
+	const short = s.name?.short;
+	return {
+		slug: `ponomar/${s.cId}`,
+		cycle,
+		names: short !== undefined && short !== "" ? [short] : [],
+		rank: unmapHtocRank(s.church?.rank ?? 0),
+		text,
 	};
 }
 
@@ -108,6 +148,7 @@ export {
 	getHtocSaintsFor,
 	getHtocDayRank,
 	mapHtocRank,
+	unmapHtocRank,
 } from "./htocSaints.ts";
 export type {
 	FastingCase,
