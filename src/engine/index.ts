@@ -209,6 +209,19 @@ export {
 	isToneSuppressed,
 	rawOctoechosTone,
 } from "./tone.ts";
+export type { SeasonKind } from "./season.ts";
+export {
+	getLentenWeek,
+	getLiturgicalSeason,
+	getPentecostWeek,
+	isSviatki,
+} from "./season.ts";
+export { renderHtocHeaderText } from "./headerText.ts";
+export {
+	getCommemorationsForAnyYear,
+	getFixedCommemorations,
+	getSeasonCommemorations,
+} from "./commemorations.ts";
 export type {
 	BibleDirective,
 	CreateDirective,
