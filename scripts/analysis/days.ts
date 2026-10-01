@@ -1,12 +1,13 @@
 // Project the scraped HTOC corpus (`tests/fixtures/htoc-full-<year>.json`)
 // down to a day-level view: one record per ISO date with the header
-// context, tone, fast text, scripture, and troparia. Commemorations are
-// omitted (covered by scratch/htoc-saints.json). Each scripture and
-// troparion carries a `saints` array attributing it to the day's
-// commemorations by matching the scripture `note` / troparion `title`
-// against `commemoration.text` and `lives[].name`. Empty `saints` means
-// the entry is a day-office / feast reading not tied to a specific saint,
-// or that no plausible commemoration matched.
+// context, tone, fast text, scripture, troparia, and kontakia.
+// Commemorations are omitted (covered by scratch/htoc-saints.json). Each
+// scripture / troparion / kontakion carries a `saints` array attributing
+// it to the day's commemorations by matching the scripture `note` or
+// hymn `title` against `commemoration.text` and `lives[].name`. Empty
+// `saints` means the entry is a day-office / feast reading not tied to a
+// specific saint, or that no plausible commemoration matched. Troparia
+// and kontakia for the same commemoration share a `group` number.
 //
 // Usage:
 //   node --experimental-strip-types scripts/analysis/days.ts
@@ -40,6 +41,14 @@ interface DayProjection {
 	readonly fastText: string | null;
 	readonly scripture: readonly AttributedScripture[];
 	readonly troparia: readonly AttributedHymn[];
+	readonly kontakia: readonly AttributedHymn[];
+}
+
+// Titles like "Kontakion, Tone IV" or the HTOC typo "Kontaklon…" are
+// kontakia; everything else (explicit "Troparion", bare saint headings,
+// "Hymn to the Theotokos", "Exaposteilarion", etc.) goes with troparia.
+function isKontakion(title: string): boolean {
+	return /\bkonta(k|kl)ion\b/i.test(title);
 }
 
 // Anything the note/title matches from these is a pure day-office or
@@ -254,6 +263,8 @@ let scriptureOffice = 0;
 let scriptureAttributed = 0;
 let troparionTotal = 0;
 let troparionAttributed = 0;
+let kontakionTotal = 0;
+let kontakionAttributed = 0;
 
 for (const { iso, day } of iterCorpus()) {
 	const scripture: AttributedScripture[] = day.scripture.map((s) => {
@@ -264,12 +275,21 @@ for (const { iso, day } of iterCorpus()) {
 		if (saints.length > 0) scriptureAttributed++;
 		return { ...s, saints };
 	});
-	const troparia: AttributedHymn[] = day.troparia.map((t) => {
-		troparionTotal++;
+	const troparia: AttributedHymn[] = [];
+	const kontakia: AttributedHymn[] = [];
+	for (const t of day.troparia) {
 		const saints = attributeTroparion(t, day.commemorations);
-		if (saints.length > 0) troparionAttributed++;
-		return { ...t, saints };
-	});
+		const entry: AttributedHymn = { ...t, saints };
+		if (isKontakion(t.title)) {
+			kontakionTotal++;
+			if (saints.length > 0) kontakionAttributed++;
+			kontakia.push(entry);
+		} else {
+			troparionTotal++;
+			if (saints.length > 0) troparionAttributed++;
+			troparia.push(entry);
+		}
+	}
 	days[iso] = {
 		civil: day.civil,
 		julian: day.julian,
@@ -278,6 +298,7 @@ for (const { iso, day } of iterCorpus()) {
 		fastText: day.fastText,
 		scripture,
 		troparia,
+		kontakia,
 	};
 }
 
@@ -299,4 +320,7 @@ console.log(
 );
 console.log(
 	`  troparia : ${troparionTotal} total, ${troparionAttributed} attributed to saint(s)`,
+);
+console.log(
+	`  kontakia : ${kontakionTotal} total, ${kontakionAttributed} attributed to saint(s)`,
 );
