@@ -7,6 +7,22 @@ Filing an issue is welcome if you hit real breakage or need one lifted.
 
 For per-phase context, see [PLAN.md](PLAN.md).
 
+## Tradition and jurisdictional scope
+
+ponomar-ts follows the **Russian Orthodox** usage of the Jerusalem Typicon
+(Slavic recension) as published by Holy Trinity Monastery, Jordanville
+(ROCOR) at [holytrinityorthodox.com](https://www.holytrinityorthodox.com/calendar/).
+Fixed feasts are keyed to the **Julian** calendar; fasting follows the
+**Russian monastic charter**; the saint corpus includes the twentieth-century
+Russian New Hieromartyrs and other Moscow-Patriarchate / ROCOR
+commemorations. See the "Tradition" section of
+[README.md](README.md#tradition) for the full statement.
+
+Out of scope: Greek / Antiochian usage, New-Calendar (Revised Julian)
+fixed-feast dating, Old Rite / Old Believer rubrics, and Mt. Athos monastic
+variants. Pull requests that would widen the project to serve those
+traditions are welcome in principle but will not block 1.0.
+
 ## Engine
 
 ### Lucan-jump *numbering* (Sept–Nov sequential-reading cycle reset)

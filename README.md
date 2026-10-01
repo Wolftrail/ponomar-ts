@@ -20,6 +20,57 @@ files that encode each day's rubrics.
 so it can be consumed by modern JS/TS applications (Node servers, Next.js
 apps, mobile React Native builds) without a JVM or a desktop UI.
 
+### Tradition
+
+ponomar-ts computes the Orthodox liturgical day as kept by the **Russian
+Orthodox Church** — the Slavic recension of the Jerusalem Typicon, in the
+form published by the [Russian Orthodox Church Outside Russia](https://www.synod.com/)
+(ROCOR) parish of Holy Trinity Monastery, Jordanville, NY at
+[holytrinityorthodox.com](https://www.holytrinityorthodox.com/calendar/) (HTOC).
+Concretely:
+
+- **Julian ("Old Calendar") menaion** — fixed feasts are keyed to Julian
+  month-day. The library accepts a Gregorian `CalendarDate` from the caller
+  and converts internally; e.g. Nativity of Christ (Julian Dec 25) falls on
+  Gregorian Jan 7.
+- **Orthodox Paschalion** — Meeus' luni-solar algorithm as implemented by
+  the Russian / Jerusalem / Serbian / OCA / ROCOR / Georgian / Bulgarian
+  churches, i.e. the dating used by every church *except* the Finnish Orthodox
+  (which follows Western Pascha).
+- **Russian monastic charter** for fasting — the nine canonical levels
+  (`strict`, `no-oil`, `with-oil`, `with-fish`, `with-caviar`, `with-wine`,
+  `fast-free`, `no-fast`, …) with HTOC's displayed phrasing
+  (`"By Monastic Charter: Strict Fast (Bread, Vegetables, Fruits)"`).
+- **Russian-recension commemorations** — including the twentieth-century
+  Russian **New Hieromartyrs** and **New Confessors**, the Royal Martyrs,
+  St. John of Shanghai and San Francisco, St. Herman of Alaska, the
+  Synaxes of Russian / Siberian / Belarusian saints, and other
+  commemorations proper to the Moscow Patriarchate / ROCOR usage.
+  `LiturgicalDay.commemorations` surfaces HTOC's day-page list verbatim
+  (16 229 entries across the vendored 2025–2027 window).
+- **English display text and biographies** — HTOC publishes in English;
+  this project ships English strings. Native-language rendering (Church
+  Slavonic, Russian, Greek) is a consumer concern.
+
+Not covered by this project:
+
+- **Greek / Antiochian / Melkite usage** (Constantinopolitan recension,
+  Greek-language rubrics, different New Hieromartyr / local-saint sets).
+- **New Calendar** (Revised Julian) fixed-feast dating as used by the
+  Ecumenical Patriarchate, Greek Archdiocese, Antiochian Archdiocese,
+  OCA parishes under the "new style", Romanian / Bulgarian / Polish /
+  Albanian / Czech-and-Slovak churches, etc. Pascha itself is dated the
+  same way as in ponomar-ts across all these jurisdictions, but every
+  fixed feast is 13 days earlier than what ponomar-ts returns.
+- **Old Rite / Old Believer** rubrics (pre-Nikonian Russian usage).
+- **Mount Athos monastic variants** of the Jerusalem Typicon.
+
+Jurisdictions that *are* served well by the shipping dataset: Moscow
+Patriarchate, ROCOR, Serbian Orthodox Church, Georgian Orthodox Church,
+Polish Orthodox Church, OCA Old Calendar parishes, Bulgarian Orthodox
+Church (fixed-feast dates; local-saint set is close but not identical),
+and Jerusalem Patriarchate (fixed-feast dates; different local-saint set).
+
 ### Scope
 
 Ported:
