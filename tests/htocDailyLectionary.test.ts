@@ -12,10 +12,10 @@ import { describe, test } from "node:test";
 import {
 	getDailyReadings,
 	getLiturgyReadings,
-	getHtocDailyLectionary,
 	HTOC_DAILY_LECTIONARY,
 	getLiturgicalDay,
 } from "../src/index.ts";
+import { getHtocDailyLectionary } from "../src/engine/dailyLectionary.ts";
 
 describe("HTOC_DAILY_LECTIONARY table", () => {
 	test("covers 880 slots", () => {

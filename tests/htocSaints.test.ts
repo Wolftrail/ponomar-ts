@@ -6,11 +6,13 @@ import { describe, test } from "node:test";
 
 import {
 	HTOC_SAINTS_BY_ISO,
+	getLiturgicalDay,
+} from "../src/index.ts";
+import {
 	getHtocDayRank,
 	getHtocSaintsFor,
-	getLiturgicalDay,
 	mapHtocRank,
-} from "../src/index.ts";
+} from "../src/engine/htocSaints.ts";
 
 describe("HTOC_SAINTS_BY_ISO table", () => {
 	test("covers 1092 unique ISO dates", () => {

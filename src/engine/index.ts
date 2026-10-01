@@ -153,18 +153,7 @@ function toHtocSaint(
 }
 
 export type { DayContext } from "./day.ts";
-/** @deprecated Ponomar DSL internals — will be moved private in a future
- *  major release. The HTOC-first API doesn't require direct access to
- *  `DayContext` or the DSL evaluator; use `getDay(date)` for day-level
- *  facts and `getReadings(date)` for scripture. */
-export { computeDayContext, dslContext } from "./day.ts";
-/** @deprecated Ponomar lookup internals — will be moved private. */
-export { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
 export type { ResolvedSaint } from "./resolve.ts";
-/** @deprecated Ponomar menaion resolver — will be moved private. Use
- *  `getSaints(date)` for the HTOC-published saint list on a date, or
- *  `getSaint(slug)` for a saint-centric profile. */
-export { resolveSaints } from "./resolve.ts";
 export type {
 	Church,
 	Commemoration,
@@ -179,51 +168,16 @@ export type {
 	ReadingRef,
 } from "./readings.ts";
 export { getDailyReadings, getLiturgyReadings } from "./readings.ts";
-export type { ResurrectionMatinsGospel } from "./matinsGospel.ts";
-/** @deprecated The 11-week resurrection matins gospel cycle is applied
- *  automatically by `getReadings(date)` on Sundays. Direct access to the
- *  cycle will be moved private in a future major release. */
-export {
-	RESURRECTION_MATINS_GOSPELS,
-	getResurrectionMatinsGospel,
-} from "./matinsGospel.ts";
 export type { HtocDailyLectionaryEntry } from "./dailyLectionary.ts";
 export { HTOC_DAILY_LECTIONARY } from "./dailyLectionary.ts";
-/** @deprecated Renamed to `getDailyLectionary` (HTOC is now the default
- *  surface so the prefix is redundant). Both names return identical
- *  values and will coexist through the 1.0 cycle. */
-export { getHtocDailyLectionary } from "./dailyLectionary.ts";
-/** @deprecated Renamed to `getReadings`. Both names return identical
- *  values and will coexist through the 1.0 cycle. */
-export { getHtocReadings } from "./htocReadings.ts";
 export type { HtocSaint } from "./htocSaints.ts";
 export { HTOC_SAINTS_BY_ISO } from "./htocSaints.ts";
-/** @deprecated Renamed to `getSaints`. Both names return identical
- *  values and will coexist through the 1.0 cycle. */
-export { getHtocSaintsFor } from "./htocSaints.ts";
-/** @deprecated HTOC rank-glyph adapters for the Ponomar numeric scale.
- *  Will be moved private; use `HtocSaint.rank` and `HtocCommemoration.rank`
- *  directly as display strings. */
-export {
-	getHtocDayRank,
-	mapHtocRank,
-	unmapHtocRank,
-} from "./htocSaints.ts";
 export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
 export { HTOC_DAY_FACTS_BY_ISO } from "./htocDayFacts.ts";
-/** @deprecated Renamed to `getDay`. Both names return identical values
- *  and will coexist through the 1.0 cycle. */
-export { getHtocDayFacts } from "./htocDayFacts.ts";
-
 export type { HtocSaintLectionaryEntry } from "./saintLectionary.ts";
 export { HTOC_SAINT_LECTIONARY } from "./saintLectionary.ts";
-/** @deprecated Renamed to `getSaintLectionary`. Both names return
- *  identical values and will coexist through the 1.0 cycle. */
-export { getHtocSaintLectionary } from "./saintLectionary.ts";
 
-// --- HTOC-first unprefixed facade. These are the preferred public names
-// going forward; the prefixed aliases above remain as deprecated-but-
-// functional re-exports.
+// --- HTOC-first facade. These are the canonical public names.
 export type { SaintCommemoration, SaintProfile } from "./saints.ts";
 export {
 	cIdToSlug,
@@ -244,54 +198,6 @@ export type {
 	FastingResult,
 } from "./fasting.ts";
 export { getFasting } from "./fasting.ts";
-export type {
-	OrderedLiturgyReadings,
-	OrderedReading,
-} from "./orderedLiturgy.ts";
-/** @deprecated Ponomar service composer — will be moved private. HTOC
- *  publishes a daily reading list, not a service ordering; use
- *  `getReadings(date)` for scripture. */
-export { getOrderedLiturgyReadings } from "./orderedLiturgy.ts";
-export type { HourSelection, ServicesResult } from "./services.ts";
-/** @deprecated Ponomar service picker — will be moved private. */
-export { getServices } from "./services.ts";
-export type {
-	DailyPropers,
-	GetPropersOptions,
-} from "./propers.ts";
-/** @deprecated Ponomar propers composer — will be moved private. HTOC
- *  troparia / kontakia are on `getDay(date).troparia` and
- *  `getDay(date).kontakia`. */
-export { getPropers } from "./propers.ts";
-export type {
-	OrderedMatinsReading,
-	OrderedMatinsReadings,
-} from "./orderedMatins.ts";
-/** @deprecated Ponomar matins composer — will be moved private. */
-export { getOrderedMatinsReadings } from "./orderedMatins.ts";
-export type { ComposedService, ComposeServiceOptions } from "./compose.ts";
-/** @deprecated Ponomar service composer — will be moved private. */
-export { composeService } from "./compose.ts";
-export type {
-	GetHourServiceOptions,
-	HourName,
-	HourReadings,
-	HourServiceResult,
-} from "./hours.ts";
-/** @deprecated Ponomar hour-service composers — will be moved private.
- *  Royal-Hours readings are available via `getReadings(date)` with
- *  `r.hour !== undefined`. */
-export { getHourReadings, getHourService } from "./hours.ts";
-export type { ResolvedTitle } from "./phrases.ts";
-/** @deprecated Ponomar DSL phrase / command / title resolver — will be
- *  moved private. */
-export {
-	getPhrase,
-	resolveBibleHeader,
-	resolveCommand,
-	resolveCreate,
-	resolveTitle,
-} from "./phrases.ts";
 export type {
 	BibleDirective,
 	CreateDirective,

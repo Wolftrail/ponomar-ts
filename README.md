@@ -80,12 +80,11 @@ Ported:
 - [x] **StringOp DSL** — lexer + Pratt parser + evaluator for `Cmd=` / `Value=` rule expressions
 - [x] **Day composition** — `getLiturgicalDay(date)` → paschal + menaion saints, `dRank`, tone
 - [x] **Commemoration metadata** — names, ranks, biographical info, and life prose (English)
-- [x] **Gospel / Epistle readings** — `getDailyReadings` (raw) and `getOrderedLiturgyReadings` (Suppress + Class3Transfers + Saturday inversion + cross-day pull)
-- [x] **Matins reading conflict resolution** — Sunday festal-vs-sequential arbitration
+- [x] **Gospel / Epistle readings** — `getReadings(date)` returns the HTOC day-page list (Liturgy apostol + gospel, Matins festal/resurrection gospel, Royal Hours readings, saint-lectionary pulls)
+- [x] **Matins reading conflict resolution** — Sunday festal-vs-sequential arbitration applied automatically
 - [x] **Fasting rules** — `getFasting(date)` → 9 canonical levels + per-food-group permissions
-- [x] **Service selection** — Little Hours template dispatch per period rules
-- [x] **Service composition** — typed directive streams for every static template under `languages/xml/Services/`
-- [x] **Hymn propers** — `getPropers(date)` → troparia + kontakia per commemoration
+- [x] **Daily commemorations** — `getSaints(date)` (navigable saint list) and `getDay(date)` (full HTOC day page: header, commemorations, troparia, kontakia, fast text)
+- [x] **Saint-centric facade** — `getSaint(slug)` returns names, commemoration dates, and life prose for `/saints/<slug>` routes
 - [x] **Phrase text** — 283 static phrases (CommonPrayers / Text / Header / Command), English
 - [x] **Bible reference parser** — 1169/1170 upstream refs parse cleanly (one is an upstream typo)
 - [x] **Astronomy** — sunrise/sunset (SUNRISET.C) + Metonic-cycle lunar phase
@@ -141,10 +140,11 @@ the browser, and time-zone-sensitive contexts.
 ```ts
 import {
   getOrthodoxPascha,
-  getLiturgicalDay,
-  getOrderedLiturgyReadings,
+  getDay,
+  getSaints,
+  getReadings,
   getFasting,
-  getHourService,
+  getSaint,
   parseBibleRef,
 } from "ponomar-ts";
 
@@ -152,26 +152,30 @@ import {
 getOrthodoxPascha(2026);
 // → { year: 2026, month: 4, day: 12 }
 
-// Full liturgical day: paschal + menaion saints, dRank, tone
-const day = getLiturgicalDay({ year: 2024, month: 1, day: 7 }); // Nativity (Old Calendar)
-day.dRank;                         // 7 (Great Feast of the Lord)
-day.allSaints[1]?.name?.short;     // "Nativity"
+// HTOC day page: header, commemorations, troparia, kontakia, fast text
+const day = getDay({ year: 2026, month: 9, day: 27 }); // Exaltation of the Cross
+day?.headerText;              // "17 th Sunday after Pentecost. Tone eight."
+day?.commemorations[0]?.text; // "Universal Exaltation of the Precious and Life-Giving Cross..."
 
-// Divine Liturgy readings — canonical order, with Suppress + Class3Transfers
-const readings = getOrderedLiturgyReadings({ year: 2024, month: 1, day: 7 });
-readings.apostol.map(r => r.reading); // ["Gal_4:4-7"]
-readings.gospel.map(r => r.reading);  // ["Mt_2:1-12"]
+// HTOC's navigable saint list (one entry per linked life page)
+const saints = getSaints({ year: 2026, month: 9, day: 27 });
+saints?.map(s => s.slug);     // ["September/14-01", ...]
+
+// HTOC's day-page scripture list
+const readings = getReadings({ year: 2026, month: 9, day: 27 });
+readings.filter(r => r.service === "liturgy").map(r => r.reading);
+// → ["I Cor_1:18-24", "Jn_19:6-11,13-20,25-28,30-35"]
 
 // Fasting rule for a date
 const fast = getFasting({ year: 2024, month: 3, day: 22 }); // Lenten Friday
-fast.level;                  // "no-oil"
-fast.permitted.meat;         // false
-fast.permitted.oil;          // false
+fast.level;                   // "no-oil"
+fast.permitted.meat;          // false
+fast.permitted.oil;           // false
 
-// Little Hour template dispatch (Prime, Terce, Sexte, None)
-const prime = getHourService({ year: 2024, month: 4, day: 2 }, "prime");
-prime.templateName;   // "Prime"
-prime.PFlag2;         // 1 (auto-derived: Lenten)
+// Saint-centric facade — resolve the slug HTOC uses in `/saints/<slug>` routes
+const saint = getSaint("December/19-01"); // Boniface of Tarsus
+saint?.commemorations.length; // 1 (Dec 19 Gregorian, in the 2025–2027 window)
+saint?.life?.text;            // biographical prose, English
 
 // Bible reference parser (78 books, 163 aliases)
 parseBibleRef("I Tim_3:14-4:5");

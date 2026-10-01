@@ -11,6 +11,70 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.9] — 2026-10-01
+
+### Removed
+
+- **Stage 3 of the HTOC-first API refactor.** The symbols deprecated in
+  rc.8 are now removed from both public barrels (`ponomar-ts` and
+  `ponomar-ts/engine`). The implementations remain in their respective
+  internal files, so the engine still works; they're just no longer
+  re-exported.
+
+- **Ponomar DSL + resolver internals** (removed): `computeDayContext`,
+  `dslContext`, `selectMenaionEntry`, `selectPaschalCycleEntry`,
+  `resolveSaints`, `getPhrase`, `resolveBibleHeader`, `resolveCommand`,
+  `resolveCreate`, `resolveTitle`.
+
+- **Ponomar service composers** (removed): `composeService`,
+  `getPropers`, `getServices`, `getHourService`, `getHourReadings`,
+  `getOrderedLiturgyReadings`, `getOrderedMatinsReadings`.
+
+- **Rank-glyph adapters** (removed): `getHtocDayRank`, `mapHtocRank`,
+  `unmapHtocRank`. Use `HtocSaint.rank` / `HtocCommemoration.rank`
+  display strings directly.
+
+- **Matins gospel cycle direct access** (removed):
+  `RESURRECTION_MATINS_GOSPELS`, `getResurrectionMatinsGospel`. Applied
+  automatically by `getReadings(date)` on Sundays.
+
+- **Prefixed `getHtoc*` function aliases** (removed): `getHtocReadings`,
+  `getHtocDayFacts`, `getHtocSaintsFor`, `getHtocDailyLectionary`,
+  `getHtocSaintLectionary`. Use the unprefixed `getReadings`, `getDay`,
+  `getSaints`, `getDailyLectionary`, `getSaintLectionary` instead.
+
+- Types removed from the public API: `ResurrectionMatinsGospel`,
+  `OrderedLiturgyReadings`, `OrderedReading`, `HourSelection`,
+  `ServicesResult`, `DailyPropers`, `GetPropersOptions`,
+  `OrderedMatinsReading`, `OrderedMatinsReadings`, `ComposedService`,
+  `ComposeServiceOptions`, `GetHourServiceOptions`, `HourName`,
+  `HourReadings`, `HourServiceResult`, `ResolvedTitle`.
+
+### Changed
+
+- README usage examples updated to showcase the HTOC-first API
+  (`getDay`, `getSaints`, `getReadings`, `getSaint`).
+
+### Migration
+
+Replace calls as follows:
+
+| Removed                         | Use instead                                    |
+|---------------------------------|------------------------------------------------|
+| `getHtocReadings(d)`            | `getReadings(d)`                               |
+| `getHtocDayFacts(d)`            | `getDay(d)`                                    |
+| `getHtocSaintsFor(d)`           | `getSaints(d)`                                 |
+| `getHtocDailyLectionary(ctx)`   | `getDailyLectionary(ctx)`                      |
+| `getHtocSaintLectionary(cId)`   | `getSaintLectionary(cId)`                      |
+| `getOrderedLiturgyReadings(d)`  | `getReadings(d).filter(r => r.service === "liturgy")` |
+| `getPropers(d)`                 | `getDay(d).troparia` + `getDay(d).kontakia`    |
+| `getResurrectionMatinsGospel(w)`| `getReadings(d).filter(r => r.service === "matins")` |
+
+If you need the old DSL/resolver/composer implementations, you can
+still import them from their direct file paths (e.g.
+`ponomar-ts/engine/compose` is unsupported but will resolve). This
+escape hatch is not covered by semver.
+
 ## [1.0.0-rc.8] — 2026-10-01
 
 ### Deprecated

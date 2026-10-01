@@ -19,7 +19,7 @@ import {
 	resolveCommand,
 	resolveCreate,
 	resolveTitle,
-} from "../src/engine/index.ts";
+} from "../src/engine/phrases.ts";
 
 describe("PHRASES map (Phase 8c-ii)", () => {
 	it("captures a representative sample from every scanned root", () => {

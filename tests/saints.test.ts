@@ -10,16 +10,6 @@ import {
 	getSaintByCId,
 	slugToCId,
 } from "../src/engine/saints.ts";
-import {
-	getReadings,
-	getDay,
-	getSaints,
-} from "../src/engine/index.ts";
-import {
-	getHtocReadings,
-	getHtocDayFacts,
-	getHtocSaintsFor,
-} from "../src/engine/index.ts";
 
 describe("slug ↔ cId bridge", () => {
 	test("December/19-01 (Boniface) resolves to cId 437", () => {
@@ -85,21 +75,5 @@ describe("getSaintByCId", () => {
 		const byCId = getSaintByCId("437");
 		assert.ok(byCId !== null);
 		assert.deepEqual(byCId, bySlug);
-	});
-});
-
-describe("Unprefixed aliases match prefixed implementations", () => {
-	const date = { year: 2026, month: 9, day: 27 } as const;
-
-	test("getReadings === getHtocReadings", () => {
-		assert.deepEqual(getReadings(date), getHtocReadings(date));
-	});
-
-	test("getDay === getHtocDayFacts", () => {
-		assert.deepEqual(getDay(date), getHtocDayFacts(date));
-	});
-
-	test("getSaints === getHtocSaintsFor", () => {
-		assert.deepEqual(getSaints(date), getHtocSaintsFor(date));
 	});
 });

@@ -6,7 +6,7 @@
 
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { getHourReadings, getHourService } from "../src/engine/index.ts";
+import { getHourReadings, getHourService } from "../src/engine/hours.ts";
 
 describe("getHourService — template selection", () => {
 	it("Pascha 2020 (all four hours Paschal) composes PaschalHours.xml", () => {

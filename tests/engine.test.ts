@@ -5,12 +5,9 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import {
-	computeDayContext,
-	getLiturgicalDay,
-	selectMenaionEntry,
-	selectPaschalCycleEntry,
-} from "../src/engine/index.ts";
+import { getLiturgicalDay } from "../src/engine/index.ts";
+import { computeDayContext } from "../src/engine/day.ts";
+import { selectMenaionEntry, selectPaschalCycleEntry } from "../src/engine/lookup.ts";
 import { getOrthodoxPascha } from "../src/paschalion.ts";
 import { addDays } from "../src/core/calendar/pcalendar.ts";
 
