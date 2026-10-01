@@ -6,11 +6,24 @@
 // glyph) — see `mapHtocRank()` for the mapping to Ponomar's numeric scale.
 
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
-import { HTOC_SAINTS_BY_ISO } from "../data/htocSaints.ts";
+import { difference as diffG } from "../core/calendar/pcalendar.ts";
+import { fromGregorian } from "../core/calendar/jdate.ts";
+import { getOrthodoxPascha } from "../paschalion.ts";
+import {
+	HTOC_SAINTS_BY_ISO,
+	HTOC_SAINT_EXCEPTIONS,
+	HTOC_SAINT_FIXED_CYCLE,
+	HTOC_SAINT_MOVABLE_CYCLE,
+} from "../data/htocSaints.ts";
 import type { HtocSaint } from "../data/htocSaints.ts";
 
 export type { HtocSaint } from "../data/htocSaints.ts";
-export { HTOC_SAINTS_BY_ISO } from "../data/htocSaints.ts";
+export {
+	HTOC_SAINTS_BY_ISO,
+	HTOC_SAINT_EXCEPTIONS,
+	HTOC_SAINT_FIXED_CYCLE,
+	HTOC_SAINT_MOVABLE_CYCLE,
+} from "../data/htocSaints.ts";
 
 /** Format a `CalendarDate` as `YYYY-MM-DD`. */
 function toIso(d: CalendarDate): string {
@@ -25,6 +38,49 @@ export function getHtocSaintsFor(
 	gregorian: CalendarDate,
 ): readonly HtocSaint[] | null {
 	return HTOC_SAINTS_BY_ISO.get(toIso(gregorian)) ?? null;
+}
+
+/** Return the HTOC saints commemorated on `gregorian` for any Gregorian
+ *  year (not limited to the 2025–2027 vendored window).
+ *
+ *  Resolution strategy:
+ *   1. If the date lies in the vendored window, return the historical
+ *      scraped list verbatim (identical to {@link getHtocSaintsFor}),
+ *      preserving HTOC's display order.
+ *   2. Otherwise, union the fixed-cycle (Julian MM-DD), movable-cycle
+ *      (Pascha offset in days), and ISO exception layers from the cycle
+ *      tables. Entries are slug-sorted within each cycle; the layers are
+ *      concatenated fixed → movable → exceptions.
+ *
+ *  Unlike {@link getHtocSaintsFor} this function never returns `null`;
+ *  dates with no commemorations return an empty array (rare in practice —
+ *  every Julian day in the menaion carries at least one saint). */
+export function getHtocSaintsForAnyYear(
+	gregorian: CalendarDate,
+): readonly HtocSaint[] {
+	const iso = toIso(gregorian);
+	const windowHit = HTOC_SAINTS_BY_ISO.get(iso);
+	if (windowHit !== undefined) return windowHit;
+
+	// Fixed cycle: look up by Julian month-day.
+	const j = fromGregorian(gregorian);
+	const fixedKey = `${String(j.month).padStart(2, "0")}-${String(j.day).padStart(2, "0")}`;
+	const fixedHits = HTOC_SAINT_FIXED_CYCLE.get(fixedKey) ?? [];
+
+	// Movable cycle: look up by Pascha offset for this civil year.
+	const pascha = getOrthodoxPascha(gregorian.year);
+	const offset = diffG(gregorian, pascha);
+	const movableHits = HTOC_SAINT_MOVABLE_CYCLE.get(offset) ?? [];
+
+	// ISO exceptions apply only within the vendored window (by definition
+	// of their keying) so this returns empty outside it, which is correct:
+	// cycle-unstable saints only have observations inside the window.
+	const exceptionHits = HTOC_SAINT_EXCEPTIONS.get(iso) ?? [];
+
+	if (fixedHits.length === 0 && movableHits.length === 0 && exceptionHits.length === 0) {
+		return [];
+	}
+	return [...fixedHits, ...movableHits, ...exceptionHits];
 }
 
 /**

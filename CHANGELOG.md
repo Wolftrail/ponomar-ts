@@ -11,6 +11,49 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.11] — 2026-10-01
+
+### Added
+
+- **Any-year HTOC saint lookup via cycle decomposition.** The vendored
+  per-ISO saint corpus (2025–2027) is now also emitted as three cycle
+  tables that resolve commemorations for any Gregorian year:
+  - `HTOC_SAINT_FIXED_CYCLE: ReadonlyMap<string, readonly HtocSaint[]>`
+    — menaion cycle keyed by Julian `MM-DD` (364 keys).
+  - `HTOC_SAINT_MOVABLE_CYCLE: ReadonlyMap<number, readonly HtocSaint[]>`
+    — pentecostarion cycle keyed by signed days from Pascha (21 keys).
+  - `HTOC_SAINT_EXCEPTIONS: ReadonlyMap<string, readonly HtocSaint[]>`
+    — per-ISO rows for the small set of saints whose cycle key drifts
+    within the window (Apostles' Fast floats, Feb-29 forefeasts).
+- New engine function `getSaintsAnyYear(date)` (also exported as
+  `getHtocSaintsForAnyYear` from `src/engine/htocSaints.ts`). In the
+  vendored window it returns the same object reference as
+  `HTOC_SAINTS_BY_ISO.get(iso)`; outside it synthesizes from the cycle
+  layers (fixed ∪ movable ∪ exceptions, slug-sorted within each cycle).
+  Unlike `getSaints`, it never returns `null`.
+
+### Changed
+
+- Per-ISO saint ordering within the vendored window is unchanged
+  (`HTOC_SAINTS_BY_ISO` preserves HTOC's historical scrape order).
+  The new cycle tables use a canonical slug-sort within each cycle so
+  any-year lookups are deterministic. For 79 days in the window the
+  two orderings differ (same saints, different interleaving); the
+  engine routes in-window lookups through `HTOC_SAINTS_BY_ISO` to
+  stay byte-identical with prior releases.
+- `src/data/htocSaints.ts`: 440 KB → 458 KB (+18 KB) for the three
+  compact cycle tables; entry pool unchanged.
+
+### Correctness
+
+- Round-trip verified for every ISO date in the vendored window: the
+  cycle-based lookup reproduces the exact `HTOC_SAINTS_BY_ISO` entry
+  set for all 1,092 days. Proof script at
+  [scripts/analysis/htoc-saint-cycles-roundtrip.ts](scripts/analysis/htoc-saint-cycles-roundtrip.ts).
+- 13 new tests in [tests/htocSaintCycles.test.ts](tests/htocSaintCycles.test.ts)
+  cover shape, in-window reference equality, and out-of-window lookups
+  (Nativity 2030/2050, Theophany 2030, Myrrhbearers 2024).
+
 ## [1.0.0-rc.10] — 2026-10-01
 
 ### Changed

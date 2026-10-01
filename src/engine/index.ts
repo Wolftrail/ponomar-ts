@@ -189,6 +189,12 @@ export {
 export { getHtocReadings as getReadings } from "./htocReadings.ts";
 export { getHtocDayFacts as getDay } from "./htocDayFacts.ts";
 export { getHtocSaintsFor as getSaints } from "./htocSaints.ts";
+export { getHtocSaintsForAnyYear as getSaintsAnyYear } from "./htocSaints.ts";
+export {
+	HTOC_SAINT_FIXED_CYCLE,
+	HTOC_SAINT_MOVABLE_CYCLE,
+	HTOC_SAINT_EXCEPTIONS,
+} from "./htocSaints.ts";
 export { getHtocDailyLectionary as getDailyLectionary } from "./dailyLectionary.ts";
 export { getHtocSaintLectionary as getSaintLectionary } from "./saintLectionary.ts";
 export type {
