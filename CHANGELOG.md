@@ -11,6 +11,27 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.4] — 2026-10-01
+
+### Fixed
+
+- `appendHtocSaintLectionary` now dedups on `(service, reading)` alone,
+  ignoring the `type` sub-field. Ponomar's menaion/paschalion label each
+  slot with structural ordinals (`matins/1..12`, `primes/1..3`,
+  `vespers/1..15`) while HTOC flattens them (`matins/gospel`,
+  `primes/reading`, `vespers/reading`). The previous `type`-aware dedup
+  missed these as the same ceremonial pericope at the same service.
+  On Great Friday (e.g. 2026-04-10) this collapses 11 duplicate matins
+  Passion Gospels, 2 duplicate readings per Royal Hour, and the Vesperal
+  Liturgy pair into their Ponomar equivalents.
+- On dedup match, HTOC's `hour` and `note` metadata is now merged onto
+  the surviving Ponomar/menaion ref rather than dropped. Downstream
+  `getHourReadings` and UI note-display consumers continue to see Royal
+  Hour tags and reading-title notes.
+- Corpus-wide reading engine-only count dropped from 2355 to **1848**
+  (−507 spurious duplicate refs). HTOC-coverage remains 100% (4097/4097
+  matched, zero HTOC-only).
+
 ## [1.0.0-rc.3] — 2026-10-01
 
 ### Fixed

@@ -157,16 +157,6 @@ function isMatinsGospelType(type: string): boolean {
 	return type === "gospel" || type === "1";
 }
 
-function typesEquivalent(
-	service: string,
-	a: string,
-	b: string,
-): boolean {
-	if (a === b) return true;
-	if (service === "matins") return isMatinsGospelType(a) && isMatinsGospelType(b);
-	return false;
-}
-
 /**
  * Append the HTOC noted scriptures (saint-specific readings — Matins
  * Gospels, saint's Apostol/Gospel, Vespers Old-Testament readings, Hours)
@@ -191,13 +181,31 @@ function appendHtocSaintLectionary(
 		if (opts.service !== undefined && opts.service !== e.service) continue;
 		if (opts.type !== undefined && opts.type !== e.type) continue;
 		const normalized = normalizeReadingForDedup(e.reading);
-		const dup = refs.some(
+		// Dedup on (service, reading) only — ignore the type sub-field.
+		// Ponomar labels each slot structurally (matins/1..12, primes/1..3)
+		// while HTOC flattens them (matins/gospel, primes/reading); the
+		// same ceremonial pericope at the same service is one reading.
+		const dupIdx = refs.findIndex(
 			(r) =>
 				r.service === e.service &&
-				typesEquivalent(r.service, r.type, e.type) &&
 				normalizeReadingForDedup(r.reading) === normalized,
 		);
-		if (dup) continue;
+		if (dupIdx >= 0) {
+			// Preserve HTOC's hour/note metadata on the surviving ref so
+			// downstream consumers (getHourReadings, UI note display) still
+			// see the Royal-Hour tag and reading-title note.
+			const existing = refs[dupIdx]!;
+			const addHour = e.hour !== undefined && existing.hour === undefined;
+			const addNote = e.note !== undefined && existing.note === undefined;
+			if (addHour || addNote) {
+				refs[dupIdx] = {
+					...existing,
+					...(addHour ? { hour: e.hour } : {}),
+					...(addNote ? { note: e.note } : {}),
+				};
+			}
+			continue;
+		}
 		refs.push({
 			cId: "htoc:saint-lectionary",
 			source: "htoc",

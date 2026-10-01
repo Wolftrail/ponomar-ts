@@ -133,11 +133,11 @@ describe("getHourReadings — Lenten sixth-hour prophecies", () => {
 		assert.equal(hit.service, "sexte");
 	});
 
-	it("HTOC-tagged Sixth-Hour refs carry hour='sixth' when present", () => {
+	it("Sixth-Hour refs carry hour='sixth' when a prophecy is scheduled", () => {
 		const r = getHourReadings({ year: 2025, month: 3, day: 3 }, "sixth");
-		const htoc = r.refs.find((x) => x.source === "htoc" && x.hour !== undefined);
-		assert.ok(htoc !== undefined, "expected at least one HTOC hour-tagged ref");
-		assert.equal(htoc.hour, "sixth");
+		const hourTagged = r.refs.find((x) => x.hour !== undefined);
+		assert.ok(hourTagged !== undefined, "expected at least one hour-tagged ref");
+		assert.equal(hourTagged.hour, "sixth");
 	});
 
 	it("Cheesefare Wed (Feb 26 2025) surfaces Joel 2:12-26 at the Sixth Hour", () => {
@@ -184,17 +184,15 @@ describe("getHourReadings — Royal Hours (Nativity Eve, Jan 6 2025)", () => {
 		});
 	}
 
-	it("HTOC-tagged Royal Hours refs carry the matching hour tag", () => {
+	it("Royal Hours refs carry the matching hour tag", () => {
 		for (const { hour } of HOURS) {
 			const r = getHourReadings(CAL, hour);
-			const htoc = r.refs.find(
-				(x) => x.source === "htoc" && x.hour !== undefined,
-			);
+			const tagged = r.refs.find((x) => x.hour !== undefined);
 			assert.ok(
-				htoc !== undefined,
-				`expected an HTOC hour-tagged ref at ${hour}`,
+				tagged !== undefined,
+				`expected an hour-tagged ref at ${hour}`,
 			);
-			assert.equal(htoc.hour, hour);
+			assert.equal(tagged.hour, hour);
 		}
 	});
 });
