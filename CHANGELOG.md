@@ -11,6 +11,31 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.14] — 2026-10-01
+
+### Changed
+
+- **`htocSaints.ts` slimmed via tuple + text + names pool interning.**
+  The vendored canonical-saint pool now stores unique `text` strings
+  and unique `names` arrays once each in secondary pools (`TX`, `NA`),
+  and each entry is a compact 5-tuple `[slug, cycleCode, namesIdx,
+  rank, textIdx]` instead of a `{slug, cycle, names, rank, text}`
+  object literal (saves ~40 bytes of field-name boilerplate per
+  entry). `cycleCode` is `0` for `"fixed"` and `1` for `"movable"`.
+  No change to the exported `HtocSaint` object shape or to any of
+  `HTOC_SAINTS_BY_ISO`, `HTOC_SAINT_FIXED_CYCLE`,
+  `HTOC_SAINT_MOVABLE_CYCLE`, or `HTOC_SAINT_EXCEPTIONS` values;
+  byte-identical hydration verified across all 1,092 vendored days
+  and 7,008 (iso, saint) rows.
+  - `src/data/htocSaints.ts`: 458 KB → 346 KB (−24.6 %);
+    pools: `NA` = 1,444 unique names arrays (38 % dedup),
+    `TX` = 2,163 unique display texts (7 % dedup — texts shared
+    chiefly by multi-name Mother-of-God icon entries).
+- Codegen script (`scripts/codegen/htoc-saints.ts`) emits the new
+  pooled layout deterministically; downstream consumers see
+  byte-identical values and the engine (`src/engine/htocSaints.ts`)
+  needs no changes.
+
 ## [1.0.0-rc.13] — 2026-10-01
 
 ### Changed
