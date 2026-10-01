@@ -11,6 +11,25 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.12] — 2026-10-01
+
+### Changed
+
+- **Lectionary data files slimmed via entry-pool interning.** Both HTOC
+  lectionary tables now store an entry pool once and reference it by
+  integer index per day, with no change to the exported `ReadonlyMap`
+  shape, keys, values, or ordering.
+  - `src/data/htocDailyLectionary.ts`: 102 KB → 54 KB (−47 %);
+    628 unique `(type, reading)` tuples pooled across 1,935 rows / 880
+    days.
+  - `src/data/htocSaintLectionary.ts`: 213 KB → 75 KB (−65 %);
+    545 unique `(service, type, reading, note, hour)` tuples pooled
+    across 2,162 rows / 710 days.
+- Codegen scripts (`scripts/codegen/htoc-daily-lectionary.ts` and
+  `scripts/codegen/htoc-saint-lectionary.ts`) emit the new pooled layout
+  deterministically; downstream consumers see byte-identical
+  `HTOC_DAILY_LECTIONARY` and `HTOC_SAINT_LECTIONARY` values.
+
 ## [1.0.0-rc.11] — 2026-10-01
 
 ### Added
