@@ -22,5 +22,6 @@ export {
 	HTOC_DAY_FACTS_BY_ISO,
 	HTOC_DAY_FACTS_TROPARIA_COUNT,
 	HTOC_DAY_FACTS_KONTAKIA_COUNT,
+	HTOC_DAY_FACTS_COMMEMORATIONS_COUNT,
 } from "./htocDayFacts.ts";
-export type { HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
+export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";

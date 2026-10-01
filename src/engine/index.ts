@@ -9,7 +9,7 @@ import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
 import { getHtocDayFacts } from "./htocDayFacts.ts";
-import type { HtocHymn } from "./htocDayFacts.ts";
+import type { HtocCommemoration, HtocHymn } from "./htocDayFacts.ts";
 import { getHtocDayRank, getHtocSaintsFor, unmapHtocRank } from "./htocSaints.ts";
 import type { HtocSaint } from "./htocSaints.ts";
 import { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
@@ -25,6 +25,13 @@ export interface LiturgicalDay {
 	 *  structural lists below (with the HTOC name overlay applied to
 	 *  `text`). Prefer this for display. */
 	readonly saints: readonly HtocSaint[];
+	/** Full commemoration list as published on HTOC's day page — the
+	 *  authoritative "what HTOC prints today" list including entries without
+	 *  a navigable life page (e.g. New Hieromartyrs, Fast Day markers, minor
+	 *  Greek/Celtic/Russian commemorations). Superset of
+	 *  {@link LiturgicalDay.saints}, which is the cId-linked navigable subset.
+	 *  Empty for dates outside the vendored HTOC coverage window. */
+	readonly commemorations: readonly HtocCommemoration[];
 	/** HTOC's header line, e.g. `"28 th Week after Pentecost. Tone two."`.
 	 *  Empty string for dates outside the vendored HTOC coverage window. */
 	readonly headerText: string;
@@ -81,6 +88,7 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const htocFacts = getHtocDayFacts(gregorian);
 	const headerText = htocFacts?.headerText ?? "";
 	const fastText = htocFacts?.fastText ?? "";
+	const commemorations = htocFacts?.commemorations ?? [];
 	const troparia = htocFacts?.troparia ?? [];
 	const kontakia = htocFacts?.kontakia ?? [];
 	let dRank = 0;
@@ -100,6 +108,7 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	return {
 		context,
 		saints,
+		commemorations,
 		headerText,
 		fastText,
 		troparia,
@@ -180,7 +189,7 @@ export {
 	mapHtocRank,
 	unmapHtocRank,
 } from "./htocSaints.ts";
-export type { HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
+export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "./htocDayFacts.ts";
 export { HTOC_DAY_FACTS_BY_ISO, getHtocDayFacts } from "./htocDayFacts.ts";
 export type {
 	FastingCase,

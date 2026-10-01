@@ -1,13 +1,15 @@
 // Codegen: reads `scratch/htoc-days.json` (produced by the full day-level
-// scraper) and emits `src/data/htocDayFacts.ts` — a per-ISO-date lookup
-// table of HTOC's `headerText`, `tone`, `fastText`, `troparia`, and
-// `kontakia`. These are the display-oriented day facts HTOC publishes in
-// addition to the saint commemoration list (vendored separately in
-// `htocSaints.ts`) and the daily lectionary (vendored in
-// `htocDailyLectionary.ts`).
+// scraper) plus the per-year `tests/fixtures/htoc-full-<year>.json`
+// fixtures, and emits `src/data/htocDayFacts.ts` — a per-ISO-date lookup
+// table of HTOC's `headerText`, `tone`, `fastText`, `commemorations`,
+// `troparia`, and `kontakia`. These are the display-oriented day facts
+// HTOC publishes in addition to the saint commemoration list (vendored
+// separately in `htocSaints.ts` as a navigable, cId-linked subset) and
+// the daily lectionary (vendored in `htocDailyLectionary.ts`).
 //
 // Run:   node --experimental-strip-types scripts/codegen/htoc-day-facts.ts
-// Reads: scratch/htoc-days.json
+// Reads: scratch/htoc-days.json  (hymns: troparia + kontakia)
+//        tests/fixtures/htoc-full-{2025,2026,2027}.json  (commemorations)
 // Emits: src/data/htocDayFacts.ts
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -38,10 +40,37 @@ interface RawFile {
 	readonly days: Readonly<Record<string, RawDay>>;
 }
 
+interface RawLivesLink {
+	readonly name: string;
+	readonly href: string;
+}
+interface RawCommemoration {
+	readonly rank: string;
+	readonly text: string;
+	readonly minor: boolean;
+	readonly lives: readonly RawLivesLink[];
+}
+interface FixtureDay {
+	readonly commemorations: readonly RawCommemoration[];
+}
+interface FixtureFile {
+	readonly days: Readonly<Record<string, FixtureDay>>;
+}
+
 const INPUT = resolve(process.cwd(), "scratch/htoc-days.json");
 const OUTPUT = resolve(process.cwd(), "src/data/htocDayFacts.ts");
+const FIXTURE_YEARS = [2025, 2026, 2027] as const;
+const FIXTURE_PATH = (y: number) =>
+	resolve(process.cwd(), `tests/fixtures/htoc-full-${y}.json`);
 
 const raw = JSON.parse(readFileSync(INPUT, "utf8")) as RawFile;
+const commemorationsByIso = new Map<string, readonly RawCommemoration[]>();
+for (const y of FIXTURE_YEARS) {
+	const fx = JSON.parse(readFileSync(FIXTURE_PATH(y), "utf8")) as FixtureFile;
+	for (const [iso, day] of Object.entries(fx.days)) {
+		commemorationsByIso.set(iso, day.commemorations ?? []);
+	}
+}
 
 /** Extract the stable `Month/DD-NN` slug from an HTOC href URL. */
 function hrefToSlug(href: string): string {
@@ -59,10 +88,21 @@ interface EmittedHymn {
 	readonly group: number;
 	readonly saints: readonly EmittedHymnSaint[];
 }
+interface EmittedLivesLink {
+	readonly name: string;
+	readonly slug: string;
+}
+interface EmittedCommemoration {
+	readonly rank: string;
+	readonly text: string;
+	readonly minor: boolean;
+	readonly lives: readonly EmittedLivesLink[];
+}
 interface EmittedDay {
 	readonly headerText: string;
 	readonly tone: number | null;
 	readonly fastText: string;
+	readonly commemorations: readonly EmittedCommemoration[];
 	readonly troparia: readonly EmittedHymn[];
 	readonly kontakia: readonly EmittedHymn[];
 }
@@ -76,19 +116,34 @@ function normalizeHymn(h: RawHymn): EmittedHymn {
 	};
 }
 
+function normalizeCommemoration(c: RawCommemoration): EmittedCommemoration {
+	return {
+		rank: c.rank,
+		text: c.text,
+		minor: c.minor,
+		lives: (c.lives ?? []).map((l) => ({ name: l.name, slug: hrefToSlug(l.href) })),
+	};
+}
+
 const emitted = new Map<string, EmittedDay>();
 let totalTroparia = 0;
 let totalKontakia = 0;
+let totalCommemorations = 0;
 for (const [iso, day] of Object.entries(raw.days)) {
 	const tone = typeof day.tone === "number" ? day.tone : null;
 	const troparia = (day.troparia ?? []).map(normalizeHymn);
 	const kontakia = (day.kontakia ?? []).map(normalizeHymn);
+	const commemorations = (commemorationsByIso.get(iso) ?? []).map(
+		normalizeCommemoration,
+	);
 	totalTroparia += troparia.length;
 	totalKontakia += kontakia.length;
+	totalCommemorations += commemorations.length;
 	emitted.set(iso, {
 		headerText: day.headerText ?? "",
 		tone,
 		fastText: day.fastText ?? "",
+		commemorations,
 		troparia,
 		kontakia,
 	});
@@ -119,7 +174,26 @@ lines.push(
 	"\treadonly saints: readonly { readonly name: string; readonly slug: string }[];",
 	"}",
 	"",
-	"/** HTOC day-level facts: title line, tone, fast rule, and the day's propers. */",
+	"/** A single commemoration as printed on HTOC's day page: the authoritative",
+	" *  user-facing list of saints / feasts / commemorations for the day, with",
+	" *  HTOC's rank glyph and (optionally) life-page links. Superset of the",
+	" *  navigable `HtocSaint` list — includes New Hieromartyrs and other entries",
+	" *  that have no life page and therefore no `cId` to join to Ponomar XML. */",
+	"export interface HtocCommemoration {",
+	'\t/** HTOC rank glyph: `6` Great Feast / `4` Vigil-Polyeleos / `3` Doxology /',
+	'\t *  `2` Six-stich / `1` Simple / `0` No sign / `o` Octoechos (weekday). */',
+	"\treadonly rank: string;",
+	"\t/** Display text as printed on the day page, with punctuation. */",
+	"\treadonly text: string;",
+	"\t/** `true` for minor commemorations grouped as a sub-bullet under a main entry. */",
+	"\treadonly minor: boolean;",
+	"\t/** Life-page links. `slug` matches `HtocSaint.slug` when the commemoration",
+	"\t *  has a life page in `htocSaints.ts`; empty for entries without a life. */",
+	"\treadonly lives: readonly { readonly name: string; readonly slug: string }[];",
+	"}",
+	"",
+	"/** HTOC day-level facts: title line, tone, fast rule, commemoration list,",
+	" *  and the day's propers. */",
 	"export interface HtocDayFacts {",
 	'\t/** Header line as scraped, e.g. `"28th Week after Pentecost. Tone two."`. */',
 	"\treadonly headerText: string;",
@@ -130,6 +204,8 @@ lines.push(
 	'\t *  Monastic Charter: Strict Fast (Bread, Vegetables, Fruits)"`. Empty',
 	"\t *  string on non-fast days. */",
 	"\treadonly fastText: string;",
+	"\t/** Full commemoration list as published by HTOC, in display order. */",
+	"\treadonly commemorations: readonly HtocCommemoration[];",
 	"\t/** Day's troparia in HTOC publication order. */",
 	"\treadonly troparia: readonly HtocHymn[];",
 	"\t/** Day's kontakia in HTOC publication order. */",
@@ -151,10 +227,12 @@ lines.push(
 	`export const HTOC_DAY_FACTS_TROPARIA_COUNT = ${totalTroparia};`,
 	`/** Total number of kontakia entries across the vendored window. */`,
 	`export const HTOC_DAY_FACTS_KONTAKIA_COUNT = ${totalKontakia};`,
+	`/** Total number of commemorations across the vendored window. */`,
+	`export const HTOC_DAY_FACTS_COMMEMORATIONS_COUNT = ${totalCommemorations};`,
 	"",
 );
 
 writeFileSync(OUTPUT, lines.join("\n"), "utf8");
 console.log(
-	`wrote ${OUTPUT.replace(process.cwd(), "")} — ${emitted.size} days, ${totalTroparia} troparia, ${totalKontakia} kontakia`,
+	`wrote ${OUTPUT.replace(process.cwd(), "")} — ${emitted.size} days, ${totalCommemorations} commemorations, ${totalTroparia} troparia, ${totalKontakia} kontakia`,
 );

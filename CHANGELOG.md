@@ -11,6 +11,23 @@ notice.
 
 ## [Unreleased]
 
+### Added
+
+- `LiturgicalDay.commemorations` — the full HTOC day-page commemoration
+  list, vendored verbatim from `htocDayFacts.ts` for dates within the
+  2025–2027 coverage window (16,229 entries across 1,095 days). This
+  is the authoritative "what HTOC prints today" list and is a superset
+  of `LiturgicalDay.saints`: it includes entries without a navigable
+  life page (e.g. New Hieromartyrs, Fast Day markers, minor
+  Greek/Celtic/Russian commemorations) that have no `cId` to join
+  against the Ponomar `xml/` corpus. Each entry carries HTOC's rank
+  glyph (`6/4/3/2/1/0/o`), display text, a `minor` flag for
+  sub-bullets, and life-page links (empty for entries without a
+  navigable life). Closes the ~57% user-facing commemoration gap
+  previously surfaced by the structural `allSaints` list. The new
+  `HtocCommemoration` type is re-exported from the top-level barrel.
+  Dates outside the vendored window return an empty array.
+
 ### Changed
 
 - `LiturgicalDay.tone` now returns HTOC's printed tone verbatim for dates

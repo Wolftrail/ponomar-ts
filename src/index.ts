@@ -43,6 +43,9 @@ export type {
 	ResurrectionMatinsGospel,
 	HtocDailyLectionaryEntry,
 	HtocSaint,
+	HtocCommemoration,
+	HtocDayFacts,
+	HtocHymn,
 } from "./engine/index.ts";
 export { parseBibleRef, formatBibleRef, findBook, BibleRefError } from "./bible/index.ts";
 export type { BibleBook, BibleRef, VerseEndpoint, VerseRange } from "./bible/index.ts";

@@ -5,9 +5,9 @@
 
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import { HTOC_DAY_FACTS_BY_ISO } from "../data/htocDayFacts.ts";
-import type { HtocDayFacts, HtocHymn } from "../data/htocDayFacts.ts";
+import type { HtocCommemoration, HtocDayFacts, HtocHymn } from "../data/htocDayFacts.ts";
 
-export type { HtocDayFacts, HtocHymn } from "../data/htocDayFacts.ts";
+export type { HtocCommemoration, HtocDayFacts, HtocHymn } from "../data/htocDayFacts.ts";
 export { HTOC_DAY_FACTS_BY_ISO } from "../data/htocDayFacts.ts";
 
 function toIso(d: CalendarDate): string {

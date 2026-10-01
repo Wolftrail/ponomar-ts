@@ -58,6 +58,10 @@ interface DayMetric {
 	};
 	troparionCount: number;
 	kontakionCount: number;
+	/** HTOC-published commemoration count on `day.commemorations`. Should
+	 *  equal `commemorations.htoc` on every covered day since both come
+	 *  from the same HTOC day-page scrape. */
+	userFacingCommemorationCount: number;
 }
 
 interface CommemorationRankObs {
@@ -91,6 +95,8 @@ interface Aggregate {
 	htocTroparionTotal: number;
 	htocKontakionTotal: number;
 	htocFactsCoverage: number;
+	userFacingCommemorationTotal: number;
+	userFacingCommemorationCountMismatches: number;
 	perfectDays: number;
 	rankObservations: Map<string, number>;
 	worstCommDays: DayMetric[];
@@ -115,6 +121,8 @@ function newAggregate(): Aggregate {
 		htocTroparionTotal: 0,
 		htocKontakionTotal: 0,
 		htocFactsCoverage: 0,
+		userFacingCommemorationTotal: 0,
+		userFacingCommemorationCountMismatches: 0,
 		perfectDays: 0,
 		rankObservations: new Map(),
 		worstCommDays: [],
@@ -208,6 +216,7 @@ function processOne(iso: string, htoc: HtocDay): {
 		},
 		troparionCount,
 		kontakionCount,
+		userFacingCommemorationCount: day.commemorations.length,
 	};
 	return { metric, comm, read };
 }
@@ -227,6 +236,10 @@ function aggregate(agg: Aggregate, metric: DayMetric, comm: CommResult): void {
 	agg.htocTroparionTotal += metric.troparionCount;
 	agg.htocKontakionTotal += metric.kontakionCount;
 	if (metric.troparionCount + metric.kontakionCount > 0) agg.htocFactsCoverage++;
+	agg.userFacingCommemorationTotal += metric.userFacingCommemorationCount;
+	if (metric.userFacingCommemorationCount !== metric.commemorations.htoc) {
+		agg.userFacingCommemorationCountMismatches++;
+	}
 	if (
 		metric.commemorations.htocOnly === 0 &&
 		metric.commemorations.engineOnly === 0 &&
@@ -311,6 +324,20 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 	);
 	l.push("");
 	l.push("### Commemorations");
+	l.push("");
+	l.push("**User-facing coverage** — `LiturgicalDay.commemorations` is the HTOC day-page commemoration list vendored verbatim via `htocDayFacts.ts`. Any UI that renders `day.commemorations` renders exactly what HTOC publishes.");
+	l.push("");
+	l.push(
+		`- Days with HTOC commemoration data: **${agg.htocFactsCoverage}** / ${agg.days}`,
+	);
+	l.push(
+		`- Total commemorations surfaced on \`day.commemorations\`: **${agg.userFacingCommemorationTotal}**`,
+	);
+	l.push(
+		`- Days where \`day.commemorations.length\` disagrees with the HTOC corpus count: **${agg.userFacingCommemorationCountMismatches}**`,
+	);
+	l.push("");
+	l.push("**Structural coverage** — the metrics below compare the Ponomar-XML-derived `LiturgicalDay.allSaints` list (which carries `cId`, `church.rank`, `tone` and other structural fields) against the HTOC published list. This diagnoses how well our XML processing recovers HTOC's text. The gap is dominated by New Hieromartyrs (20th-century Russian martyrs) and other HTOC addenda that live outside the vendored Ponomar `xml/` corpus. These saints already appear verbatim on `day.commemorations` for user-facing display.");
 	l.push("");
 	l.push(`- Matched (aggregate): **${agg.commemorationMatched}**`);
 	l.push(`- HTOC-only (aggregate): **${agg.commemorationHtocOnly}**`);
