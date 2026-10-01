@@ -11,6 +11,54 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.8] — 2026-10-01
+
+### Deprecated
+
+- **Stage 2 of the HTOC-first API refactor.** The following re-exports
+  are now marked `@deprecated` in JSDoc. They remain functional and
+  tests still cover them, but IDEs will show them struck-through so
+  downstream apps can migrate. Scheduled for removal at `1.0.0`.
+
+- **Ponomar DSL + resolver internals** (never meant to be public):
+  `computeDayContext`, `dslContext`, `selectMenaionEntry`,
+  `selectPaschalCycleEntry`, `resolveSaints`, `getPhrase`,
+  `resolveBibleHeader`, `resolveCommand`, `resolveCreate`,
+  `resolveTitle`.
+
+- **Ponomar service composers** (HTOC publishes a daily reading list,
+  not a service ordering): `composeService`, `getPropers`,
+  `getServices`, `getHourService`, `getHourReadings`,
+  `getOrderedLiturgyReadings`, `getOrderedMatinsReadings`.
+
+- **Rank-glyph adapters** (use `HtocSaint.rank` / `HtocCommemoration.rank`
+  as display strings directly): `getHtocDayRank`, `mapHtocRank`,
+  `unmapHtocRank`.
+
+- **Matins gospel cycle direct access** (now applied automatically by
+  `getReadings` on Sundays): `RESURRECTION_MATINS_GOSPELS`,
+  `getResurrectionMatinsGospel`.
+
+- **Prefixed HTOC function aliases** (prefer the unprefixed Stage 1
+  names): `getHtocReadings` → `getReadings`,
+  `getHtocDayFacts` → `getDay`,
+  `getHtocSaintsFor` → `getSaints`,
+  `getHtocDailyLectionary` → `getDailyLectionary`,
+  `getHtocSaintLectionary` → `getSaintLectionary`.
+
+### Kept (non-deprecated public API)
+
+- Foundations: `getLiturgicalDay`, `getDailyReadings`,
+  `getLiturgyReadings`, `getFasting`, `getLife`.
+- Stage 1 saint API: `getSaint`, `getSaintByCId`, `getLifeBySlug`,
+  `slugToCId`, `cIdToSlug`.
+- HTOC facade: `getReadings`, `getDay`, `getSaints`,
+  `getDailyLectionary`, `getSaintLectionary`.
+- Raw HTOC data maps: `HTOC_SAINTS_BY_ISO`, `HTOC_DAILY_LECTIONARY`,
+  `HTOC_DAY_FACTS_BY_ISO`, `HTOC_SAINT_LECTIONARY`.
+- All `Htoc*` types, `ReadingRef`, `DailyReadings`, saint API types.
+- Bible, astronomy, paschalion sub-APIs.
+
 ## [1.0.0-rc.7] — 2026-10-01
 
 ### Added
