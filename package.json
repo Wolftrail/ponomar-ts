@@ -1,6 +1,6 @@
 {
   "name": "ponomar-ts",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "TypeScript port of the Ponomar Orthodox liturgics engine: paschal date math, Typicon rule dispatcher, saint & reading resolution.",
   "keywords": [
     "orthodox",

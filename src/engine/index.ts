@@ -181,6 +181,7 @@ export {
 	HTOC_DAILY_LECTIONARY,
 	getHtocDailyLectionary,
 } from "./dailyLectionary.ts";
+export { getHtocReadings } from "./htocReadings.ts";
 export type { HtocSaint } from "./htocSaints.ts";
 export {
 	HTOC_SAINTS_BY_ISO,

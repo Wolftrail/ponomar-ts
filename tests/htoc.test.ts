@@ -24,6 +24,7 @@ import { describe, test } from "node:test";
 
 import type { CalendarDate } from "../src/core/calendar/pcalendar.ts";
 import { getLiturgicalDay } from "../src/engine/index.ts";
+import { getHtocReadings } from "../src/engine/htocReadings.ts";
 import { getOrderedLiturgyReadings } from "../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../src/engine/orderedMatins.ts";
 import { getDailyReadings } from "../src/engine/readings.ts";
@@ -265,6 +266,50 @@ describe("HTOC daily-lectionary eviction", () => {
 		);
 		assert.ok(gospels[0]?.reading.startsWith("Jn_12:28-36"));
 		assert.notEqual(gospels[0]?.source, "cycle");
+	});
+});
+
+describe("getHtocReadings", () => {
+	test("Thu 2026-10-01: returns exactly HTOC's 2 published refs", () => {
+		const refs = getHtocReadings({ year: 2026, month: 10, day: 1 });
+		assert.ok(refs !== null);
+		assert.equal(refs.length, 2);
+		const liturgy = refs.filter((r) => r.service === "liturgy");
+		assert.equal(liturgy.length, 2);
+		assert.ok(liturgy.some((r) => r.reading === "Eph_5:33-6:9" && r.type === "apostol"));
+		assert.ok(liturgy.some((r) => r.reading === "Mt_24:13-28" && r.type === "gospel"));
+		for (const r of refs) assert.equal(r.source, "htoc");
+	});
+
+	test("Sun 2026-09-27 (Universal Exaltation): festal matins + liturgy pair, no resurrection cycle", () => {
+		const refs = getHtocReadings({ year: 2026, month: 9, day: 27 });
+		assert.ok(refs !== null);
+		assert.equal(refs.length, 3);
+		assert.ok(refs.some((r) => r.service === "matins" && r.reading === "Jn_12:28-36"));
+		assert.ok(refs.some((r) => r.service === "liturgy" && r.reading === "I Cor_1:18-24"));
+		assert.ok(
+			refs.some(
+				(r) => r.service === "liturgy" && r.reading === "Jn_19:6-11, 13-20, 25-28, 30-35",
+			),
+		);
+	});
+
+	test("Fri 2026-04-10 (Great Friday): all 12 Passion Gospels + Royal Hours + Vesperal Liturgy", () => {
+		const refs = getHtocReadings({ year: 2026, month: 4, day: 10 });
+		assert.ok(refs !== null);
+		const matinsGospels = refs.filter((r) => r.service === "matins" && r.type === "gospel");
+		assert.equal(matinsGospels.length, 12);
+		for (const hour of ["prime", "third", "sixth", "ninth"] as const) {
+			const atHour: readonly ReadingRef[] = refs.filter((r) => r.hour === hour);
+			assert.equal(atHour.length, 2, `Royal Hour ${hour} should have 2 refs`);
+		}
+		const liturgy = refs.filter((r) => r.service === "liturgy");
+		assert.equal(liturgy.length, 6, "Vesperal Liturgy: 1 apostol + 5 gospels");
+	});
+
+	test("Dates outside the 2025–2027 vendored corpus window return null", () => {
+		assert.equal(getHtocReadings({ year: 2028, month: 1, day: 1 }), null);
+		assert.equal(getHtocReadings({ year: 2024, month: 12, day: 31 }), null);
 	});
 });
 

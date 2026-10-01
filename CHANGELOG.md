@@ -11,6 +11,26 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.5] — 2026-10-01
+
+### Added
+
+- `getHtocReadings(date)` — new public API returning exactly the
+  pericopes HTOC publishes in its day-page `scripture[]` block, as
+  structured `ReadingRef[]`. Union of the rjadovoje daily lectionary and
+  the noted saint lectionary; nothing from Ponomar's menaion / paschalion
+  structural extras. Returns `null` outside the vendored 2025–2027
+  corpus window.
+
+  Use this when the UI should match what HTOC's day page shows and
+  nothing more. For the full liturgical surface — Great-Feast Vespers
+  OT prophecies, Nativity-Eve / Theophany-Eve Royal Hours, polyeleos
+  saint menaion readings not surfaced on HTOC's daily feed — continue
+  calling `getDailyReadings`.
+
+  Verified against the full 2026 fixture: 365/365 days match HTOC's
+  `scripture[]` block exactly.
+
 ## [1.0.0-rc.4] — 2026-10-01
 
 ### Fixed
