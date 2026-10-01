@@ -223,6 +223,7 @@ export {
 	getFixedCommemorations,
 	getPaschalMovables,
 	getSeasonCommemorations,
+	getTransferOverlays,
 } from "./commemorations.ts";
 export type {
 	BibleDirective,

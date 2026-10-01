@@ -9,6 +9,7 @@ import {
 	getFixedCommemorations,
 	getPaschalMovables,
 	getSeasonCommemorations,
+	getTransferOverlays,
 } from "../src/engine/commemorations.ts";
 import { HTOC_FIXED_COMMEMORATIONS_CYCLE } from "../src/data/htocFixedCommemorations.ts";
 import { HTOC_PASCHAL_MOVABLES_CYCLE } from "../src/data/htocPaschalMovables.ts";
@@ -149,12 +150,12 @@ test("coverage: ≥90% perfect-match days vs 1095 vendored", () => {
 		if (match) perfect++;
 	}
 	assert.ok(
-		perfect >= Math.floor(1095 * 0.99),
-		`Expected ≥99% perfect-match days, got ${perfect}/1095 (${((perfect / 1095) * 100).toFixed(1)}%)`,
+		perfect >= Math.floor(1095 * 0.999),
+		`Expected ≥99.9% perfect-match days, got ${perfect}/1095 (${((perfect / 1095) * 100).toFixed(2)}%)`,
 	);
 });
 
-test("coverage: ≥99.9% commemoration-entry recall vs 1095 vendored", () => {
+test("coverage: ≥99.99% commemoration-entry recall vs 1095 vendored", () => {
 	let expected = 0;
 	let correct = 0;
 	const keyOf = (c: { rank: string; text: string; minor: boolean }) =>
@@ -168,12 +169,12 @@ test("coverage: ≥99.9% commemoration-entry recall vs 1095 vendored", () => {
 	}
 	const pct = (correct / expected) * 100;
 	assert.ok(
-		pct >= 99.9,
-		`Expected ≥99.9% recall, got ${correct}/${expected} (${pct.toFixed(2)}%)`,
+		pct >= 99.99,
+		`Expected ≥99.99% recall, got ${correct}/${expected} (${pct.toFixed(3)}%)`,
 	);
 });
 
-test("coverage: ≤3 extra entries across 1095 vendored days", () => {
+test("coverage: ≤1 extra entries across 1095 vendored days", () => {
 	let extras = 0;
 	const keyOf = (c: { rank: string; text: string; minor: boolean }) =>
 		`${c.rank}|${c.minor ? 1 : 0}|${c.text}`;
@@ -183,7 +184,7 @@ test("coverage: ≤3 extra entries across 1095 vendored days", () => {
 			if (!exp.has(keyOf(c))) extras++;
 		}
 	}
-	assert.ok(extras <= 3, `Expected ≤3 extras, got ${extras}`);
+	assert.ok(extras <= 1, `Expected ≤1 extras, got ${extras}`);
 });
 
 // --- Phase C4: DOW-shift / DOW-nearest-Julian movable commemorations ---
@@ -290,6 +291,100 @@ test("future year: Phase C4 composition works for 2030 (no vendored data)", () =
 		dow.some((c) => c.text.startsWith("New Martyrs and Confessors of Russian Church")),
 		"DOW-nearest rule must work for arbitrary future years",
 	);
+});
+
+// --- Phase C5: per-year transfer overlays ---
+
+test("transfer: Meeting of Mother of God and Elizabeth natural day (Julian Mar 30, 2027)", () => {
+	// 2027 Pascha = May 2 Greg; Julian Mar 30 2027 = April 12 Greg (nday=-20),
+	// well outside the Lazarus-Sat..Pascha window, so the feast fires on its
+	// natural day.
+	const ctx = computeDayContext({ year: 2027, month: 4, day: 12 });
+	assert.equal(ctx.julian.month, 3);
+	assert.equal(ctx.julian.day, 30);
+	const overlay = getTransferOverlays(ctx);
+	assert.ok(
+		overlay.emit.some((c) => c.text.startsWith("The Meeting of the Mother of God and Saint Elizabeth")),
+		"Elizabeth feast must fire on Julian Mar 30 when Pascha is late",
+	);
+});
+
+test("transfer: Meeting of Elizabeth bumped to Bright Friday when Mar 30 Jul = Lazarus Sat (2025)", () => {
+	// 2025 Pascha = Apr 20 Greg; Julian Mar 30 = Apr 12 Greg (nday=-8 = Lazarus
+	// Sat), so HTOC transfers the feast to Bright Friday (nday=5 = Apr 25).
+	const natural = computeDayContext({ year: 2025, month: 4, day: 12 });
+	assert.equal(natural.julian.month, 3);
+	assert.equal(natural.julian.day, 30);
+	assert.equal(natural.nday, -8);
+	const naturalOverlay = getTransferOverlays(natural);
+	assert.ok(
+		!naturalOverlay.emit.some((c) => c.text.startsWith("The Meeting of the Mother of God and Saint Elizabeth")),
+		"Elizabeth feast must NOT fire on natural day when transferred",
+	);
+	const transferred = computeDayContext({ year: 2025, month: 4, day: 25 });
+	assert.equal(transferred.nday, 5);
+	const transferredOverlay = getTransferOverlays(transferred);
+	assert.ok(
+		transferredOverlay.emit.some((c) => c.text.startsWith("The Meeting of the Mother of God and Saint Elizabeth")),
+		"Elizabeth feast must fire on Bright Friday when Mar 30 Jul = Lazarus Sat",
+	);
+});
+
+test("transfer: Meeting of Elizabeth bumped when Mar 30 Jul = Pascha itself (2026)", () => {
+	// 2026 Julian Mar 30 = Apr 12 Greg = Pascha (nday=0). Transferred to Bright
+	// Friday (Apr 17 Greg, nday=5).
+	const transferred = computeDayContext({ year: 2026, month: 4, day: 17 });
+	assert.equal(transferred.nday, 5);
+	const overlay = getTransferOverlays(transferred);
+	assert.ok(
+		overlay.emit.some((c) => c.text.startsWith("The Meeting of the Mother of God and Saint Elizabeth")),
+		"Elizabeth feast must transfer to Bright Friday when Mar 30 Jul = Pascha",
+	);
+});
+
+test("transfer: Dunchad+Tikhon composite fires on Julian Mar 24 when nday=-14 (2025)", () => {
+	// 2025 Pascha = Apr 20 Greg; Julian Mar 24 = Apr 6 Greg (nday=-14),
+	// Annunciation (Mar 25 Jul) lands on Holy Monday — HTOC prints the
+	// extended composite entry and suppresses the plain Dunchad fixed entry.
+	const ctx = computeDayContext({ year: 2025, month: 4, day: 6 });
+	assert.equal(ctx.julian.month, 3);
+	assert.equal(ctx.julian.day, 24);
+	assert.equal(ctx.nday, -14);
+	const overlay = getTransferOverlays(ctx);
+	assert.ok(
+		overlay.emit.some((c) => c.text.startsWith("St. Dunchad, abbot of Iona. The Commemoration of the Repose of Hieromartyr Tikhon")),
+		"Dunchad composite must fire when Mar 24 Jul = nday -14",
+	);
+	assert.ok(
+		overlay.suppressTexts.includes("St. Dunchad, abbot of Iona."),
+		"Plain Dunchad entry must be suppressed to avoid duplicate output",
+	);
+	// Composition must not emit both the plain and composite entries.
+	const all = getCommemorationsForAnyYear(ctx);
+	const dunchadEntries = all.filter((c) => c.text.startsWith("St. Dunchad"));
+	assert.equal(dunchadEntries.length, 1, "Exactly one Dunchad entry on 2025-04-06");
+	assert.ok(dunchadEntries[0]!.text.includes("Hieromartyr Tikhon"));
+});
+
+test("transfer: Dunchad plain entry fires normally in years where nday ≠ -14 (2026, 2027)", () => {
+	for (const year of [2026, 2027]) {
+		const ctx = computeDayContext({ year, month: 4, day: 6 });
+		assert.equal(ctx.julian.month, 3);
+		assert.equal(ctx.julian.day, 24);
+		assert.notEqual(ctx.nday, -14);
+		const all = getCommemorationsForAnyYear(ctx);
+		const dunchadEntries = all.filter((c) => c.text.startsWith("St. Dunchad"));
+		assert.equal(dunchadEntries.length, 1, `Exactly one Dunchad entry on ${year}-04-06`);
+		assert.equal(dunchadEntries[0]!.text, "St. Dunchad, abbot of Iona.");
+	}
+});
+
+test("transfer: overlay is inert on days with no C5 trigger", () => {
+	// Random mid-year weekday, nothing to transfer.
+	const ctx = computeDayContext({ year: 2025, month: 7, day: 15 });
+	const overlay = getTransferOverlays(ctx);
+	assert.equal(overlay.emit.length, 0);
+	assert.equal(overlay.suppressTexts.length, 0);
 });
 
 test("future year: 2030 Julian Jan 1 returns Basil the Great (any year works)", () => {

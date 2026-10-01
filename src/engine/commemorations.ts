@@ -3,12 +3,16 @@
 // Sviatki, fast-period beginnings). Phase C2 adds the paschal/triodion
 // movable layer. Phase C4 adds DOW-shift / DOW-nearest-Julian movables
 // (Sunday/Saturday-anchored commemorations around a Julian landmark).
+// Phase C5 adds per-year transfer rules for commemorations HTOC moves
+// off their natural day under specific paschal conditions.
 
 import type { HtocCommemoration } from "../data/htocDayFacts.ts";
 import { HTOC_FIXED_COMMEMORATIONS_CYCLE } from "../data/htocFixedCommemorations.ts";
 import { HTOC_PASCHAL_MOVABLES_CYCLE } from "../data/htocPaschalMovables.ts";
 import { HTOC_DOW_MOVABLES, type DowMovableRule } from "../data/htocDowMovables.ts";
 import type { DayContext } from "./day.ts";
+import { difference, julianDate } from "../core/calendar/jdate.ts";
+import { getJulianPaschaRich } from "../paschalion.ts";
 import { getLiturgicalSeason } from "./season.ts";
 
 /**
@@ -141,16 +145,88 @@ export function getDowMovables(ctx: DayContext): readonly HtocCommemoration[] {
 	return out;
 }
 
+// Nday of an arbitrary Julian month/day in a civil year. Used by Phase C5
+// transfer rules whose trigger depends on where the natural Julian day
+// lands relative to Pascha (which varies with the paschalion each year).
+function ndayOfJulianMonthDay(year: number, month: number, day: number): number {
+	return difference(julianDate(year, month, day), getJulianPaschaRich(year));
+}
+
+/**
+ * Per-year transfer rules. For a small set of commemorations whose text
+ * explicitly instructs a transfer under specific paschal conditions,
+ * returns the entries HTOC emits on this day plus the exact texts of any
+ * other-layer entries the composer should suppress to avoid double counting.
+ */
+export function getTransferOverlays(ctx: DayContext): {
+	readonly emit: readonly HtocCommemoration[];
+	readonly suppressTexts: readonly string[];
+} {
+	const emit: HtocCommemoration[] = [];
+	const suppressTexts: string[] = [];
+
+	// Rule 1: St. Dunchad / Hieromartyr Tikhon transfer composite.
+	// When Annunciation (Julian Mar 25) falls on Holy Monday (nday=-13),
+	// HTOC prints an extended Dunchad entry on Julian Mar 24 (nday=-14)
+	// that absorbs Tikhon's repose commemoration transferred off Mar 25.
+	// We suppress the plain fixed-Julian "St. Dunchad, abbot of Iona."
+	// entry on that day to avoid duplication.
+	if (ctx.julian.month === 3 && ctx.julian.day === 24 && ctx.nday === -14) {
+		emit.push({
+			rank: "o",
+			text:
+				"St. Dunchad, abbot of Iona. The Commemoration of the Repose of " +
+				"Hieromartyr Tikhon, patriarch of Moscow and All Russia (1925) is " +
+				"transferred from Monday, April 7/March 25 to this day.",
+			minor: true,
+			lives: [],
+		});
+		suppressTexts.push("St. Dunchad, abbot of Iona.");
+	}
+
+	// Rule 2: Meeting of the Mother of God and Saint Elizabeth.
+	// Natural day is Julian Mar 30. When that day falls in the Lazarus-
+	// Saturday-through-Pascha window (nday in [-8, 0]), HTOC transfers the
+	// feast to Bright Friday (nday=5).
+	const marchThirtyNday = ndayOfJulianMonthDay(ctx.julian.year, 3, 30);
+	const elizabethTransfer = marchThirtyNday >= -8 && marchThirtyNday <= 0;
+	const elizabethFires = elizabethTransfer
+		? ctx.nday === 5
+		: ctx.julian.month === 3 && ctx.julian.day === 30;
+	if (elizabethFires) {
+		emit.push({
+			rank: "0",
+			text:
+				"The Meeting of the Mother of God and Saint Elizabeth " +
+				"( movable Feast on March 30. If March 30 should fall between " +
+				"Lazarus Saturday and Pascha, however, the Feast is transferred " +
+				"to Bright Friday ).",
+			minor: false,
+			lives: [],
+		});
+	}
+
+	return { emit, suppressTexts };
+}
+
 /**
  * Compose season markers + fixed-Julian + paschal-movable + DOW-shift
- * movable commemorations into a single list. Phase C4 handles everything
- * except per-year transferred composites (Phase C5).
+ * movable commemorations + per-year transfer overlays into a single list.
+ * The transfer overlay runs last and can suppress exact-text matches from
+ * the earlier layers (used for the Dunchad composite replacement).
  */
 export function getCommemorationsForAnyYear(ctx: DayContext): readonly HtocCommemoration[] {
-	return [
+	const base = [
 		...getSeasonCommemorations(ctx),
 		...getFixedCommemorations(ctx),
 		...getPaschalMovables(ctx),
 		...getDowMovables(ctx),
 	];
+	const overlay = getTransferOverlays(ctx);
+	if (overlay.suppressTexts.length === 0 && overlay.emit.length === 0) {
+		return base;
+	}
+	const suppress = new Set(overlay.suppressTexts);
+	const filtered = suppress.size === 0 ? base : base.filter((c) => !suppress.has(c.text));
+	return [...filtered, ...overlay.emit];
 }
