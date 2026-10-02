@@ -7,7 +7,7 @@
 // off their natural day under specific paschal conditions.
 
 import type { Commemoration } from "../data/dayFacts.ts";
-import { FIXED_COMMEMORATIONS_CYCLE } from "../data/fixedCommemorations.ts";
+import { FIXED_COMMEMORATIONS_CYCLE, JULIAN_LEAP_TRANSFER_CYCLE } from "../data/fixedCommemorations.ts";
 import { PASCHAL_MOVABLES_CYCLE } from "../data/paschalMovables.ts";
 import { DOW_MOVABLES, type DowMovableRule } from "../data/dowMovables.ts";
 import type { DayContext } from "./day.ts";
@@ -74,11 +74,22 @@ export function getSeasonCommemorations(ctx: DayContext): readonly Commemoration
 /**
  * Fixed-Julian commemoration lookup. Returns the HTOC commemoration entries
  * attached to this day's Julian month-day, independent of civil year.
- * Works for any year.
+ * Includes leap-gated entries for Julian Feb 28 ↔ Feb 29 transfer saints
+ * (e.g. John Cassian the Roman — HTOC fires on Feb 29 in Julian leap years,
+ * Feb 28 otherwise). Works for any year.
  */
 export function getFixedCommemorations(ctx: DayContext): readonly Commemoration[] {
 	const key = `${String(ctx.julian.month).padStart(2, "0")}-${String(ctx.julian.day).padStart(2, "0")}`;
-	return FIXED_COMMEMORATIONS_CYCLE.get(key) ?? [];
+	const always = FIXED_COMMEMORATIONS_CYCLE.get(key) ?? [];
+	const leapGated = JULIAN_LEAP_TRANSFER_CYCLE.get(key);
+	if (leapGated === undefined) return always;
+	const isJulianLeap = ctx.julian.year % 4 === 0;
+	const matched: Commemoration[] = [];
+	for (const e of leapGated) {
+		if (e.julianLeap === isJulianLeap) matched.push(e.commem);
+	}
+	if (matched.length === 0) return always;
+	return [...always, ...matched];
 }
 
 /**

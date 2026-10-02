@@ -55,8 +55,9 @@ const TITLE_RULES: readonly { prefix: string; rule: Rule }[] = [
 	{ prefix: "Sunday after the Universal Elevation", rule: { kind: "dow-after-strict", dow: 0, julianMonth: 9, julianDay: 14 } },
 	// Sunday of Holy Forefathers (last Sun on or before Julian Dec 17).
 	{ prefix: "Week of Holy Forefathers", rule: { kind: "dow-before", dow: 0, julianMonth: 12, julianDay: 17 } },
-	// Fathers of the Seventh Council (Sunday in Julian Oct 11-17).
-	{ prefix: "Commemoration of the Holy Fathers of the Seventh Ecumenical Council", rule: { kind: "dow-after-strict", dow: 0, julianMonth: 10, julianDay: 10 } },
+	// Fathers of the Seventh Ecumenical Council: HTOC fires on the Sunday
+	// nearest Julian Oct 11 (window Oct 8-14 Julian), not strictly after it.
+	{ prefix: "Commemoration of the Holy Fathers of the Seventh Ecumenical Council", rule: { kind: "dow-nearest", dow: 0, julianMonth: 10, julianDay: 11 } },
 	// Triodion Parents' Saturdays (2nd, 3rd, 4th Lenten Sats).
 	{ prefix: "Parents\u2019 Saturday. Remembrance of the dead", rule: { kind: "nday-set", ndays: [-36, -29, -22] } },
 	// Demetrius Saturday (last Sat strictly before Julian Oct 26).
@@ -66,10 +67,10 @@ const TITLE_RULES: readonly { prefix: string; rule: Rule }[] = [
 	// HTOC data anomaly: text says "Saturday" but the icon actually fires on
 	// the Sunday on-or-after Julian June 18 across all vendored years.
 	{ prefix: "Korobeinikov-Kazan Icon of the Most Holy Theotokos", rule: { kind: "dow-after", dow: 0, julianMonth: 6, julianDay: 18 } },
-	// Spanish Icon's parenthetical says "Sunday before Sep 29" but HTOC fires
-	// it on the Sunday closest to Sep 29 Julian (anchor-day included), unlike
-	// the strict-before semantics of other "Sunday before X" entries.
-	{ prefix: "Synaxis of All Saints Who Shone Forth in the Spanish and Portuguese Lands", rule: { kind: "dow-nearest", dow: 0, julianMonth: 9, julianDay: 29 } },
+	// Spanish Icon's parenthetical says "Sunday before Sep 29" and HTOC
+	// fires it on the Sunday on-or-before Julian Sep 29 (inclusive) — i.e.
+	// the plain dow-before window diff ∈ [-6, 0], not dow-nearest.
+	{ prefix: "Synaxis of All Saints Who Shone Forth in the Spanish and Portuguese Lands", rule: { kind: "dow-before", dow: 0, julianMonth: 9, julianDay: 29 } },
 ];
 
 function parseParenthetical(text: string): Rule | null {

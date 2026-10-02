@@ -48,6 +48,10 @@ export interface Occurrence {
 
 export interface ClassifiedOccurrence extends Occurrence {
 	readonly classification: Classification;
+	// For fixed-julian entries whose text group spans a Julian Feb 28 ↔ Feb 29
+	// (leap-year transfer) pattern: "leap" means emit only on Julian leap
+	// years, "non-leap" only on non-leap years, undefined means always emit.
+	readonly leapScope?: "leap" | "non-leap";
 }
 
 function textKey(c: Commemoration): string {
@@ -81,6 +85,10 @@ export function classifyAll(): ClassifiedOccurrence[] {
 		}
 	}
 
+	const allCorpusYears = [...new Set(occurrences.map((o) => o.year))].sort();
+	const corpusLeap = new Set(allCorpusYears.filter((y) => y % 4 === 0));
+	const corpusNonLeap = new Set(allCorpusYears.filter((y) => y % 4 !== 0));
+
 	const textGroups = new Map<string, Occurrence[]>();
 	for (const o of occurrences) {
 		const k = textKey(o.commem);
@@ -89,6 +97,8 @@ export function classifyAll(): ClassifiedOccurrence[] {
 	}
 
 	const textClass = new Map<string, Classification>();
+	// For split-julian text groups, per-julianKey leap scope.
+	const textLeapScopes = new Map<string, Map<string, "any" | "leap" | "non-leap">>();
 	for (const [k, group] of textGroups) {
 		const sample = group[0]!.commem.text;
 		if (matchesAny(sample, SEASON_SYNTHESIZED)) {
@@ -129,10 +139,76 @@ export function classifyAll(): ClassifiedOccurrence[] {
 			textClass.set(k, "paschal-movable");
 			continue;
 		}
+		// Split-julian: the text group spans multiple Julian keys where each
+		// key's year coverage matches a Julian leap-year predicate. The
+		// canonical case is a commemoration anchored to Julian Feb 29 that
+		// HTOC transfers to Feb 28 in non-leap Julian years (10+ saints in
+		// the vendored corpus). Also catches "primary date + Feb 29 transfer"
+		// composites (e.g. St. Theosterictus on Mar 17 Julian + Feb 28/29).
+		const scopes = detectLeapScopes(group, allCorpusYears, corpusLeap, corpusNonLeap);
+		if (scopes !== null) {
+			textClass.set(k, "fixed-julian");
+			textLeapScopes.set(k, scopes);
+			continue;
+		}
 		// Everything else varies in both axes — DOW-nearest-Julian or
 		// per-year transferred composites.
 		textClass.set(k, "dow-shift");
 	}
 
-	return occurrences.map((o) => ({ ...o, classification: textClass.get(textKey(o.commem))! }));
+	return occurrences.map((o) => {
+		const tk = textKey(o.commem);
+		const cls = textClass.get(tk)!;
+		const scopes = textLeapScopes.get(tk);
+		const scope = scopes?.get(o.julianKey);
+		if (scope === "leap" || scope === "non-leap") {
+			return { ...o, classification: cls, leapScope: scope };
+		}
+		return { ...o, classification: cls };
+	});
+}
+
+/**
+ * Detect split-julian pattern: the text group is covered by a set of julian
+ * keys where each key's observed year set matches "all corpus years",
+ * "all leap years in corpus", or "all non-leap years in corpus". Returns
+ * the per-key scope map, or null if the group doesn't fit the pattern.
+ */
+function detectLeapScopes(
+	group: readonly Occurrence[],
+	allCorpusYears: readonly number[],
+	corpusLeap: ReadonlySet<number>,
+	corpusNonLeap: ReadonlySet<number>,
+): Map<string, "any" | "leap" | "non-leap"> | null {
+	const perKey = new Map<string, Set<number>>();
+	for (const o of group) {
+		if (!perKey.has(o.julianKey)) perKey.set(o.julianKey, new Set());
+		perKey.get(o.julianKey)!.add(o.year);
+	}
+	// Dedupe to one occurrence per (year, key) pair; refuse ambiguous groups
+	// with multiple same-day same-text entries.
+	let totalPairs = 0;
+	for (const years of perKey.values()) totalPairs += years.size;
+	if (totalPairs !== group.length) return null;
+	const scopes = new Map<string, "any" | "leap" | "non-leap">();
+	for (const [jk, obsYears] of perKey) {
+		if (allCorpusYears.every((y) => obsYears.has(y))) {
+			scopes.set(jk, "any");
+		} else if (
+			corpusLeap.size > 0
+			&& [...obsYears].every((y) => corpusLeap.has(y))
+			&& [...corpusLeap].every((y) => obsYears.has(y))
+		) {
+			scopes.set(jk, "leap");
+		} else if (
+			corpusNonLeap.size > 0
+			&& [...obsYears].every((y) => corpusNonLeap.has(y))
+			&& [...corpusNonLeap].every((y) => obsYears.has(y))
+		) {
+			scopes.set(jk, "non-leap");
+		} else {
+			return null;
+		}
+	}
+	return scopes;
 }

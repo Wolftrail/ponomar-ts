@@ -57,6 +57,20 @@ notice.
   emission) or safely skipped. Measured impact on 6-year corpus:
   commemoration set-mismatches 57 → 42 (−26 %, 25 fewer extras),
   all-5-fields set-equal reproduction 97.35 % → **98.04 %**.
+- **New overlay: `JULIAN_LEAP_TRANSFER_CYCLE`.** Detects commemorations
+  whose text group spans a Julian Feb 28 ↔ Feb 29 transfer (e.g.
+  Venerable John Cassian the Roman, 10 other saints, and the St.
+  Theosterictus multi-day composite). The classifier recognizes a
+  "split-julian" pattern — per-julianKey year coverage that matches a
+  Julian leap-year predicate — and emits leap-gated entries that the
+  composer merges into `getFixedCommemorations` based on
+  `ctx.julian.year % 4 === 0`. Removes ~63 missing commemorations
+  (10 saints × 6 years + Theosterictus) that were previously dropped as
+  unstable. Also fixes HTOC Oct 11 ("Fathers of the Seventh Ecumenical
+  Council") and Sep 29 ("Spanish and Portuguese Saints") DOW rules
+  (`dow-after-strict`/`dow-nearest` → `dow-nearest`/`dow-before`). Measured
+  impact on 6-year corpus: commemoration set-mismatches 42 → 22 (−48 %),
+  all-5-fields set-equal reproduction 98.04 % → **98.90 %**.
 - **Internal scratch-file naming unified.** Dropped the legacy `htoc-`
   prefix from `scripts/analysis/` scratch outputs: `scratch/htoc-days.json`
   → `scratch/days.json` and `scratch/htoc-saints.json` →
@@ -71,17 +85,19 @@ notice.
 | ---------------- | ----------: | --------: | -------: |
 | `headerText`     |    100.00 % |         — |        — |
 | `tone`           |    100.00 % |         — |        — |
-| `commemorations` |          0% |   98.08 % |   1.92 % |
+| `commemorations` |          0% |   99.00 % |   1.00 % |
 | `troparia`       |     75.31 % |   24.65 % |   0.05 % |
 | `kontakia`       |     81.15 % |   18.76 % |   0.09 % |
 
-All-5-fields set-equal across every vendored day: **2,148 / 2,191 (98.04 %)**.
-The remaining 1.92 % commemoration mismatch is dominated by (a) Julian
-Feb 29 commemorations whose non-leap-year transfer (to Feb 28 or Mar 1)
-is not yet modeled, and (b) a residue of DOW-anchor rules (e.g. "Synaxis
-of all saints of Nizhny Novgorod — Sunday after August 26") whose text
-appears in only some of the vendored years; these are candidates for
-future per-year gating.
+All-5-fields set-equal across every vendored day: **2,167 / 2,191 (98.90 %)**.
+The remaining 1.00 % commemoration mismatch is dominated by (a) HTOC
+rank-drift across years for a few Sunday-anchored movables (e.g. "Synaxis
+of all saints of Nizhny Novgorod" switches from rank 0 to rank 1 mid-corpus),
+(b) HTOC conditional headers (e.g. "Saturday before the Theophany" vs
+"Saturday after Nativity and before Baptism" chosen based on which window
+the Saturday falls in), and (c) HTOC source double-listings deduped by the
+composer. These require either HTOC-side editorial normalization or
+per-year overlays, not pattern inference.
 
 ## [1.0.0-rc.20] — 2026-10-02
 
