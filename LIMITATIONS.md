@@ -72,15 +72,18 @@ Two surfaces behave differently here:
 - `LiturgicalDay.troparia` / `.kontakia` returned by `getLiturgicalDay`
   **are populated for any Gregorian year**. Inside the vendored
   2025–2027 window they are HTOC's published hymns verbatim; outside the
-  window they are composed from three position-stable cycle maps
+  window they are composed from four position-stable cycle maps
   (`FIXED_HYMNS_CYCLE` keyed by Julian MM-DD, `PASCHAL_HYMNS_CYCLE` keyed
-  by signed days from Pascha, `SUNDAY_TONE_HYMNS_CYCLE` keyed by tone),
-  which reproduce ~98% of in-window hymn occurrences with no false
-  positives (the composer never emits content HTOC did not publish). The
-  remaining ~2% are moveable-Sunday feasts whose dates depend on
-  DOW/week-of-year interactions (e.g. Sunday Before Nativity, Sunday of
-  the Holy Forefathers, Sunday of the Fathers of the 7th Ecumenical
-  Council); their hymns are deliberately dropped rather than guessed.
+  by signed days from Pascha, `SUNDAY_TONE_HYMNS_CYCLE` keyed by tone,
+  and `DOW_JULIAN_WINDOW_HYMNS_CYCLE` keyed by `"${dow}-MM-DD"` for
+  moveable-Sunday feasts anchored to a nearby Julian landmark).
+  Together these reproduce 100 % of in-window hymn occurrences at the
+  set level with no false positives (the composer never emits content
+  HTOC did not publish). Outside the vendored window the dow-julian
+  cycle only fires on observed `(dow, julianKey)` pairs, so civil years
+  whose matching Sunday falls on a Julian date the vendored data did
+  not sample will miss that one Sunday-near-feast proper; the rest of
+  the day's hymns compose correctly.
 - The lower-level `getDay(date)` / `DAY_FACTS_BY_ISO.get(iso)` accessor
   returns HTOC's verbatim record inside the window and a partial record
   outside the window with `troparia` / `kontakia` empty. Prefer

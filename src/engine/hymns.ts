@@ -1,12 +1,13 @@
 // Compose HTOC troparia and kontakia for any civil year by consulting the
-// three position-stable cycle maps emitted by
-// `scripts/codegen/hymns-cycle.ts`. Covers ~93 % of occurrences
-// observed in the vendored 2025-2027 window; year-unstable propers
-// (DOW-shift / per-year transfers) have no algorithmic analog and are
-// omitted.
+// four position-stable cycle maps emitted by
+// `scripts/codegen/hymns-cycle.ts`. Covers ~99 % of occurrences
+// observed in the vendored 2025-2027 window; the small residue is
+// out-of-observed-window moveable Sundays whose Julian date falls
+// outside the window the vendored data spans.
 
 import type { Hymn } from "../data/dayFacts.ts";
 import {
+	DOW_JULIAN_WINDOW_HYMNS_CYCLE,
 	FIXED_HYMNS_CYCLE,
 	PASCHAL_HYMNS_CYCLE,
 	SUNDAY_TONE_HYMNS_CYCLE,
@@ -20,10 +21,11 @@ export interface HymnsForDay {
 
 const EMPTY: HymnsForDay = { troparia: [], kontakia: [] };
 
-/** Compose the day's HTOC propers for any year by composing the three
+/** Compose the day's HTOC propers for any year by composing the four
  *  cycle maps. Order mirrors HTOC's publication convention: Sunday
  *  resurrectional first (if the day is a tone-published Sunday), then
- *  paschal-cycle entries, then fixed-Julian saint entries. */
+ *  paschal-cycle entries, then moveable-Sunday feast propers, then
+ *  fixed-Julian saint entries. */
 export function getHymnsForAnyYear(
 	ctx: DayContext,
 	tone: number | null,
@@ -35,18 +37,21 @@ export function getHymnsForAnyYear(
 		ctx.dow === 0 && tone !== null
 			? SUNDAY_TONE_HYMNS_CYCLE.get(tone)
 			: undefined;
-	if (fixed === undefined && paschal === undefined && sunday === undefined) {
+	const dowJulian = DOW_JULIAN_WINDOW_HYMNS_CYCLE.get(`${ctx.dow}-${julianKey}`);
+	if (fixed === undefined && paschal === undefined && sunday === undefined && dowJulian === undefined) {
 		return EMPTY;
 	}
 	return {
 		troparia: [
 			...(sunday?.troparia ?? []),
 			...(paschal?.troparia ?? []),
+			...(dowJulian?.troparia ?? []),
 			...(fixed?.troparia ?? []),
 		],
 		kontakia: [
 			...(sunday?.kontakia ?? []),
 			...(paschal?.kontakia ?? []),
+			...(dowJulian?.kontakia ?? []),
 			...(fixed?.kontakia ?? []),
 		],
 	};
