@@ -1,10 +1,10 @@
 // Compare the algorithmic `renderFastText(ctx, level)` composer against
-// the vendored `fastText` field in HTOC_DAY_FACTS_BY_ISO across the full
+// the vendored `fastText` field in DAY_FACTS_BY_ISO across the full
 // 2025-2027 corpus. Buckets mismatches so we can see which period / level
 // combinations are drifting and whether the engine fasting level or the
 // composer period name is the source of the gap.
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { computeFastingFromContext } from "../../src/engine/fasting.ts";
 import { renderFastText } from "../../src/engine/fastText.ts";
@@ -33,7 +33,7 @@ function split(s: string): { period: string; suffix: string } {
 const matches: Row[] = [];
 const mismatches: Row[] = [];
 
-for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 	const [ys, ms, ds] = iso.split("-");
 	const greg = { year: Number(ys), month: Number(ms), day: Number(ds) };
 	const ctx = computeDayContext(greg);

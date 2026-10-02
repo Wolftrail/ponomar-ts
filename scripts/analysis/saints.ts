@@ -8,7 +8,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { HTOC_YEARS, SCRATCH_DIR, iterCorpus } from "./corpus.ts";
+import { YEARS, SCRATCH_DIR, iterCorpus } from "./corpus.ts";
 
 interface SaintEntry {
 	readonly href: string;
@@ -74,10 +74,10 @@ function classifyCycle(href: string): "fixed" | "movable" {
 
 if (!existsSync(SCRATCH_DIR)) mkdirSync(SCRATCH_DIR, { recursive: true });
 
-const outPath = resolve(SCRATCH_DIR, "htoc-saints.json");
+const outPath = resolve(SCRATCH_DIR, "saints.json");
 const payload = {
 	source: "tests/fixtures/htoc-full-<year>.json",
-	years: [...HTOC_YEARS],
+	years: [...YEARS],
 	generatedAt: new Date().toISOString(),
 	count: saints.length,
 	saints,

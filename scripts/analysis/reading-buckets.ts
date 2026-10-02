@@ -1,6 +1,6 @@
 // Categorize the HTOC vs. engine reading deltas so we can pick the biggest
 // bucket to fix first. Reads `tests/fixtures/htoc-full-*.json`, runs the
-// same reading comparator as `metrics.ts`, then classifies every htocOnly
+// same reading comparator as `metrics.ts`, then classifies every only
 // (readings the engine misses) and every engineOnly (readings the engine
 // emits but HTOC omits) into a small set of service-context buckets. The
 // classifier keys off the HTOC `note` field, which HTOC uses as the label
@@ -22,10 +22,10 @@ import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
 import { compareReadings, tryParseCitation } from "./comparators.ts";
 import { iterCorpus, SCRATCH_DIR } from "./corpus.ts";
-import type { HtocScriptureReading } from "./corpus.ts";
+import type { ScriptureReading } from "./corpus.ts";
 
 /** Classify an HTOC `note` string into a coarse service-context bucket. */
-function bucketHtocNote(note: string | undefined): string {
+function bucketNote(note: string | undefined): string {
 	const n = (note ?? "").trim();
 	if (n === "") return "default (no note)";
 	if (/matins gospel/i.test(n)) {
@@ -138,7 +138,7 @@ function isoToCal(iso: string): CalendarDate {
 
 function main(): void {
 	if (!existsSync(SCRATCH_DIR)) mkdirSync(SCRATCH_DIR, { recursive: true });
-	const htocOnlyBuckets = new Map<string, BucketAcc>();
+	const onlyBuckets = new Map<string, BucketAcc>();
 	const engineOnlyBuckets = new Map<string, BucketAcc>();
 
 	let processed = 0;
@@ -147,21 +147,21 @@ function main(): void {
 		const engine = collectEngineReadings(cal);
 		const res = compareReadings(day.scripture, engine);
 
-		// htocOnly needs to look at the ORIGINAL HtocScriptureReading to
+		// only needs to look at the ORIGINAL ScriptureReading to
 		// preserve note context, so we resolve indices post-hoc.
-		const usedHtoc = new Set<HtocScriptureReading>();
-		for (const missing of res.htocOnly) {
-			usedHtoc.add(missing as HtocScriptureReading);
+		const usedHtoc = new Set<ScriptureReading>();
+		for (const missing of res.only) {
+			usedHtoc.add(missing as ScriptureReading);
 		}
 		for (let i = 0; i < day.scripture.length; i++) {
 			const r = day.scripture[i]!;
-			if (!res.htocOnly.some((h) => h.citation === r.citation && h.note === r.note))
+			if (!res.only.some((h) => h.citation === r.citation && h.note === r.note))
 				continue;
-			const bucket = bucketHtocNote(r.note);
-			let acc = htocOnlyBuckets.get(bucket);
+			const bucket = bucketNote(r.note);
+			let acc = onlyBuckets.get(bucket);
 			if (acc === undefined) {
 				acc = newBucketAcc();
-				htocOnlyBuckets.set(bucket, acc);
+				onlyBuckets.set(bucket, acc);
 			}
 			acc.count++;
 			const book = bookOfCitation(r.citation);
@@ -206,7 +206,7 @@ function main(): void {
 		"Categorization of the ~1,278 HTOC-only + ~2,167 engine-only readings from",
 	);
 	md.push(
-		"[scratch/htoc-metrics.md](htoc-metrics.md). Buckets are inferred from the HTOC `note` field",
+		"[scratch/htoc-metrics.md](metrics.md). Buckets are inferred from the HTOC `note` field",
 	);
 	md.push(
 		"for HTOC-only, and from `(service, type)` for engine-only. Sorted by count.",
@@ -216,10 +216,10 @@ function main(): void {
 	md.push("");
 	md.push("| bucket | count | top books |");
 	md.push("| --- | ---: | --- |");
-	const htocRows = [...htocOnlyBuckets.entries()].sort(
+	const rows = [...onlyBuckets.entries()].sort(
 		(a, b) => b[1].count - a[1].count,
 	);
-	for (const [bucket, acc] of htocRows) {
+	for (const [bucket, acc] of rows) {
 		const books = [...acc.books.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, 5)
@@ -230,7 +230,7 @@ function main(): void {
 	md.push("");
 	md.push("### HTOC-only examples per bucket");
 	md.push("");
-	for (const [bucket, acc] of htocRows) {
+	for (const [bucket, acc] of rows) {
 		md.push(`#### \`${bucket}\` (${acc.count} total)`);
 		md.push("");
 		md.push("```");
@@ -267,12 +267,12 @@ function main(): void {
 	}
 
 	writeFileSync(
-		resolve(SCRATCH_DIR, "htoc-reading-buckets.md"),
+		resolve(SCRATCH_DIR, "reading-buckets.md"),
 		`${md.join("\n")}\n`,
 		"utf8",
 	);
 	process.stdout.write(
-		`wrote scratch/htoc-reading-buckets.md — ${htocRows.length} htoc-only buckets, ${engineRows.length} engine-only buckets\n`,
+		`wrote scratch/htoc-reading-buckets.md — ${rows.length} only buckets, ${engineRows.length} engine-only buckets\n`,
 	);
 }
 

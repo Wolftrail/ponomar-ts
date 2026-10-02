@@ -4,9 +4,9 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
 import { computeDayContext } from "../src/engine/day.ts";
-import { renderHtocHeaderText } from "../src/engine/headerText.ts";
+import { renderHeaderText } from "../src/engine/headerText.ts";
 import {
 	getLentenWeek,
 	getLiturgicalSeason,
@@ -88,15 +88,15 @@ describe("isSviatki", () => {
 	});
 });
 
-describe("renderHtocHeaderText matches all vendored HTOC facts", () => {
+describe("renderHeaderText matches all vendored HTOC facts", () => {
 	for (const year of [2025, 2026, 2027] as const) {
 		test(`${year} corpus matches HTOC headerText`, () => {
 			let seen = 0;
 			let mismatches = 0;
-			for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+			for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 				if (!iso.startsWith(`${year}-`)) continue;
 				seen++;
-				const got = renderHtocHeaderText(ctxFromIso(iso));
+				const got = renderHeaderText(ctxFromIso(iso));
 				if (got !== facts.headerText) {
 					mismatches++;
 					if (mismatches <= 3) {
@@ -112,9 +112,9 @@ describe("renderHtocHeaderText matches all vendored HTOC facts", () => {
 	test("full 2025-2027 corpus matches (1095 days)", () => {
 		let seen = 0;
 		let mismatches = 0;
-		for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+		for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 			seen++;
-			const got = renderHtocHeaderText(ctxFromIso(iso));
+			const got = renderHeaderText(ctxFromIso(iso));
 			if (got !== facts.headerText) mismatches++;
 		}
 		assert.equal(seen, 1095);

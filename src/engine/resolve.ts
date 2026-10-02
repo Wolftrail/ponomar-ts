@@ -12,7 +12,7 @@ import type {
 	SaintInfo,
 	SaintName,
 } from "../data/index.ts";
-import { COMMEMORATIONS, HTOC_NAME_OVERLAY, RANK_OVERLAY } from "../data/index.ts";
+import { COMMEMORATIONS, NAME_OVERLAY, RANK_OVERLAY } from "../data/index.ts";
 import type { DayContext } from "./day.ts";
 import { dslContext } from "./day.ts";
 
@@ -66,7 +66,7 @@ function applyNameOverlay(
 	cId: string,
 	meta: SaintName | undefined,
 ): SaintName | undefined {
-	const overlay = HTOC_NAME_OVERLAY[cId];
+	const overlay = NAME_OVERLAY[cId];
 	if (overlay === undefined) return meta;
 	return { ...(meta ?? {}), nominative: overlay };
 }

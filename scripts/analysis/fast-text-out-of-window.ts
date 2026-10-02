@@ -3,7 +3,7 @@
 // Ponomar-driven `renderFastText`, and dumps a few landmark dates.
 
 import { getLiturgicalDay } from "../../src/engine/index.ts";
-import { getHtocFastTextForAnyYear } from "../../src/engine/htocFastText.ts";
+import { getFastTextForAnyYear } from "../../src/engine/fastText.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 
 interface Bucket {
@@ -28,7 +28,7 @@ for (const y of years) {
 		const d = new Date(t);
 		const greg = { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
 		const ctx = computeDayContext(greg);
-		const pivot = getHtocFastTextForAnyYear(ctx);
+		const pivot = getFastTextForAnyYear(ctx);
 		const day = getLiturgicalDay(greg);
 		total++;
 		if (pivot !== null) pivotHits++;

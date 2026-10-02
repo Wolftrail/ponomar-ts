@@ -1,9 +1,9 @@
-// Phase B validator: compare algorithmic renderHtocHeaderText against the
-// hardcoded `headerText` field in HTOC_DAY_FACTS_BY_ISO.
+// Phase B validator: compare algorithmic renderHeaderText against the
+// hardcoded `headerText` field in DAY_FACTS_BY_ISO.
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
-import { renderHtocHeaderText } from "../../src/engine/headerText.ts";
+import { renderHeaderText } from "../../src/engine/headerText.ts";
 
 type Row = {
 	iso: string;
@@ -17,10 +17,10 @@ type Row = {
 const matches: Row[] = [];
 const mismatches: Row[] = [];
 
-for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 	const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
 	const ctx = computeDayContext({ year: y, month: m, day: d });
-	const actual = renderHtocHeaderText(ctx);
+	const actual = renderHeaderText(ctx);
 	const row: Row = {
 		iso,
 		nday: ctx.nday,

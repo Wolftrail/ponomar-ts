@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
 import { computeDayContext } from "../src/engine/day.ts";
 import {
 	getOctoechosTone,
@@ -95,7 +95,7 @@ describe("getOctoechosTone matches all vendored HTOC facts", () => {
 		test(`${year} corpus matches HTOC tone`, () => {
 			let seen = 0;
 			let mismatches = 0;
-			for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+			for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 				if (!iso.startsWith(`${year}-`)) continue;
 				seen++;
 				const got = getOctoechosTone(ctxFromIso(iso));
@@ -114,7 +114,7 @@ describe("getOctoechosTone matches all vendored HTOC facts", () => {
 	test("full 2025-2027 corpus matches (1095 days)", () => {
 		let mismatches = 0;
 		let seen = 0;
-		for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+		for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 			seen++;
 			const got = getOctoechosTone(ctxFromIso(iso));
 			if (got !== facts.tone) mismatches++;

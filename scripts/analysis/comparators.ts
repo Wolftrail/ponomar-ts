@@ -16,7 +16,7 @@ import type { BibleRef, VerseRange } from "../../src/bible/types.ts";
 import { BibleRefError, parseBibleRef } from "../../src/bible/parse.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
 import type { ResolvedSaint } from "../../src/engine/resolve.ts";
-import type { HtocCommemoration, HtocScriptureReading } from "./corpus.ts";
+import type { Commemoration, ScriptureReading } from "./corpus.ts";
 
 const STOPWORDS = new Set([
 	"the",
@@ -92,21 +92,21 @@ export function tokens(input: string): Set<string> {
 }
 
 export interface CommMatch {
-	readonly htocIndex: number;
+	readonly index: number;
 	readonly engineIndex: number;
 	readonly overlap: number;
-	readonly htocText: string;
+	readonly text: string;
 	readonly engineName: string;
-	readonly htocRank: string;
+	readonly rank: string;
 	readonly engineRank: number | undefined;
 	readonly minor: boolean;
 }
 
 export interface CommResult {
-	readonly htocCount: number;
+	readonly count: number;
 	readonly engineCount: number;
 	readonly matched: readonly CommMatch[];
-	readonly htocOnly: readonly {
+	readonly only: readonly {
 		readonly rank: string;
 		readonly minor: boolean;
 		readonly text: string;
@@ -128,10 +128,10 @@ function saintNameStrings(s: ResolvedSaint): string[] {
 }
 
 export function compareCommemorations(
-	htoc: readonly HtocCommemoration[],
+	htoc: readonly Commemoration[],
 	engine: readonly ResolvedSaint[],
 ): CommResult {
-	const htocTokens = htoc.map((c) => tokens(c.text));
+	const commTokens = htoc.map((c) => tokens(c.text));
 	const engineTokens = engine.map((s) =>
 		tokens(saintNameStrings(s).join(" ")),
 	);
@@ -142,7 +142,7 @@ export function compareCommemorations(
 	}
 	const cands: Cand[] = [];
 	for (let hi = 0; hi < htoc.length; hi++) {
-		const ht = htocTokens[hi]!;
+		const ht = commTokens[hi]!;
 		if (ht.size === 0) continue;
 		for (let ei = 0; ei < engine.length; ei++) {
 			const et = engineTokens[ei]!;
@@ -156,8 +156,8 @@ export function compareCommemorations(
 			if (overlap === 0) continue;
 			if (overlap < 2) {
 				const engineSubset = overlap === et.size;
-				const htocSubset = overlap === ht.size;
-				if (!engineSubset && !htocSubset) continue;
+				const subset = overlap === ht.size;
+				if (!engineSubset && !subset) continue;
 			}
 			cands.push({ hi, ei, overlap });
 		}
@@ -173,17 +173,17 @@ export function compareCommemorations(
 		const h = htoc[c.hi]!;
 		const s = engine[c.ei]!;
 		matched.push({
-			htocIndex: c.hi,
+			index: c.hi,
 			engineIndex: c.ei,
 			overlap: c.overlap,
-			htocText: h.text,
+			text: h.text,
 			engineName: saintNameStrings(s)[0] ?? "(anon)",
-			htocRank: h.rank,
+			rank: h.rank,
 			engineRank: s.church?.rank,
 			minor: h.minor,
 		});
 	}
-	const htocOnly = htoc
+	const only = htoc
 		.map((c, i) => ({ i, c }))
 		.filter(({ i }) => !usedHtoc.has(i))
 		.map(({ c }) => ({ rank: c.rank, minor: c.minor, text: c.text }));
@@ -196,19 +196,19 @@ export function compareCommemorations(
 			name: saintNameStrings(s)[0] ?? "(anon)",
 		}));
 	return {
-		htocCount: htoc.length,
+		count: htoc.length,
 		engineCount: engine.length,
 		matched,
-		htocOnly,
+		only,
 		engineOnly,
 	};
 }
 
 export interface ReadingResult {
-	readonly htocCount: number;
+	readonly count: number;
 	readonly engineCount: number;
 	readonly matched: number;
-	readonly htocOnly: readonly {
+	readonly only: readonly {
 		readonly citation: string;
 		readonly note?: string;
 	}[];
@@ -275,10 +275,10 @@ export function tryParseCitation(citation: string): BibleRef | null {
 }
 
 export function compareReadings(
-	htoc: readonly HtocScriptureReading[],
+	htoc: readonly ScriptureReading[],
 	engine: readonly ReadingRef[],
 ): ReadingResult {
-	const htocKeys = htoc.map((r) => {
+	const keys = htoc.map((r) => {
 		const parsed = tryParseCitation(r.citation);
 		return parsed === null ? null : refKey(parsed);
 	});
@@ -298,7 +298,7 @@ export function compareReadings(
 	// is listed once for St John and again for Hieromartyr Ignatius). One
 	// canonical engine emission covers both intentions.
 	for (let hi = 0; hi < htoc.length; hi++) {
-		const k = htocKeys[hi];
+		const k = keys[hi];
 		if (k === null) continue;
 		for (let ei = 0; ei < engine.length; ei++) {
 			if (engineKeys[ei] === k) {
@@ -308,7 +308,7 @@ export function compareReadings(
 			}
 		}
 	}
-	const htocOnly = htoc
+	const only = htoc
 		.map((r, i) => ({ i, r }))
 		.filter(({ i }) => !matchedIndices.has(i))
 		.map(({ r }) =>
@@ -326,10 +326,10 @@ export function compareReadings(
 			reading: r.reading,
 		}));
 	return {
-		htocCount: htoc.length,
+		count: htoc.length,
 		engineCount: engine.length,
 		matched: matchedIndices.size,
-		htocOnly,
+		only,
 		engineOnly,
 	};
 }

@@ -23,10 +23,10 @@ function normalize(rank: number): string {
 
 interface Row {
 	iso: string;
-	htocRank: string;
+	rank: string;
 	engineRank: number;
 	engineGlyph: string;
-	htocText: string;
+	text: string;
 	engineName: string;
 	engineCId: string;
 }
@@ -40,24 +40,24 @@ for (const { iso, day: htoc } of iterCorpus()) {
 	for (const m of comm.matched) {
 		if (m.engineRank === undefined) continue;
 		const g = normalize(m.engineRank);
-		if (g === m.htocRank) continue;
+		if (g === m.rank) continue;
 		const cId = engineDay.allSaints[m.engineIndex]?.cId ?? "?";
 		rows.push({
 			iso,
-			htocRank: m.htocRank,
+			rank: m.rank,
 			engineRank: m.engineRank,
 			engineGlyph: g,
-			htocText: m.htocText.slice(0, 80),
+			text: m.text.slice(0, 80),
 			engineName: m.engineName.slice(0, 60),
 			engineCId: cId,
 		});
 	}
 }
 
-// Bucket rows by (htocRank, engineGlyph) then by cId.
+// Bucket rows by (rank, engineGlyph) then by cId.
 const buckets = new Map<string, Row[]>();
 for (const r of rows) {
-	const k = `${r.htocRank}->${r.engineGlyph}`;
+	const k = `${r.rank}->${r.engineGlyph}`;
 	const list = buckets.get(k) ?? [];
 	list.push(r);
 	buckets.set(k, list);
@@ -87,12 +87,12 @@ for (const [k, list] of [...buckets.entries()].sort()) {
 		const dates = rs.map((r) => r.iso).join(", ");
 		const first = rs[0]!;
 		out.push(
-			`| \`${cId}\` | ${first.engineName} | ${first.engineRank} | ${dates} | ${first.htocText} |`,
+			`| \`${cId}\` | ${first.engineName} | ${first.engineRank} | ${dates} | ${first.text} |`,
 		);
 	}
 	out.push("");
 }
 
-const outPath = resolve(SCRATCH_DIR, "htoc-rank-disagreements.md");
+const outPath = resolve(SCRATCH_DIR, "rank-disagreements.md");
 writeFileSync(outPath, out.join("\n"), "utf8");
 console.log(`wrote ${outPath} — ${rows.length} rows across ${buckets.size} buckets`);

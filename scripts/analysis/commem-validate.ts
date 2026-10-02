@@ -3,7 +3,7 @@
 // markers. The gap is movable overlays (paschal/triodion/DOW-shift), which
 // are left to later sub-phases.
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { getCommemorationsForAnyYear } from "../../src/engine/commemorations.ts";
 
@@ -17,12 +17,12 @@ let totalIntersection = 0;
 let totalMissing = 0;
 let totalExtra = 0;
 let perfectDays = 0;
-const totalDays = HTOC_DAY_FACTS_BY_ISO.size;
+const totalDays = DAY_FACTS_BY_ISO.size;
 
 const missingByText = new Map<string, number>();
 const extraByText = new Map<string, number>();
 
-for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 	const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
 	const ctx = computeDayContext({ year: y, month: m, day: d });
 	const got = getCommemorationsForAnyYear(ctx);

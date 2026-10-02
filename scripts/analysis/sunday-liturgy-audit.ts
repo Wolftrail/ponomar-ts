@@ -8,7 +8,7 @@ import { getLiturgicalDay } from "../../src/engine/index.ts";
 import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { compareReadings } from "./comparators.ts";
 import { iterCorpus } from "./corpus.ts";
-import type { HtocScriptureReading } from "./corpus.ts";
+import type { ScriptureReading } from "./corpus.ts";
 
 function toCal(iso: string): CalendarDate {
 	const [y, m, d] = iso.split("-").map((s) => Number.parseInt(s, 10));
@@ -26,11 +26,11 @@ function bucketHtoc(note: string): "liturgy" | "matins" | "vespers" | "hour" {
 interface Row {
 	iso: string;
 	nday: number;
-	htocApostles: string[];
-	htocGospels: string[];
+	apostles: string[];
+	gospels: string[];
 	engineApostles: string[];
 	engineGospels: string[];
-	htocOnly: string[];
+	only: string[];
 	engineOnly: string[];
 }
 
@@ -42,24 +42,24 @@ for (const { iso, day: htoc } of iterCorpus()) {
 	if (engineDay.context.dow !== 0) continue;
 	const lit = getOrderedLiturgyReadings(cal);
 	const engineBag = [...lit.apostol, ...lit.gospel, ...lit.suppressed];
-	const htocLit: HtocScriptureReading[] = [];
+	const litBag: ScriptureReading[] = [];
 	for (const r of htoc.scripture) {
-		if (bucketHtoc(r.note ?? "") === "liturgy") htocLit.push(r);
+		if (bucketHtoc(r.note ?? "") === "liturgy") litBag.push(r);
 	}
-	const cmp = compareReadings(htocLit, engineBag);
-	if (cmp.htocOnly.length === 0 && cmp.engineOnly.length === 0) continue;
+	const cmp = compareReadings(litBag, engineBag);
+	if (cmp.only.length === 0 && cmp.engineOnly.length === 0) continue;
 	rows.push({
 		iso,
 		nday: engineDay.context.nday,
-		htocApostles: htocLit
+		apostles: litBag
 			.filter((r) => /^[123]?\s*(Rom|Cor|Gal|Eph|Phil|Col|Thess|Tim|Tit|Philem|Heb|Jas|Pet|Jn|John|Jude|Acts)/i.test(r.citation.trim()))
 			.map((r) => r.citation),
-		htocGospels: htocLit
+		gospels: litBag
 			.filter((r) => /^(Mat|Mar|Luk|Joh|Mt|Mk|Lk|Jn)/i.test(r.citation.trim()))
 			.map((r) => r.citation),
 		engineApostles: lit.apostol.map((r) => `${r.reading}${r.pericope !== undefined ? ` (p${r.pericope})` : ""} [${r.rank}]`),
 		engineGospels: lit.gospel.map((r) => `${r.reading}${r.pericope !== undefined ? ` (p${r.pericope})` : ""} [${r.rank}]`),
-		htocOnly: cmp.htocOnly.map((r) => `${r.citation}${r.note ? ` "${r.note}"` : ""}`),
+		only: cmp.only.map((r) => `${r.citation}${r.note ? ` "${r.note}"` : ""}`),
 		engineOnly: cmp.engineOnly.map((r) => `${r.reading}`),
 	});
 }
@@ -71,10 +71,10 @@ if (rows.length === 0) {
 	process.exit(0);
 }
 
-// Group by (sorted htocOnly, sorted engineOnly).
+// Group by (sorted only, sorted engineOnly).
 const groups = new Map<string, Row[]>();
 for (const r of rows) {
-	const key = JSON.stringify({ h: r.htocOnly.slice().sort(), e: r.engineOnly.slice().sort() });
+	const key = JSON.stringify({ h: r.only.slice().sort(), e: r.engineOnly.slice().sort() });
 	if (!groups.has(key)) groups.set(key, []);
 	groups.get(key)!.push(r);
 }
@@ -84,7 +84,7 @@ for (const [_, list] of sortedGroups) {
 	const dates = list.map((r) => `${r.iso} nday=${r.nday}`).join(", ");
 	console.log(`── ${list.length}× ──`);
 	console.log(`  dates:      ${dates}`);
-	console.log(`  htocOnly:   ${rep.htocOnly.join(" | ") || "(none)"}`);
+	console.log(`  only:   ${rep.only.join(" | ") || "(none)"}`);
 	console.log(`  engineOnly: ${rep.engineOnly.join(" | ") || "(none)"}`);
 	console.log("");
 }

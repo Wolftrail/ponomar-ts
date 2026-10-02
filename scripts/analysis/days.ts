@@ -15,27 +15,27 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
-	HTOC_YEARS,
+	YEARS,
 	SCRATCH_DIR,
 	iterCorpus,
-	type HtocCommemoration,
-	type HtocDay,
-	type HtocHymn,
-	type HtocLivesLink,
-	type HtocScriptureReading,
+	type Commemoration,
+	type Day,
+	type Hymn,
+	type LivesLink,
+	type ScriptureReading,
 } from "./corpus.ts";
 
-interface AttributedScripture extends HtocScriptureReading {
-	readonly saints: readonly HtocLivesLink[];
+interface AttributedScripture extends ScriptureReading {
+	readonly saints: readonly LivesLink[];
 }
 
-interface AttributedHymn extends HtocHymn {
-	readonly saints: readonly HtocLivesLink[];
+interface AttributedHymn extends Hymn {
+	readonly saints: readonly LivesLink[];
 }
 
 interface DayProjection {
-	readonly civil: HtocDay["civil"];
-	readonly julian: HtocDay["julian"];
+	readonly civil: Day["civil"];
+	readonly julian: Day["julian"];
 	readonly headerText: string;
 	readonly tone: number | null;
 	readonly fastText: string | null;
@@ -180,13 +180,13 @@ function extractName(target: string): string | null {
 }
 
 function attributeScripture(
-	entry: HtocScriptureReading,
-	commemorations: readonly HtocCommemoration[],
-): HtocLivesLink[] {
+	entry: ScriptureReading,
+	commemorations: readonly Commemoration[],
+): LivesLink[] {
 	const note = entry.note?.trim() ?? "";
 	if (!note || isOfficeNote(note)) return [];
 
-	const found = new Map<string, HtocLivesLink>();
+	const found = new Map<string, LivesLink>();
 	for (const target of targetsFromNote(note)) {
 		if (isOfficeNote(target)) continue;
 
@@ -219,13 +219,13 @@ const PURE_HYMN_TITLE =
 	/^(kontakion(,|\s+in|\s*$)|troparion of the sunday|kontakion of the sunday|or this troparion|troparion in the same tone|hymn to the theotokos|glory|both now)/i;
 
 function attributeTroparion(
-	hymn: HtocHymn,
-	commemorations: readonly HtocCommemoration[],
-): HtocLivesLink[] {
+	hymn: Hymn,
+	commemorations: readonly Commemoration[],
+): LivesLink[] {
 	const title = hymn.title.trim();
 	if (!title || PURE_HYMN_TITLE.test(title)) return [];
 
-	const found = new Map<string, HtocLivesLink>();
+	const found = new Map<string, LivesLink>();
 	const name = extractName(title);
 	for (const comm of commemorations) {
 		for (const link of comm.lives) {
@@ -304,10 +304,10 @@ for (const { iso, day } of iterCorpus()) {
 
 if (!existsSync(SCRATCH_DIR)) mkdirSync(SCRATCH_DIR, { recursive: true });
 
-const outPath = resolve(SCRATCH_DIR, "htoc-days.json");
+const outPath = resolve(SCRATCH_DIR, "days.json");
 const payload = {
 	source: "tests/fixtures/htoc-full-<year>.json",
-	years: [...HTOC_YEARS],
+	years: [...YEARS],
 	generatedAt: new Date().toISOString(),
 	count: Object.keys(days).length,
 	days,

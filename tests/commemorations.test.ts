@@ -1,7 +1,7 @@
 import test from "node:test";
 import { strict as assert } from "node:assert";
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
 import { computeDayContext } from "../src/engine/day.ts";
 import {
 	getCommemorationsForAnyYear,
@@ -11,9 +11,9 @@ import {
 	getSeasonCommemorations,
 	getTransferOverlays,
 } from "../src/engine/commemorations.ts";
-import { HTOC_FIXED_COMMEMORATIONS_CYCLE } from "../src/data/htocFixedCommemorations.ts";
-import { HTOC_PASCHAL_MOVABLES_CYCLE } from "../src/data/htocPaschalMovables.ts";
-import { HTOC_DOW_MOVABLES } from "../src/data/htocDowMovables.ts";
+import { FIXED_COMMEMORATIONS_CYCLE } from "../src/data/fixedCommemorations.ts";
+import { PASCHAL_MOVABLES_CYCLE } from "../src/data/paschalMovables.ts";
+import { DOW_MOVABLES } from "../src/data/dowMovables.ts";
 
 function ctxFor(iso: string) {
 	const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
@@ -21,7 +21,7 @@ function ctxFor(iso: string) {
 }
 
 test("fixed cycle: all 365 Julian keys present", () => {
-	assert.equal(HTOC_FIXED_COMMEMORATIONS_CYCLE.size, 365);
+	assert.equal(FIXED_COMMEMORATIONS_CYCLE.size, 365);
 });
 
 test("fixed lookup: Julian Jan 1 (Gregorian Jan 14) — Basil the Great", () => {
@@ -101,12 +101,12 @@ test("season markers: Sviatki marker only on Nativity (Julian Dec 25)", () => {
 });
 
 test("paschal cycle: nday=14 (3rd Sun of Pascha) includes Myrrh-Bearing Women", () => {
-	const entries = HTOC_PASCHAL_MOVABLES_CYCLE.get(14) ?? [];
+	const entries = PASCHAL_MOVABLES_CYCLE.get(14) ?? [];
 	assert.ok(entries.some((c) => /Myrrh-Bearing Women/i.test(c.text)));
 });
 
 test("paschal cycle: nday=39 (Ascension) includes Georgian Martyrs anchored to Ascension", () => {
-	const entries = HTOC_PASCHAL_MOVABLES_CYCLE.get(39) ?? [];
+	const entries = PASCHAL_MOVABLES_CYCLE.get(39) ?? [];
 	assert.ok(
 		entries.some((c) => /Holy Georgian Martyrs of Persia/i.test(c.text)),
 		"nday=39 should include the Georgian Martyrs commemoration anchored to Ascension",
@@ -114,7 +114,7 @@ test("paschal cycle: nday=39 (Ascension) includes Georgian Martyrs anchored to A
 });
 
 test("paschal cycle: nday=49 (Trinity Sunday) includes Lesna Icon anchored to Trinity Sunday", () => {
-	const entries = HTOC_PASCHAL_MOVABLES_CYCLE.get(49) ?? [];
+	const entries = PASCHAL_MOVABLES_CYCLE.get(49) ?? [];
 	assert.ok(
 		entries.some((c) => /Lesna.*Theotokos.*Trinity Sunday/i.test(c.text)),
 		"nday=49 should include the 'Lesna' Icon of the Theotokos commemoration",
@@ -122,7 +122,7 @@ test("paschal cycle: nday=49 (Trinity Sunday) includes Lesna Icon anchored to Tr
 });
 
 test("paschal cycle: nday=-48 (Clean Monday) is EMPTY (season-synth handles it)", () => {
-	const entries = HTOC_PASCHAL_MOVABLES_CYCLE.get(-48) ?? [];
+	const entries = PASCHAL_MOVABLES_CYCLE.get(-48) ?? [];
 	for (const e of entries) {
 		assert.ok(e.text !== "Clean Monday.", "Clean Monday must be season-synth, not paschal-movable");
 	}
@@ -140,7 +140,7 @@ test("coverage: ≥90% perfect-match days vs 1095 vendored", () => {
 	let perfect = 0;
 	const keyOf = (c: { rank: string; text: string; minor: boolean }) =>
 		`${c.rank}|${c.minor ? 1 : 0}|${c.text}`;
-	for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+	for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 		const got = getCommemorationsForAnyYear(ctxFor(iso));
 		const exp = new Set(facts.commemorations.map(keyOf));
 		const gotSet = new Set(got.map(keyOf));
@@ -160,7 +160,7 @@ test("coverage: ≥99.99% commemoration-entry recall vs 1095 vendored", () => {
 	let correct = 0;
 	const keyOf = (c: { rank: string; text: string; minor: boolean }) =>
 		`${c.rank}|${c.minor ? 1 : 0}|${c.text}`;
-	for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+	for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 		const got = new Set(getCommemorationsForAnyYear(ctxFor(iso)).map(keyOf));
 		for (const c of facts.commemorations) {
 			expected++;
@@ -178,7 +178,7 @@ test("coverage: ≤1 extra entries across 1095 vendored days", () => {
 	let extras = 0;
 	const keyOf = (c: { rank: string; text: string; minor: boolean }) =>
 		`${c.rank}|${c.minor ? 1 : 0}|${c.text}`;
-	for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+	for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 		const exp = new Set(facts.commemorations.map(keyOf));
 		for (const c of getCommemorationsForAnyYear(ctxFor(iso))) {
 			if (!exp.has(keyOf(c))) extras++;
@@ -191,8 +191,8 @@ test("coverage: ≤1 extra entries across 1095 vendored days", () => {
 
 test("dow-shift inventory: at least 40 rule-tagged entries emitted", () => {
 	assert.ok(
-		HTOC_DOW_MOVABLES.length >= 40,
-		`Expected ≥40 DOW-shift entries, got ${HTOC_DOW_MOVABLES.length}`,
+		DOW_MOVABLES.length >= 40,
+		`Expected ≥40 DOW-shift entries, got ${DOW_MOVABLES.length}`,
 	);
 });
 
@@ -226,7 +226,7 @@ test("dow-shift: Parents' Saturday fires only on nday -36 / -29 / -22", () => {
 	for (const nday of [-36, -29, -22]) {
 		// Find any date with this nday in the vendored window.
 		let found = false;
-		for (const [iso] of HTOC_DAY_FACTS_BY_ISO) {
+		for (const [iso] of DAY_FACTS_BY_ISO) {
 			const ctx = ctxFor(iso);
 			if (ctx.nday === nday) {
 				const dow = getDowMovables(ctx);

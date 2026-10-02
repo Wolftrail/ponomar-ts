@@ -21,13 +21,13 @@ import { COMMEMORATIONS } from "../data/index.ts";
 import type { Scripture, ServiceContext } from "../data/index.ts";
 import { computeDayContext, dslContext } from "./day.ts";
 import type { DayContext } from "./day.ts";
-import { getHtocDailyLectionary } from "./dailyLectionary.ts";
+import { getDailyLectionary } from "./dailyLectionary.ts";
 import type { HourName } from "./hours.ts";
 import { getLiturgicalDay } from "./index.ts";
 import type { LiturgicalDay } from "./index.ts";
 import { getResurrectionMatinsGospel } from "./matinsGospel.ts";
 import type { ResolvedSaint } from "./resolve.ts";
-import { getHtocSaintLectionary } from "./saintLectionary.ts";
+import { getSaintLectionary } from "./saintLectionary.ts";
 
 export interface ReadingRef {
 	readonly cId: string;
@@ -65,8 +65,8 @@ export function getDailyReadings(
 	collectFrom(day.paschalSaints, "paschal", vars, opts, refs);
 	collectFrom(day.menaionSaints, "menaion", vars, opts, refs);
 	appendResurrectionMatinsGospel(day, opts, refs);
-	appendHtocDailyLectionary(day, opts, refs);
-	appendHtocSaintLectionary(day, opts, refs);
+	appendDailyLectionary(day, opts, refs);
+	appendSaintLectionary(day, opts, refs);
 	return { context: day.context, refs };
 }
 
@@ -78,7 +78,7 @@ export function getDailyReadings(
  * Ponomar's XML encodes the Moscow Patriarchate Slavonic recension, which
  * disagrees with HTOC on ~180 ordinary weekday gospels per year (mostly
  * driven by a different Lucan-Jump convention). This appender fills the
- * gap using the codegen'd `HTOC_DAILY_LECTIONARY` table. Refs are tagged
+ * gap using the codegen'd `DAILY_LECTIONARY` table. Refs are tagged
  * `source: "htoc"` for downstream visibility.
  *
  * The HTOC pick for a given `(liturgy, type)` slot is authoritative under
@@ -90,20 +90,20 @@ export function getDailyReadings(
  * match one of HTOC's picks (common on days where HTOC publishes multiple
  * pairs — the ordinary + a transferred one), the Ponomar ref is kept.
  */
-function appendHtocDailyLectionary(
+function appendDailyLectionary(
 	day: LiturgicalDay,
 	opts: GetDailyReadingsOptions,
 	refs: ReadingRef[],
 ): void {
 	if (opts.service !== undefined && opts.service !== "liturgy") return;
-	const entries = getHtocDailyLectionary(day.context);
+	const entries = getDailyLectionary(day.context);
 	if (entries === null) return;
-	const htocByType = new Map<string, Set<string>>();
+	const byType = new Map<string, Set<string>>();
 	for (const e of entries) {
-		let s = htocByType.get(e.type);
+		let s = byType.get(e.type);
 		if (s === undefined) {
 			s = new Set();
-			htocByType.set(e.type, s);
+			byType.set(e.type, s);
 		}
 		s.add(normalizeReadingForDedup(e.reading));
 	}
@@ -111,9 +111,9 @@ function appendHtocDailyLectionary(
 		const r = refs[i]!;
 		if (r.service !== "liturgy") continue;
 		if (!isPonomarSequentialCid(r.cId)) continue;
-		const htocReadings = htocByType.get(r.type);
-		if (htocReadings === undefined) continue;
-		if (htocReadings.has(normalizeReadingForDedup(r.reading))) continue;
+		const readings = byType.get(r.type);
+		if (readings === undefined) continue;
+		if (readings.has(normalizeReadingForDedup(r.reading))) continue;
 		refs.splice(i, 1);
 	}
 	for (const e of entries) {
@@ -183,16 +183,18 @@ function canonicalRefKey(ref: BibleRef): string {
 /** Menaion/triodion/pentecostarion encode festal matins gospels as
  *  `type="1"` and resurrection-cycle Sunday matins gospels (9057, 9064, …)
  *  as `type="matins"`; HTOC's saint-lectionary and the resurrection-cycle
- *  fallback use `type="gospel"`. Treat all three as the same slot for
- *  matins dedup so the sources don't both surface. */
+ *  fallback use `type="gospel"`. Great Friday additionally uses `type="2"`
+ *  through `type="12"` for the twelve Passion Gospels. Treat all these
+ *  as the same slot for matins dedup / HTOC filtering so the sources
+ *  don't both surface. */
 function isMatinsGospelType(type: string): boolean {
-	return type === "gospel" || type === "1" || type === "matins";
+	return type === "gospel" || type === "matins" || /^\d+$/.test(type);
 }
 
 /**
  * Append the HTOC noted scriptures (saint-specific readings — Matins
  * Gospels, saint's Apostol/Gospel, Vespers Old-Testament readings, Hours)
- * for `day`. These come from the codegen'd `HTOC_SAINT_LECTIONARY` table,
+ * for `day`. These come from the codegen'd `SAINT_LECTIONARY` table,
  * which categorises every `note !== ""` HTOC scripture citation from the
  * corpus fixtures into `(service, type)` buckets.
  *
@@ -202,12 +204,12 @@ function isMatinsGospelType(type: string): boolean {
  * additively (deduped against refs already emitted), keeping Ponomar's
  * own guards untouched.
  */
-function appendHtocSaintLectionary(
+function appendSaintLectionary(
 	day: LiturgicalDay,
 	opts: GetDailyReadingsOptions,
 	refs: ReadingRef[],
 ): void {
-	const entries = getHtocSaintLectionary(day.context.gregorian);
+	const entries = getSaintLectionary(day.context.gregorian);
 	if (entries === null) return;
 	for (const e of entries) {
 		if (opts.service !== undefined && opts.service !== e.service) continue;
@@ -321,3 +323,31 @@ export function getLiturgyReadings(gregorian: CalendarDate): DailyReadings {
 
 export type { CalendarDate } from "../core/calendar/pcalendar.ts";
 export { computeDayContext };
+
+// --- HTOC-only scripture view ---------------------------------------
+// (Formerly src/engine/htocReadings.ts; merged on prefix removal.)
+// HTOC-only scripture view — filters `getDailyReadings` down to the
+// pericopes HTOC's day page publishes (daily rjadovoje liturgy pair +
+// matins gospel + any noted saint-lectionary / Royal Hours entries).
+// Pure derivation on top of the main engine; no fixture-window gate.
+// Inside the vendored 2025–2027 corpus, HTOC-tagged refs provide
+// ground-truth output; outside that window the Ponomar algorithm fills
+// in from menaion/triodion/pentecostarion/paschalion data.
+
+/** Return every scripture HTOC's day page would publish for `gregorian`:
+ *  liturgy apostol+gospel, matins gospel, and any noted entry (Royal
+ *  Hours, saint's apostol/gospel, Vespers OT prophecy). For in-window
+ *  dates (2025–2027) the result matches HTOC's published feed verbatim;
+ *  for out-of-window dates it is the Ponomar algorithm's best
+ *  approximation using the same underlying menaion data. */
+export function getReadings(gregorian: CalendarDate): readonly ReadingRef[] {
+	const refs = getDailyReadings(gregorian).refs;
+	return refs.filter(
+		(r) =>
+			r.source === "htoc" ||
+			r.service === "liturgy" ||
+			(r.service === "matins" && isMatinsGospelType(r.type)) ||
+			r.hour !== undefined,
+	);
+}
+

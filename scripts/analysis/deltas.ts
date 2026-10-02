@@ -15,7 +15,7 @@ import { getDailyReadings } from "../../src/engine/readings.ts";
 import type { ReadingRef } from "../../src/engine/readings.ts";
 import type { ResolvedSaint } from "../../src/engine/resolve.ts";
 import { loadYear, SCRATCH_DIR } from "./corpus.ts";
-import type { HtocCommemoration, HtocDay, HtocScriptureReading } from "./corpus.ts";
+import type { Commemoration, Day, ScriptureReading } from "./corpus.ts";
 
 interface Sample {
 	readonly iso: string;
@@ -59,7 +59,7 @@ function saintDisplay(s: ResolvedSaint): string {
 	return `${s.cId.padEnd(6)} rank=${rank}  src=${src.padStart(6)}  ${name}`;
 }
 
-function htocComDisplay(c: HtocCommemoration): string {
+function comDisplay(c: Commemoration): string {
 	const minor = c.minor ? "min" : "maj";
 	const text = c.text.length > 90 ? `${c.text.slice(0, 87)}...` : c.text;
 	return `${c.rank.padEnd(3)} ${minor}  ${text}`;
@@ -77,14 +77,14 @@ function readingDisplay(r: ReadingRef): string {
 	return bits.join(" ");
 }
 
-function htocScriptureDisplay(s: HtocScriptureReading): string {
+function scriptureDisplay(s: ScriptureReading): string {
 	const prefixMatch = /\/calendar\/(reading2?\/[^/]+)\//.exec(s.href);
 	const prefix = prefixMatch === null ? "?" : prefixMatch[1]!;
 	const note = s.note ? ` — ${s.note}` : "";
 	return `${prefix.padEnd(12)}  ${s.citation}${note}`;
 }
 
-function renderDay(sample: Sample, htoc: HtocDay): string {
+function renderDay(sample: Sample, htoc: Day): string {
 	const cal = toCal(sample.iso);
 	const day = getLiturgicalDay(cal);
 	const lit = getOrderedLiturgyReadings(cal);
@@ -110,7 +110,7 @@ function renderDay(sample: Sample, htoc: HtocDay): string {
 		`HTOC (${htoc.commemorations.length}) — glyph, minor/major, text:`,
 	);
 	lines.push("```");
-	for (const c of htoc.commemorations) lines.push(htocComDisplay(c));
+	for (const c of htoc.commemorations) lines.push(comDisplay(c));
 	lines.push("```");
 	lines.push("");
 	lines.push(`Engine (${day.allSaints.length}):`);
@@ -124,7 +124,7 @@ function renderDay(sample: Sample, htoc: HtocDay): string {
 	lines.push("");
 	lines.push(`HTOC (${htoc.scripture.length}):`);
 	lines.push("```");
-	for (const r of htoc.scripture) lines.push(htocScriptureDisplay(r));
+	for (const r of htoc.scripture) lines.push(scriptureDisplay(r));
 	lines.push("```");
 	lines.push("");
 	lines.push("Engine — Liturgy ordered:");
@@ -210,7 +210,7 @@ function main(): void {
 		out.push(renderDay(sample, day));
 	}
 
-	const path = resolve(SCRATCH_DIR, "htoc-deltas.md");
+	const path = resolve(SCRATCH_DIR, "deltas.md");
 	writeFileSync(path, `${out.join("\n")}\n`, "utf8");
 	process.stdout.write(`wrote ${path} (${SAMPLES.length} days)\n`);
 }

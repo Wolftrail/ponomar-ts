@@ -11,6 +11,49 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.18] — 2026-10-02
+
+### Changed
+
+- **BREAKING: dropped the `htoc`/`Htoc`/`HTOC_` prefix from all public
+  names, file paths, and codegen artifacts.** Now that HTOC is the
+  primary data channel for the day-info engine, the prefix is
+  redundant signage. Renames follow a uniform rule — `HTOC_FOO` →
+  `FOO`, `HtocFoo` → `Foo`, `htocFoo` → `foo`, `htoc-foo` → `foo`.
+
+  **Public API renames** (import from `ponomar-ts`):
+  - Constants: `HTOC_DAILY_LECTIONARY` → `DAILY_LECTIONARY`,
+    `HTOC_SAINTS_BY_ISO` → `SAINTS_BY_ISO`,
+    `HTOC_DAY_FACTS_BY_ISO` → `DAY_FACTS_BY_ISO`,
+    `HTOC_SAINT_LECTIONARY` → `SAINT_LECTIONARY`,
+    `HTOC_SAINT_FIXED_CYCLE` → `SAINT_FIXED_CYCLE`,
+    `HTOC_SAINT_MOVABLE_CYCLE` → `SAINT_MOVABLE_CYCLE`,
+    `HTOC_SAINT_EXCEPTIONS` → `SAINT_EXCEPTIONS`.
+  - Types: `HtocDailyLectionaryEntry` → `DailyLectionaryEntry`,
+    `HtocSaint` → `Saint`, `HtocCommemoration` → `Commemoration`,
+    `HtocDayFacts` → `DayFacts`, `HtocHymn` → `Hymn`,
+    `HtocSaintLectionaryEntry` → `SaintLectionaryEntry`.
+  - Functions: `renderHtocHeaderText` → `renderHeaderText`,
+    `isHtocVendoredDate` → `isVendoredDate`.
+
+  **Deep-import path renames** (if you import via
+  `ponomar-ts/engine/*` or `ponomar-ts/data/*`):
+  `htocDayFacts` → `dayFacts`, `htocSaints` → `saints`,
+  `htocSaintLectionary` → `saintLectionary`,
+  `htocDailyLectionary` → `dailyLectionary`, and the
+  `src/engine/htocFastText.ts`, `src/engine/htocSaints.ts`,
+  `src/engine/htocReadings.ts` modules were merged into their
+  non-prefixed counterparts (`fastText.ts`, `saints.ts`, `readings.ts`).
+
+  Internal disambiguation: `LiturgicalDay.htocDRank` is now
+  `LiturgicalDay.saintsDRank` (`dRank` keeps its original Ponomar-
+  structural meaning).
+
+  Migration: a one-liner `sed -E 's/\bHTOC_//g; s/\bHtoc([A-Z])/\1/g;
+  s/\bhtoc([A-Z])/\l\1/g'` on your imports covers the vast majority
+  of call sites; use `saintsDRank` where you previously used
+  `htocDRank`.
+
 ## [1.0.0-rc.17] — 2026-10-02
 
 ### Changed

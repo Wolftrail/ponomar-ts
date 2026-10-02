@@ -1,6 +1,6 @@
 {
   "name": "ponomar-ts",
-  "version": "1.0.0-rc.17",
+  "version": "1.0.0-rc.18",
   "description": "TypeScript port of the Ponomar Orthodox liturgics engine: paschal date math, Typicon rule dispatcher, saint & reading resolution.",
   "keywords": [
     "orthodox",
@@ -90,7 +90,7 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "node --experimental-strip-types scripts/clean.ts",
     "codegen": "node --experimental-strip-types scripts/codegen/index.ts",
-    "scrape:htoc": "node --experimental-strip-types scripts/scrape-htoc.ts",
+    "scrape:htoc": "node --experimental-strip-types scripts/scrape.ts",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run codegen -- --check && npm run typecheck && npm test && npm run build"

@@ -6,10 +6,10 @@
 // Phase C5 adds per-year transfer rules for commemorations HTOC moves
 // off their natural day under specific paschal conditions.
 
-import type { HtocCommemoration } from "../data/htocDayFacts.ts";
-import { HTOC_FIXED_COMMEMORATIONS_CYCLE } from "../data/htocFixedCommemorations.ts";
-import { HTOC_PASCHAL_MOVABLES_CYCLE } from "../data/htocPaschalMovables.ts";
-import { HTOC_DOW_MOVABLES, type DowMovableRule } from "../data/htocDowMovables.ts";
+import type { Commemoration } from "../data/dayFacts.ts";
+import { FIXED_COMMEMORATIONS_CYCLE } from "../data/fixedCommemorations.ts";
+import { PASCHAL_MOVABLES_CYCLE } from "../data/paschalMovables.ts";
+import { DOW_MOVABLES, type DowMovableRule } from "../data/dowMovables.ts";
 import type { DayContext } from "./day.ts";
 import { difference, julianDate } from "../core/calendar/jdate.ts";
 import { getJulianPaschaRich } from "../paschalion.ts";
@@ -20,8 +20,8 @@ import { getLiturgicalSeason } from "./season.ts";
  * top of certain day pages (Clean Monday, Sviatki opening, fast-period
  * beginnings). Keyed off `DayContext` rather than any lookup table.
  */
-export function getSeasonCommemorations(ctx: DayContext): readonly HtocCommemoration[] {
-	const out: HtocCommemoration[] = [];
+export function getSeasonCommemorations(ctx: DayContext): readonly Commemoration[] {
+	const out: Commemoration[] = [];
 	const season = getLiturgicalSeason(ctx);
 
 	// Clean Monday: first day of Great Lent (nday = -48 relative to Pascha).
@@ -76,9 +76,9 @@ export function getSeasonCommemorations(ctx: DayContext): readonly HtocCommemora
  * attached to this day's Julian month-day, independent of civil year.
  * Works for any year.
  */
-export function getFixedCommemorations(ctx: DayContext): readonly HtocCommemoration[] {
+export function getFixedCommemorations(ctx: DayContext): readonly Commemoration[] {
 	const key = `${String(ctx.julian.month).padStart(2, "0")}-${String(ctx.julian.day).padStart(2, "0")}`;
-	return HTOC_FIXED_COMMEMORATIONS_CYCLE.get(key) ?? [];
+	return FIXED_COMMEMORATIONS_CYCLE.get(key) ?? [];
 }
 
 /**
@@ -87,8 +87,8 @@ export function getFixedCommemorations(ctx: DayContext): readonly HtocCommemorat
  * Covers Pentecostarion Sundays, Bright Week weekdays, Ascension-anchored
  * feasts, Lenten Saturday/Sunday commemorations, Cheese-fare Week, etc.
  */
-export function getPaschalMovables(ctx: DayContext): readonly HtocCommemoration[] {
-	return HTOC_PASCHAL_MOVABLES_CYCLE.get(ctx.nday) ?? [];
+export function getPaschalMovables(ctx: DayContext): readonly Commemoration[] {
+	return PASCHAL_MOVABLES_CYCLE.get(ctx.nday) ?? [];
 }
 
 // Non-leap-year Julian day-of-year ordinal. Dec 31 → 365. Julian year has
@@ -137,9 +137,9 @@ function matchesDowRule(ctx: DayContext, rule: DowMovableRule): boolean {
  * (e.g. Sunday closest to Julian Jan 25, Saturday before Julian Oct 26,
  * 2nd/3rd/4th Lenten Parents' Saturdays). Works for any year.
  */
-export function getDowMovables(ctx: DayContext): readonly HtocCommemoration[] {
-	const out: HtocCommemoration[] = [];
-	for (const m of HTOC_DOW_MOVABLES) {
+export function getDowMovables(ctx: DayContext): readonly Commemoration[] {
+	const out: Commemoration[] = [];
+	for (const m of DOW_MOVABLES) {
 		if (matchesDowRule(ctx, m.rule)) out.push(m.commem);
 	}
 	return out;
@@ -159,10 +159,10 @@ function ndayOfJulianMonthDay(year: number, month: number, day: number): number 
  * other-layer entries the composer should suppress to avoid double counting.
  */
 export function getTransferOverlays(ctx: DayContext): {
-	readonly emit: readonly HtocCommemoration[];
+	readonly emit: readonly Commemoration[];
 	readonly suppressTexts: readonly string[];
 } {
-	const emit: HtocCommemoration[] = [];
+	const emit: Commemoration[] = [];
 	const suppressTexts: string[] = [];
 
 	// Rule 1: St. Dunchad / Hieromartyr Tikhon transfer composite.
@@ -215,7 +215,7 @@ export function getTransferOverlays(ctx: DayContext): {
  * The transfer overlay runs last and can suppress exact-text matches from
  * the earlier layers (used for the Dunchad composite replacement).
  */
-export function getCommemorationsForAnyYear(ctx: DayContext): readonly HtocCommemoration[] {
+export function getCommemorationsForAnyYear(ctx: DayContext): readonly Commemoration[] {
 	const base = [
 		...getSeasonCommemorations(ctx),
 		...getFixedCommemorations(ctx),

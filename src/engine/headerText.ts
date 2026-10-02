@@ -35,7 +35,7 @@ function toneSegment(tone: number | null): string {
 }
 
 /** Render the HTOC `headerText` line for `ctx`. */
-export function renderHtocHeaderText(ctx: DayContext): string {
+export function renderHeaderText(ctx: DayContext): string {
 	const season = getLiturgicalSeason(ctx);
 	const tone = getOctoechosTone(ctx);
 	const title = renderTitle(ctx, season);

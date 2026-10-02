@@ -1,8 +1,8 @@
 // Phase A validator: compare algorithmic `getOctoechosTone` against the
-// hardcoded `tone` field in HTOC_DAY_FACTS_BY_ISO across the full 2025-2027
+// hardcoded `tone` field in DAY_FACTS_BY_ISO across the full 2025-2027
 // vendored corpus. Prints a mismatch table and summary.
 
-import { HTOC_DAY_FACTS_BY_ISO } from "../../src/data/htocDayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { getOctoechosTone, rawOctoechosTone } from "../../src/engine/tone.ts";
 
@@ -20,7 +20,7 @@ type Row = {
 const matches: Row[] = [];
 const mismatches: Row[] = [];
 
-for (const [iso, facts] of HTOC_DAY_FACTS_BY_ISO) {
+for (const [iso, facts] of DAY_FACTS_BY_ISO) {
 	const [ys, ms, ds] = iso.split("-");
 	const greg = { year: Number(ys), month: Number(ms), day: Number(ds) };
 	const ctx = computeDayContext(greg);

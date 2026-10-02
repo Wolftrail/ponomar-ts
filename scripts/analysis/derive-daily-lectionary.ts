@@ -10,13 +10,13 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { computeDayContext } from "../../src/engine/day.ts";
-import type { HtocCorpus } from "./corpus.ts";
+import type { Corpus } from "./corpus.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const FIXTURES_DIR = resolve(HERE, "..", "..", "tests", "fixtures");
 const YEARS = [2025, 2026, 2027] as const;
 
-interface HtocReading {
+interface Reading {
 	readonly citation: string;
 	readonly note?: string;
 }
@@ -28,21 +28,21 @@ interface Slot {
 	readonly nday: number;
 	readonly dow: number;
 	readonly dRank: string;
-	readonly readings: readonly HtocReading[];
+	readonly readings: readonly Reading[];
 }
 
 /** Only keep "no-note" (or empty note) entries — those are the daily
  *  rjadovoje readings. Feasts / matins gospels / theotokos / etc. have
  *  explicit notes and are handled elsewhere. */
-function isRjadovoje(r: HtocReading): boolean {
+function isRjadovoje(r: Reading): boolean {
 	const n = (r.note ?? "").trim();
 	return n === "";
 }
 
-function loadCorpus(year: number): HtocCorpus | null {
-	const p = resolve(FIXTURES_DIR, `htoc-full-${year}.json`);
+function loadCorpus(year: number): Corpus | null {
+	const p = resolve(FIXTURES_DIR, `full-${year}.json`);
 	if (!existsSync(p)) return null;
-	return JSON.parse(readFileSync(p, "utf8")) as HtocCorpus;
+	return JSON.parse(readFileSync(p, "utf8")) as Corpus;
 }
 
 function isoToCal(iso: string): { year: number; month: number; day: number } {
