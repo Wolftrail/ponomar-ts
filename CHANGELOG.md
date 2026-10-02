@@ -34,8 +34,18 @@ notice.
   misclassified as octoechos-tracking and firing on every tone-II Sunday.
   Position-specific identities now fall through to `dow-julian-window`
   where emission is restricted to observed `(dow, julianKey)` pairs.
-  Measured impact on 6-year corpus: kontakia set-mismatches 48 → 13
-  (−73 %), all-5-fields set-equal reproduction 95.48 % → 96.94 %.
+- **Hymns classifier: `dow-julian-window` eligibility relaxed on two axes.**
+  (1) The strict "appears in every corpus year" requirement is replaced
+  with `>= ⌈corpusYears / 2⌉` year coverage, so once-per-cycle hymns whose
+  natural julian window skips some civil years (e.g. Sunday Before
+  Nativity, when that Sunday falls in the Holy Forefathers window
+  instead) are reproduced. (2) The `dowSet.size === 1` requirement is
+  dropped; emission is already restricted to observed `(dow, julianKey)`
+  pairs, which safely handles weekday transfers like "Sunday After the
+  Nativity" shifting to Monday when Nativity itself lands on a Sunday
+  (e.g. 2029-01-08). Measured impact on 6-year corpus: troparia
+  set-mismatches 13 → 1, kontakia 13 → 2, all-5-fields set-equal
+  reproduction 96.94 % → 97.35 %.
 - **Internal scratch-file naming unified.** Dropped the legacy `htoc-`
   prefix from `scripts/analysis/` scratch outputs: `scratch/htoc-days.json`
   → `scratch/days.json` and `scratch/htoc-saints.json` →
@@ -51,10 +61,10 @@ notice.
 | `headerText`     |    100.00 % |         — |        — |
 | `tone`           |    100.00 % |         — |        — |
 | `commemorations` |          0% |   97.40 % |   2.60 % |
-| `troparia`       |     75.26 % |   24.14 % |   0.59 % |
-| `kontakia`       |     80.69 % |   18.71 % |   0.59 % |
+| `troparia`       |     75.31 % |   24.65 % |   0.05 % |
+| `kontakia`       |     81.15 % |   18.76 % |   0.09 % |
 
-All-5-fields set-equal across every vendored day: **2,124 / 2,191 (96.94 %)**.
+All-5-fields set-equal across every vendored day: **2,133 / 2,191 (97.35 %)**.
 The 2.60 % commemoration mismatch is dominated by DOW-shift rules whose
 single-year coincidence under the old 3-year window turned out not to
 reproduce under 6 years (e.g. "Synaxis of Novgorod Nizhny saints — Sunday

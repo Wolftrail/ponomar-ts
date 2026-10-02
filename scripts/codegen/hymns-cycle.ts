@@ -143,14 +143,18 @@ for (const [, group] of byIdentity) {
 		tones.size === 1;
 
 	// A moveable Sunday/Saturday feast proper fires at most once per corpus
-	// year, always on the same day-of-week, and lands in a bounded julian
-	// window around the fixed feast it anchors to. We emit on exactly the
-	// (dow, julianKey) pairs we have observed — any civil year whose
-	// matching Sunday falls on an observed Julian date reproduces HTOC.
-	const dowSet = new Set(group.map((o) => o.dow));
+	// year and lands in a bounded julian window around the fixed feast it
+	// anchors to. We emit on exactly the (dow, julianKey) pairs we have
+	// observed — any civil year whose matching day falls on an observed
+	// pair reproduces HTOC. Require >50% year coverage so single-year
+	// composites don't lock a key. The DOW is NOT required to be unique:
+	// some once-per-cycle hymns legitimately transfer across weekdays
+	// (e.g. "Sunday After the Nativity" transfers to Monday when Nativity
+	// itself falls on Sunday — in 2029 this hymn fires on Mon Jan 8).
+	// Emission on observed pairs is the safety net against false positives.
 	const yearsWithOccurrence = new Set(group.map((o) => o.year));
-	const dowJulianWindow =
-		dowSet.size === 1 && allCorpusYears.every((y) => yearsWithOccurrence.has(y));
+	const dowJulianMinYears = Math.ceil(allCorpusYears.length / 2);
+	const dowJulianWindow = yearsWithOccurrence.size >= dowJulianMinYears;
 
 	let cls: Classification;
 	let keys: string[];
