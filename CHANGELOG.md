@@ -11,6 +11,8 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.20] — 2026-10-02
+
 ### Added
 
 - **New hymn classification axis `dow-julian-window`** in
