@@ -1,14 +1,19 @@
 // Codegen: emits the HTOC hymn (troparion + kontakion) cycle maps.
-// Classifies every hymn occurrence in the vendored 2025-2027 corpus by
-// position stability:
-//   fixed-julian:    same Julian MM-DD every year it appears
-//   paschal-movable: same `nday` (days-from-Pascha) every year
+// Classifies every hymn-identity (unique title + text + saints tuple) in the
+// vendored 2025-2027 corpus by position stability. A hymn-identity is
+// reproducible under classification X when every occurrence of it falls on
+// a key that is X-stable (present in every vendored year). Each hymn gets
+// at most one classification but may be emitted under multiple keys within
+// it — e.g. the Paschal troparion lives under paschal-movable at ndays
+// {0..6}, "No Kontakion is given in the Menaion" under fixed-julian at
+// 15 Julian keys.
+//
+//   fixed-julian:    reproducible via a stable set of Julian MM-DDs
+//   paschal-movable: reproducible via a stable set of `nday`s
 //   sunday-tone:     Sunday-only occurrences, same resurrectional tone
 //   unstable:        skipped (DOW-shift / per-year transfer; not reproducible)
 //
-// Emits three cycle maps covering ~93% of occurrences, so out-of-window
-// years get near-full HTOC propers fidelity. Mirror of
-// `fixed-commemorations.ts` + `paschal-movables.ts` for hymns.
+// Mirror of `fixed-commemorations.ts` + `paschal-movables.ts` for hymns.
 //
 // Run:   node --experimental-strip-types scripts/codegen/hymns-cycle.ts
 // Emits: src/data/hymnsCycle.ts
@@ -36,8 +41,14 @@ interface Occurrence {
 }
 
 function hymnIdentity(h: Hymn, kind: HymnKind): string {
-	const slugs = h.saints.map((s) => s.slug).sort().join(",");
-	return `${kind}|${h.title}|${h.text}|${slugs}`;
+	// Identity is (kind, title, text). Saint slugs are deliberately excluded:
+	// the same hymn can appear with different saint-slug sets when its
+	// commemoration coincides with another feast (e.g. 4th Sun of Lent hymn
+	// in a year where it falls on the Julian fixed feast of St John Climacus
+	// picks up both the paschal and the fixed saint tags). Those are the
+	// SAME hymn to the reader. Merging them lets us measure cross-year
+	// stability honestly.
+	return `${kind}|${h.title}|${h.text}`;
 }
 
 const occurrences: Occurrence[] = [];
@@ -70,33 +81,69 @@ interface Bucket {
 	readonly hymn: Hymn;
 }
 
+// A hymn identity is "reproducible under classification X" when every one of
+// its occurrences falls on a key that is X-stable across every vendored year.
+// Each hymn gets at most one classification, but may be emitted under multiple
+// keys within it (e.g. Pascha troparion → paschal-movable at ndays {0..6}).
+const allCorpusYears = [...new Set(occurrences.map((o) => o.year))].sort();
 const buckets: Bucket[] = [];
 let unstable = 0;
 for (const [, group] of byIdentity) {
-	const julianKeys = new Set(group.map((o) => o.julianKey));
-	const ndays = new Set(group.map((o) => o.nday));
-	const dows = new Set(group.map((o) => o.dow));
-	const tones = new Set(group.map((o) => o.tone));
 	const sample = group[0]!;
+
+	const yearJulianKeys = new Map<number, Set<string>>();
+	const yearNdays = new Map<number, Set<number>>();
+	for (const o of group) {
+		if (!yearJulianKeys.has(o.year)) yearJulianKeys.set(o.year, new Set());
+		yearJulianKeys.get(o.year)!.add(o.julianKey);
+		if (!yearNdays.has(o.year)) yearNdays.set(o.year, new Set());
+		yearNdays.get(o.year)!.add(o.nday);
+	}
+
+	// Stability is measured against every corpus year, not just the years this
+	// identity happens to appear in. If an identity is missing from any corpus
+	// year, no key qualifies as stable → unstable (prevents single-year
+	// composite identities from being locked to one specific julianKey or
+	// nday, which would false-positive in other years).
+	const stableJulianKeys = new Set(
+		[...new Set(group.map((o) => o.julianKey))].filter((k) =>
+			allCorpusYears.every((y) => yearJulianKeys.get(y)?.has(k) ?? false),
+		),
+	);
+	const allJulianKeysCovered =
+		stableJulianKeys.size > 0 && group.every((o) => stableJulianKeys.has(o.julianKey));
+
+	const stableNdays = new Set(
+		[...new Set(group.map((o) => o.nday))].filter((n) =>
+			allCorpusYears.every((y) => yearNdays.get(y)?.has(n) ?? false),
+		),
+	);
+	const allNdaysCovered =
+		stableNdays.size > 0 && group.every((o) => stableNdays.has(o.nday));
+
+	const tones = new Set(group.map((o) => o.tone));
+	const sundayOneTone =
+		group.every((o) => o.dow === 0 && o.tone !== null) && tones.size === 1;
+
 	let cls: Classification;
-	let key: string;
-	if (julianKeys.size === 1) {
+	let keys: string[];
+	if (allJulianKeysCovered) {
 		cls = "fixed-julian";
-		key = [...julianKeys][0]!;
-	} else if (ndays.size === 1) {
+		keys = [...stableJulianKeys].sort();
+	} else if (allNdaysCovered) {
 		cls = "paschal-movable";
-		key = String([...ndays][0]!);
-	} else if (
-		dows.size === 1 && [...dows][0] === 0 &&
-		tones.size === 1 && [...tones][0] !== null
-	) {
+		keys = [...stableNdays].sort((a, b) => a - b).map(String);
+	} else if (sundayOneTone) {
 		cls = "sunday-tone";
-		key = String([...tones][0]!);
+		keys = [String([...tones][0]!)];
 	} else {
 		unstable++;
 		continue;
 	}
-	buckets.push({ cls, key, group: sample.group, kind: sample.kind, hymn: sample.hymn });
+
+	for (const key of keys) {
+		buckets.push({ cls, key, group: sample.group, kind: sample.kind, hymn: sample.hymn });
+	}
 }
 
 /** Group buckets by (classification, key), then emit per-classification maps. */

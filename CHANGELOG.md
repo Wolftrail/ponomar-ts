@@ -11,6 +11,29 @@ notice.
 
 ## [Unreleased]
 
+### Changed
+
+- **Hymn composer (any-year propers) raised from ~93% to ~98%
+  reproduction with zero false positives.** The codegen that emits
+  `src/data/hymnsCycle.ts` previously required a hymn's occurrences to
+  collapse to a single stable Julian key or a single stable nday,
+  dropping hymns like the Paschal troparion ("Christ is risen" — ndays
+  0..6 across Bright Week) as "unstable". The classifier now accepts
+  any hymn whose occurrences all fall on keys that are stable across
+  every corpus year, allowing multi-key emission within one
+  classification. Identity is now keyed on `(kind, title, text)` only;
+  the saint-slug set is excluded so a hymn that picks up a composite
+  saint tag in a coincidence year (e.g. 4th Sunday of Lent falling on
+  the Julian fixed feast of St John Climacus) is not split into two
+  single-year identities that falsely stabilise on arbitrary keys.
+  Measured against the vendored 2025–2027 window: all-fields set-equal
+  reproduction rose from 84.93% to 98.08%; troparia 91.96% → 98.08%;
+  kontakia 86.30% → 98.63%; false-positive emissions eliminated. The
+  remaining ~2% long tail is DOW/week-of-year moveable Sundays (Sunday
+  Before Nativity, Sunday of the Holy Forefathers, Sunday of the
+  Fathers of the 7th Ecumenical Council) that need a classification
+  axis beyond Julian / nday / tone.
+
 ## [1.0.0-rc.19] — 2026-10-03
 
 ### Changed

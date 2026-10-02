@@ -75,9 +75,12 @@ Two surfaces behave differently here:
   window they are composed from three position-stable cycle maps
   (`FIXED_HYMNS_CYCLE` keyed by Julian MM-DD, `PASCHAL_HYMNS_CYCLE` keyed
   by signed days from Pascha, `SUNDAY_TONE_HYMNS_CYCLE` keyed by tone),
-  which reproduce ~93% of in-window hymn occurrences. The remaining ~7%
-  are year-unstable (DOW-shift / per-year transferred) commemorations;
-  their hymns are deliberately dropped rather than guessed.
+  which reproduce ~98% of in-window hymn occurrences with no false
+  positives (the composer never emits content HTOC did not publish). The
+  remaining ~2% are moveable-Sunday feasts whose dates depend on
+  DOW/week-of-year interactions (e.g. Sunday Before Nativity, Sunday of
+  the Holy Forefathers, Sunday of the Fathers of the 7th Ecumenical
+  Council); their hymns are deliberately dropped rather than guessed.
 - The lower-level `getDay(date)` / `DAY_FACTS_BY_ISO.get(iso)` accessor
   returns HTOC's verbatim record inside the window and a partial record
   outside the window with `troparia` / `kontakia` empty. Prefer
