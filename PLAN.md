@@ -439,6 +439,140 @@ Post-release (before `1.0.0` plain tag):
 - Tag `v1.0.0-rc.0` and publish to npm under dist-tag `next`.
 - Soak. If no blocking issues arise, cut `1.0.0`.
 
+### Phase 12 — HTOC overlay and any-year composition *(rc.1 → rc.19)*
+
+**Status: 🔄 in progress.** The "soak" after `1.0.0-rc.0` did not stay
+housekeeping-only. Users rendering a calendar UI against the ported
+engine found the Russian-typikon service composer less useful than the
+day-level publication data that [Holy Trinity Monastery,
+Jordanville](https://www.holytrinityorthodox.com/calendar/) ("HTOC")
+already publishes per date: a single header line, a printed Octoechos
+tone, a canonical commemoration list with rank glyphs, a fast-rule
+label, and the day's troparia / kontakia / lectionary references. HTOC
+also encodes the ROCOR / Russian jurisdictional choices
+(New-Hieromartyr additions, specific Sunday-after-Julian-date
+transfers, Russian monastic charter fasting) that were otherwise
+inferable from upstream XML only with substantial custom logic.
+
+Phase 12 therefore rebuilds the public API around HTOC as the
+publication-level source of truth, while keeping the Ponomar engine
+underneath as the structural layer (paschalion, menaion, lives corpus,
+fasting DSL, saint ↔ cId bridge). Shipped incrementally as 19 release
+candidates on top of `1.0.0-rc.0`; see [CHANGELOG.md](CHANGELOG.md) for
+the per-RC detail. The macro arc:
+
+- **Phase 12a — HTOC overlay** *(rc.1 – rc.6)*. Vendored the full HTOC
+  day-page scrape for the 2025 – 2027 window (1,095 days) at
+  [tests/fixtures/htoc-full-{2025,2026,2027}.json](tests/fixtures/).
+  Added `LiturgicalDay.commemorations` (full HTOC day-page list,
+  superset of `allSaints`), replaced `LiturgicalDay.tone` with HTOC's
+  printed tone in-window, pivoted `getPropers` to source troparia /
+  kontakia directly from HTOC, and introduced `HTOC_SAINT_LECTIONARY`
+  (2,162 refs across 710 dates) as a dedup overlay on top of
+  `getDailyReadings`. Fixed four classes of reading-dedup bug (verse-
+  part suffixes, `matins/1` ↔ `matins/gospel`, Royal Hours structural
+  slots, sequential vs HTOC-picked Gospel on the Lucan handoff) that
+  the overlay surfaced. `getHtocReadings(date)` added as an
+  algorithmic derivation (not a lookup) so it works any date.
+
+- **Phase 12b — HTOC-first public API refactor** *(rc.7 – rc.9)*.
+  Added `getSaint(slug)` / `getSaintByCId(cId)` / `getLifeBySlug(slug)`
+  / `slugToCId` / `cIdToSlug` as the saint-centric facade for
+  `/saints/<slug>` routes. Introduced unprefixed `getReadings` /
+  `getDay` / `getSaints` / `getDailyLectionary` / `getSaintLectionary`
+  as the HTOC day-page lookup surface. Deprecated and then removed
+  the entire Ponomar service composer (`composeService`, `getPropers`,
+  `getServices`, `getHourService`, `getHourReadings`,
+  `getOrderedLiturgyReadings`, `getOrderedMatinsReadings`), the
+  Ponomar DSL / resolver internals (`computeDayContext`, `dslContext`,
+  `selectMenaionEntry`, `selectPaschalCycleEntry`, `resolveSaints`,
+  phrase resolvers), the rank-glyph adapters, and the matins-cycle
+  direct accessors. The implementations remain under `src/engine/*`
+  as an unsupported deep-import escape hatch not covered by semver.
+
+- **Phase 12c — Pool interning** *(rc.10 – rc.14)*. Four passes of
+  codegen-level deduplication to shrink the vendored artifacts without
+  touching any public API or value. `htocDayFacts.ts` went 3.81 MB →
+  1.05 MB via header/fast/hymn/commem text pools plus hymn-tuple /
+  commem-tuple / propers-triplet pools; `htocSaints.ts` went 1.17 MB →
+  0.35 MB via a canonical-entry pool plus a 5-tuple layout with
+  name-array and text-pool interning; `htocDailyLectionary.ts` 102 KB →
+  54 KB and `htocSaintLectionary.ts` 213 KB → 75 KB via entry pools.
+  Published tarball 4.4 MB → 3.7 MB (−16 %); unpacked install
+  25.2 MB → 21.9 MB (−13 %).
+
+- **Phase 12d — Any-year composition** *(rc.11, rc.16 – rc.17, plus
+  Phase C/D)*. The vendored window is finite; day-level publication
+  fields must extrapolate to arbitrary Gregorian dates for the engine
+  to be useful outside 2025 – 2027. Decomposed each HTOC field into
+  position-stable cycle maps:
+  - **Saints** (rc.11): `SAINT_FIXED_CYCLE` (364 Julian MM-DD keys),
+    `SAINT_MOVABLE_CYCLE` (21 nday keys), `SAINT_EXCEPTIONS` (per-ISO
+    overrides for cycle-key-unstable rows). Round-trip verified on all
+    1,092 vendored days.
+  - **Header line + tone** (Phase B / rc.16): `renderHeaderText(ctx)`
+    composes the `"28 th Week after Pentecost. Tone two."` form from
+    the paschal/triodion cycle counter + Octoechos tone computer.
+    `getOctoechosTone(ctx)` validated 100 % against the vendored
+    corpus; `renderHeaderText` validated to the sentence.
+  - **Commemorations** (Phase C1 – C5): fixed-Julian menaion overlay +
+    paschal/triodion-cycle movable commemorations + DOW-shift /
+    DOW-nearest-Julian overlay + season markers (fast weeks, Sviatki)
+    + per-year transfer overlays with suppression.
+  - **Troparia / kontakia** (rc.16): three cycle maps
+    (`FIXED_HYMNS_CYCLE` 365 Julian keys, `PASCHAL_HYMNS_CYCLE` 36
+    nday keys, `SUNDAY_TONE_HYMNS_CYCLE` 8 tones) covering ~93 % of
+    in-window hymn occurrences; year-unstable DOW-shift / per-year-
+    transferred hymns are deliberately dropped rather than guessed.
+    Wired into `getLiturgicalDay` so `.troparia` / `.kontakia`
+    populate for any date.
+  - **Fast-rule text** (rc.17, superseded by rc.19). First shipped a
+    HTOC-pivot composer with 88 % any-year non-empty coverage; later
+    removed in rc.19 (see Phase 12f).
+
+- **Phase 12e — Reading / dedup correctness** *(rc.15, rc.17)*. HTOC
+  renders book names differently from Ponomar menaion XML
+  (`Phil_2:5-11` vs `Philip_2:5-11`) and uses full-chapter-prefix form
+  for cross-chapter continuations (`Lk_10:38-42, 11:27-11:28` vs
+  `Lk_10:38-42, 11:27-28`). `normalizeReadingForDedup` now parses both
+  forms through `parseBibleRef` and keys the dedup on canonical
+  `${book}|${ranges}`; `isMatinsGospelType` now accepts
+  `type="matins"`. Corpus-wide engine overflow dropped 1,841 → 1,603
+  refs (−238 across 2025 – 2027).
+
+- **Phase 12f — Public API hygiene** *(rc.18 – rc.19)*. Two breaking
+  cleanups on the way to `1.0.0`:
+  - rc.18 dropped the `Htoc` / `HTOC_` / `htoc-` prefix from every
+    public name, file, and codegen artifact now that HTOC is the
+    primary channel. `getHtocReadings` → `getReadings`,
+    `HTOC_DAY_FACTS_BY_ISO` → `DAY_FACTS_BY_ISO`,
+    `renderHtocHeaderText` → `renderHeaderText`, etc. One-liner `sed`
+    migration documented in the changelog.
+  - rc.19 removed the rendered English `fastText` field entirely
+    (previous composer encoded a strict-Russian-typikon flavour that
+    diverged from HTOC's Hellenic rendering on ~22 % of days) and
+    replaced it with a structured `fasting.period`
+    (`"great-lent"` / `"apostles"` / `"dormition"` / `"nativity"` /
+    `"weekly"` with `isEve`) + `getFastingPeriodName(period)` label.
+    `renderFastText(ctx, level)` kept as a documented courtesy
+    helper.
+
+Still open for `1.0.0` plain:
+
+- Reproducibility audit of the day-facts composer against the vendored
+  corpus — [scripts/analysis/day-facts-reproducibility.ts](scripts/analysis/day-facts-reproducibility.ts)
+  measures per-field exact / set-only / mismatch rates. If scalar
+  fields reproduce ≥ 99 % and sequences ≥ 90 %, `DAY_FACTS_BY_ISO`
+  itself can shrink to the exceptions overlay and the three cycle
+  maps become the primary source.
+- Possible extension of the vendored window to 2028 – 2030 (fixture
+  scrapes already present under
+  [tests/fixtures/htoc-full-20{28,29,30}.json](tests/fixtures/) but
+  not yet consumed by codegen).
+- Soak and cut `1.0.0` once the API has been stable across a full
+  development cycle for a downstream consumer (the Bible site app
+  per [AGENTS.md](AGENTS.md)).
+
 ### Explicitly out of scope (initial port; may reconsider later)
 
 - All Swing UI: `Main`, `JCalendar`, `JDaySelector`, `IconDisplay`,

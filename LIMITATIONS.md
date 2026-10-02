@@ -25,63 +25,83 @@ traditions are welcome in principle but will not block 1.0.
 
 ## Engine
 
+### Service composition is no longer public API
+
+The `0.1.x-alpha` line shipped a full Ponomar service composer
+(`composeService`, `getPropers`, `getServices`, `getHourService`,
+`getOrderedLiturgyReadings`, `getOrderedMatinsReadings`, plus the DSL /
+resolver internals). `1.0.0-rc.9` removed every one of these from the
+public barrels after HTOC was adopted as the publication-level source of
+truth: HTOC supplies the printed daily commemorations, propers, header,
+tone, and reading list directly, which turned out to be more valuable to
+consumers than a half-translated Russian typikon service order. The
+implementations still exist under `src/engine/*` and resolve via direct
+deep imports (e.g. `ponomar-ts/engine/compose`) as an **unsupported
+escape hatch** not covered by semver — if you depend on them, pin the
+exact version.
+
+Follow-on consequences:
+- Upstream `DivineLiturgy1.Readings()`'s `dRank = "0"` override on the
+  cross-day peek (preserved internally in `getOrderedLiturgyReadings`) is
+  therefore inert from a public-API perspective. The cross-day pull now
+  only matters to consumers using the escape hatch.
+- Rank-aware `<SERVICE Type>` filtering of `Commemoration.hymns` was
+  never ported (rank data is too sparse — only ~6 of 3,371 cIds carry a
+  rank), and this is also no longer visible from the public surface
+  since `getPropers` is gone.
+- `Octoecheos/**` + `Var/**` dynamic includes were preserved by the old
+  `composeService` as opaque `get` directives for consumers to render;
+  that engine is no longer public, so the behaviour is only observable
+  via the escape hatch.
+
 ### Lucan-jump *numbering* (Sept–Nov sequential-reading cycle reset)
 
-`getOrderedLiturgyReadings` implements Suppress, Class3Transfers, Saturday
-inversion, and cross-day pull (`TransferRulesB` / `TransferRulesF`). The
-September–November boundary where sequential-reading *numbering* shifts to
-a Lucan cycle lives in upstream's static day XML (`pentecostarion/*.xml`) and
-is consumed as-is via codegen. If upstream's XML is correct, our ordering is
-correct; if upstream's XML has a numbering bug, we inherit it.
-
-### `dRank = "0"` override on cross-day peek
-
-Upstream `DivineLiturgy1.Readings()` sets `dRank = "0"` before its recursive
-call into the adjacent day, suppressing rank-gated `Class3Transfers`
-(`dRank >= 5`) and rank-gated `Suppress` clauses when peeking at the neighbor.
-`ponomar-ts` does not mirror this override. It's **inert on the current
-corpus** because only 6 of 3,371 commemorations carry a `<CHURCH Rank>`.
-Consumers who supply richer rank data may see divergence.
-
-### Rank-aware `<SERVICE Type>` selection
-
-`Commemoration.hymns` collects every `<TROPARION>` / `<KONTAKION>`, regardless
-of the day's `dRank`. Upstream `Service.java` would filter by
-`<SERVICE Type="…">` matching the current rank. Same reason as above: rank
-data is too sparse for the filter to be meaningful. `Commemoration.hymns` is
-no longer a public-API source — `getPropers` returns HTOC's published
-propers verbatim — so this filter never runs in practice.
+The September–November boundary where sequential-reading *numbering*
+shifts to a Lucan cycle lives in upstream's static day XML
+(`pentecostarion/*.xml`) and is consumed as-is via codegen. If upstream's
+XML is correct, our output is correct; if upstream has a numbering bug,
+we inherit it. In practice `getDailyReadings` now runs HTOC's
+saint-lectionary layer on top of the structural picks, so for the
+vendored 2025–2027 window the Lucan handoff follows HTOC's published
+choice regardless of what Ponomar's structural XML says.
 
 ### Propers outside the HTOC coverage window
 
-`getPropers(date)` and `LiturgicalDay.troparia` / `.kontakia` return HTOC
-day-facts verbatim. The vendored window is 2025–2027 (1095 days). Dates
-outside return empty arrays. Composing an order of service via
-`composeService` still works for any date, but the hymn text slots emit
-opaque `create` directives for consumers to fill from a language pack.
+Two surfaces behave differently here:
+
+- `LiturgicalDay.troparia` / `.kontakia` returned by `getLiturgicalDay`
+  **are populated for any Gregorian year**. Inside the vendored
+  2025–2027 window they are HTOC's published hymns verbatim; outside the
+  window they are composed from three position-stable cycle maps
+  (`FIXED_HYMNS_CYCLE` keyed by Julian MM-DD, `PASCHAL_HYMNS_CYCLE` keyed
+  by signed days from Pascha, `SUNDAY_TONE_HYMNS_CYCLE` keyed by tone),
+  which reproduce ~93% of in-window hymn occurrences. The remaining ~7%
+  are year-unstable (DOW-shift / per-year transferred) commemorations;
+  their hymns are deliberately dropped rather than guessed.
+- The lower-level `getDay(date)` / `DAY_FACTS_BY_ISO.get(iso)` accessor
+  returns HTOC's verbatim record inside the window and a partial record
+  outside the window with `troparia` / `kontakia` empty. Prefer
+  `getLiturgicalDay` for the composed hymn surface.
 
 ### `Matins.LeapReadings`
 
-Upstream's `Matins.LeapReadings()` reads a shared `Information2` map populated
-by `DivineLiturgy1`. In the current corpus, that table's Matins-scoped entries
-are empty and the method is a no-op. Not ported.
-
-### `Octoecheos/**` and `Var/**` service overrides
-
-Upstream's Hour classes overlay tone/weekday `Octoecheos/Tone N/<Weekday>.xml`
-onto the base `<PRIMES>` / `<TERCE>` / `<SEXTE>` / `<NONE>` rules, and
-resolve `<GET File="Var/…"/>` includes to dynamically-generated content.
-`composeService` **preserves these as opaque `get` directives** so consumers
-can inject the right content when rendering. The engine does not compose them
-because their content is parameterised over tone selections that upstream
-resolves via UI state (`PrimeSelector` etc.).
+Upstream's `Matins.LeapReadings()` reads a shared `Information2` map
+populated by `DivineLiturgy1`. In the current corpus that table's
+Matins-scoped entries are empty and the method is a no-op. Not ported.
 
 ### Fasting display strings
 
-`Fasting.convert()` upstream produces a localized human-readable string from
-the 7-bit permission mask. `getFasting` returns the mask + a coarse `level`
-enum; localization belongs to the consumer per the "engine returns raw IDs"
-policy.
+`Fasting.convert()` upstream produces a localized human-readable string
+from the 7-bit permission mask. `getFasting` returns the mask + a coarse
+`level` enum + a structured `period` (`"great-lent"` / `"apostles"` /
+`"dormition"` / `"nativity"` / `"weekly"` with an `isEve` flag). An
+optional `renderFastText(ctx, level)` courtesy helper and the
+`getFastingPeriodName(period)` label are provided for consumers who want
+a quick starter, but `renderFastText` encodes a strict Russian typikon
+flavour and is documented to diverge from HTOC's Hellenic rendering —
+localization in general belongs to the consumer per the "engine returns
+raw IDs" policy. (See [CHANGELOG.md](CHANGELOG.md) for the `1.0.0-rc.19`
+removal of the pre-rendered English `fastText` field.)
 
 ### Rank inference "klutz" in `ServiceInfo.java`
 
