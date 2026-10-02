@@ -1,21 +1,16 @@
-// Compose HTOC's fast-rule display string ("Great Lent. Food with Oil"
-// etc.) for any civil year by templating the day's fasting period name
-// over the strict-level suffix. The 23 unique strings observed in the
-// vendored 2025-2027 window all follow the `"<period>. <level>"` shape
-// (or a bare `"Eve of <period>."` on the day before each major fast).
+// Optional English renderer for the day's fasting rule. Follows the HTOC
+// "<Period>. <Level>" shape as a convenience for consumers who want a
+// drop-in English label; most consumers should prefer the structured
+// `fasting.level` + `fasting.period` on `LiturgicalDay` and render against
+// their own tradition / language.
 //
-// Period boundaries were derived from the vendored corpus:
-//   nday ∈ [-48, -1]              → Great Lent
-//   nday === 56                   → Eve of Apostles' Fast
-//   nday ≥ 57, Julian ≤ 6/28      → Apostles' (Peter & Paul) Fast
-//   Julian 7/31                   → Eve of the Dormition Fast
-//   Julian 8/1 - 8/14             → Dormition (Theotokos) Fast
-//   Julian 11/14                  → Eve of the Nativity Fast
-//   Julian 11/15 - 12/24          → Nativity (St. Philip's Fast)
-//   otherwise, a fasting day      → bare "Fast" (weekly Wed/Fri, eves)
+// Note: this encodes the strict Russian typikon (Fasting.xml) and will
+// differ from HTOC's published Hellenic-tradition text on days with
+// polyeleos/6-stich saints on Wed/Fri. See LIMITATIONS.md.
 
-import type { FastingLevel } from "./fasting.ts";
 import type { DayContext } from "./day.ts";
+import type { FastingLevel, FastingPeriod, FastingPeriodKind } from "./fasting.ts";
+import { getFastingPeriod } from "./fasting.ts";
 
 const LEVEL_SUFFIX: Readonly<Record<FastingLevel, string>> = {
 	"no-food": "By Monastic Charter - Full abstention from food",
@@ -30,77 +25,34 @@ const LEVEL_SUFFIX: Readonly<Record<FastingLevel, string>> = {
 	custom: "",
 };
 
-function periodName(ctx: DayContext): { name: string; isEve: boolean } | null {
-	const { nday, julian } = ctx;
-	if (nday === -49) return { name: "Eve of Great Lent", isEve: true };
-	if (nday >= -48 && nday <= -1) return { name: "Great Lent", isEve: false };
-	if (nday === 56) return { name: "Eve of Apostles' (Peter & Paul) Fast", isEve: true };
-	if (nday >= 57 && isBeforeJulian(julian.month, julian.day, 6, 29))
-		return { name: "Apostles' (Peter & Paul) Fast", isEve: false };
-	if (julian.month === 7 && julian.day === 31)
-		return { name: "Eve of the Dormition Fast", isEve: true };
-	if (julian.month === 8 && julian.day >= 1 && julian.day <= 14)
-		return { name: "Dormition (Theotokos) Fast", isEve: false };
-	if (julian.month === 11 && julian.day === 14)
-		return { name: "Eve of the Nativity Fast", isEve: true };
-	if (
-		(julian.month === 11 && julian.day >= 15) ||
-		(julian.month === 12 && julian.day <= 24)
-	) {
-		return { name: "Nativity (St. Philip's Fast)", isEve: false };
-	}
-	return null;
+const PERIOD_NAME: Readonly<Record<FastingPeriodKind, string>> = {
+	"great-lent": "Great Lent",
+	apostles: "Apostles' (Peter & Paul) Fast",
+	dormition: "Dormition (Theotokos) Fast",
+	nativity: "Nativity (St. Philip's Fast)",
+	weekly: "Fast",
+};
+
+/** English display name for the fasting period. Returns `null` on days
+ *  that are not inside any scheduled fast. */
+export function getFastingPeriodName(period: FastingPeriod): string | null {
+	if (period.kind === null) return null;
+	const base = PERIOD_NAME[period.kind];
+	return period.isEve ? `Eve of ${base}` : base;
 }
 
-function isBeforeJulian(
-	mo: number,
-	day: number,
-	targetMo: number,
-	targetDay: number,
-): boolean {
-	if (mo < targetMo) return true;
-	if (mo > targetMo) return false;
-	return day < targetDay;
-}
-
-/** Render HTOC's fast-rule display string for the given day. Returns
- *  the empty string on non-fasting days (matching HTOC's convention
- *  of leaving the fast line blank). */
+/** Compose an English display string for the day's fast — strict Russian
+ *  typikon flavour. Empty on non-fasting days. */
 export function renderFastText(ctx: DayContext, level: FastingLevel): string {
+	const period = getFastingPeriod(ctx);
 	const suffix = LEVEL_SUFFIX[level];
-	const period = periodName(ctx);
-	if (period === null) {
-		if (suffix === "") return "";
-		return `Fast. ${suffix}`;
+	if (period.kind === null) {
+		return suffix === "" ? "" : `Fast. ${suffix}`;
 	}
-	if (period.isEve) return `${period.name}.`;
-	if (suffix === "") return "";
-	return `${period.name}. ${suffix}`;
+	const name = PERIOD_NAME[period.kind];
+	if (period.isEve) return `Eve of ${name}.`;
+	if (period.kind === "weekly") {
+		return suffix === "" ? "" : `Fast. ${suffix}`;
+	}
+	return suffix === "" ? "" : `${name}. ${suffix}`;
 }
-
-// --- HTOC fast-text cycle pivot --------------------------------------
-// (Formerly src/engine/htocFastText.ts; merged on prefix removal.)
-// Compose HTOC `fastText` for any civil year by consulting the two
-// position-stable cycle maps emitted by
-// `scripts/codegen/fast-text-cycle.ts`. Covers 100 % of occurrences
-// in the vendored 2025-2027 window; precedence (paschal → Julian) mirrors
-// the codegen classifier.
-
-import {
-	FAST_TEXT_JULIAN_CYCLE,
-	FAST_TEXT_PASCHAL_CYCLE,
-} from "../data/fastTextCycle.ts";
-
-/** Look up `fastText` for any day via the cycle pivot. Returns `null`
- *  when neither axis has a stable key for the given day; callers should
- *  then fall back to the engine-level renderer. */
-export function getFastTextForAnyYear(ctx: DayContext): string | null {
-	const paschalKey = `${ctx.nday}|${ctx.dow}`;
-	const paschal = FAST_TEXT_PASCHAL_CYCLE.get(paschalKey);
-	if (paschal !== undefined) return paschal;
-	const julianKey = `${String(ctx.julian.month).padStart(2, "0")}-${String(ctx.julian.day).padStart(2, "0")}|${ctx.dow}`;
-	const julian = FAST_TEXT_JULIAN_CYCLE.get(julianKey);
-	if (julian !== undefined) return julian;
-	return null;
-}
-

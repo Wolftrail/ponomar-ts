@@ -19,9 +19,9 @@ export { COMMEMORATIONS } from "./commemorations.ts";
 export { RANK_OVERLAY, getOverlayRank } from "./rankOverlay.ts";
 export { NAME_OVERLAY } from "./nameOverlay.ts";
 export {
-	DAY_FACTS_BY_ISO,
+	DAY_FACTS_PARTIAL_BY_ISO,
 	DAY_FACTS_TROPARIA_COUNT,
 	DAY_FACTS_KONTAKIA_COUNT,
 	DAY_FACTS_COMMEMORATIONS_COUNT,
 } from "./dayFacts.ts";
-export type { Commemoration, DayFacts, Hymn } from "./dayFacts.ts";
+export type { Commemoration, DayFacts, DayFactsPartial, Hymn } from "./dayFacts.ts";

@@ -15,7 +15,7 @@ export * as data from "./data/index.ts";
 export * as engine from "./engine/index.ts";
 export * as bible from "./bible/index.ts";
 export * as astronomy from "./astronomy/index.ts";
-export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getOctoechosTone, getLiturgicalSeason, getPentecostWeek, getLentenWeek, isSviatki, renderHeaderText, getCommemorationsForAnyYear, getDowMovables, getFixedCommemorations, getPaschalMovables, getSeasonCommemorations, getTransferOverlays, isVendoredDate, DAILY_LECTIONARY, SAINTS_BY_ISO, DAY_FACTS_BY_ISO, SAINT_LECTIONARY, SAINT_FIXED_CYCLE, SAINT_MOVABLE_CYCLE, SAINT_EXCEPTIONS, cIdToSlug, getLifeBySlug, getSaint, getSaintByCId, slugToCId, getReadings, getDay, getSaints, getSaintsAnyYear, getDailyLectionary, getSaintLectionary } from "./engine/index.ts";
+export { getLiturgicalDay, getDailyReadings, getLiturgyReadings, getFasting, getFastingPeriod, renderFastText, getFastingPeriodName, getOctoechosTone, getLiturgicalSeason, getPentecostWeek, getLentenWeek, isSviatki, renderHeaderText, getCommemorationsForAnyYear, getDowMovables, getFixedCommemorations, getPaschalMovables, getSeasonCommemorations, getTransferOverlays, isVendoredDate, DAILY_LECTIONARY, SAINTS_BY_ISO, DAY_FACTS_BY_ISO, SAINT_LECTIONARY, SAINT_FIXED_CYCLE, SAINT_MOVABLE_CYCLE, SAINT_EXCEPTIONS, cIdToSlug, getLifeBySlug, getSaint, getSaintByCId, slugToCId, getReadings, getDay, getSaints, getSaintsAnyYear, getDailyLectionary, getSaintLectionary } from "./engine/index.ts";
 export type {
 	LiturgicalDay,
 	DailyReadings,
@@ -23,6 +23,8 @@ export type {
 	FastingResult,
 	FastingLevel,
 	FastingPermissions,
+	FastingPeriod,
+	FastingPeriodKind,
 	ServiceDirective,
 	ServiceTemplate,
 	ServiceTitle,

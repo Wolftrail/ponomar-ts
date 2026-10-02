@@ -1,7 +1,7 @@
 // Phase B validator: compare algorithmic renderHeaderText against the
 // hardcoded `headerText` field in DAY_FACTS_BY_ISO.
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { renderHeaderText } from "../../src/engine/headerText.ts";
 

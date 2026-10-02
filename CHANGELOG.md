@@ -11,6 +11,62 @@ notice.
 
 ## [Unreleased]
 
+## [1.0.0-rc.19] — 2026-10-03
+
+### Changed
+
+- **BREAKING: dropped the rendered `fastText` English string from the
+  public API.** The engine previously synthesised a single tradition-
+  flavoured sentence (strict Russian typikon) and shipped it on
+  `LiturgicalDay.fastText`, `DayFacts.fastText`, and
+  `DayFactsPartial.fastText`. HTOC's own `fastText` field encodes a
+  Hellenic flavour that differs from the renderer in roughly 22 % of
+  calendar days — rather than ship an opinionated string that is wrong
+  for most consumers, the engine now returns a structured fasting
+  record and lets front-ends render against their own tradition.
+
+  **Removed:**
+  - `LiturgicalDay.fastText`, `DayFacts.fastText`,
+    `DayFactsPartial.fastText` (field no longer exists).
+  - `getFastTextForAnyYear(ctx)` (helper that pivoted HTOC's own
+    strings onto arbitrary dates — superseded by `fasting.period`).
+  - `src/data/fastTextCycle.ts` (both `FAST_TEXT_PASCHAL_CYCLE` and
+    `FAST_TEXT_JULIAN_CYCLE` cycle maps and the module itself).
+  - Internal: the `F` string pool and `fastIdx` column were dropped
+    from `src/data/dayFacts.ts`; `CompactDay` is now a 3-tuple.
+
+  **Added:**
+  - `LiturgicalDay.fasting: FastingResult` — the full `FastingResult`
+    (`case`, `level`, `permitted`, `isDefault`, `period`) is now
+    attached directly to the composed day.
+  - `FastingResult.period: FastingPeriod` — a new structured field
+    classifying the day's scheduled fast window.
+  - New types `FastingPeriod` (`{ kind, isEve }`) and
+    `FastingPeriodKind` (`"great-lent" | "apostles" | "dormition" |
+    "nativity" | "weekly"`).
+  - New exports `getFastingPeriod(ctx)` and `getFastingPeriodName(period)`.
+  - `renderFastText(ctx, level)` is retained but repositioned as an
+    **optional courtesy helper** that encodes a strict Russian
+    typikon flavour and is documented to diverge from HTOC's Hellenic
+    rendering. Consumers who want HTOC-style English should write
+    their own thin renderer against `fasting.period` + `fasting.level`.
+
+  **Migration:**
+  - Replace `day.fastText` with your own rendering, e.g.
+    ```ts
+    const name = getFastingPeriodName(day.fasting.period);
+    const label = name
+      ? `${day.fasting.period.isEve ? "Eve of " : ""}${name}.`
+      : "";
+    ```
+    Or, for the previous Russian-flavoured string:
+    ```ts
+    import { renderFastText } from "ponomar-ts";
+    const text = renderFastText(day.context, day.fasting.level);
+    ```
+  - Replace `facts.fastText` reads on `DayFacts` with structured
+    composition at the `LiturgicalDay` layer.
+
 ## [1.0.0-rc.18] — 2026-10-02
 
 ### Changed

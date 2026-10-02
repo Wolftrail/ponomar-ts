@@ -1,11 +1,13 @@
 // Codegen: reads `scratch/htoc-days.json` (produced by the full day-level
 // scraper) plus the per-year `tests/fixtures/htoc-full-<year>.json`
 // fixtures, and emits `src/data/dayFacts.ts` — a per-ISO-date lookup
-// table of HTOC's `headerText`, `tone`, `fastText`, `commemorations`,
-// `troparia`, and `kontakia`. These are the display-oriented day facts
-// HTOC publishes in addition to the saint commemoration list (vendored
-// separately in `saints.ts` as a navigable, cId-linked subset) and
-// the daily lectionary (vendored in `dailyLectionary.ts`).
+// table of HTOC's `commemorations`, `troparia`, and `kontakia`.
+// These are the display-oriented day facts HTOC publishes in addition
+// to the saint commemoration list (vendored separately in `saints.ts`
+// as a navigable, cId-linked subset) and the daily lectionary
+// (vendored in `dailyLectionary.ts`). `headerText`, `tone`, and the
+// fasting rule are all synthesized at the engine layer and not stored
+// here (100 %-reproducible from the paschal + Julian cycle).
 //
 // Run:   node --experimental-strip-types scripts/codegen/day-facts.ts
 // Reads: scratch/htoc-days.json  (hymns: troparia + kontakia)
@@ -99,9 +101,6 @@ interface EmittedCommemoration {
 	readonly lives: readonly EmittedLivesLink[];
 }
 interface EmittedDay {
-	readonly headerText: string;
-	readonly tone: number | null;
-	readonly fastText: string;
 	readonly commemorations: readonly EmittedCommemoration[];
 	readonly troparia: readonly EmittedHymn[];
 	readonly kontakia: readonly EmittedHymn[];
@@ -153,7 +152,6 @@ let totalTroparia = 0;
 let totalKontakia = 0;
 let totalCommemorations = 0;
 for (const [iso, day] of Object.entries(raw.days)) {
-	const tone = typeof day.tone === "number" ? day.tone : null;
 	const troparia = (day.troparia ?? []).map(normalizeHymn);
 	const kontakia = (day.kontakia ?? []).map(normalizeHymn);
 	const commemorations = (commemorationsByIso.get(iso) ?? []).map(
@@ -163,9 +161,6 @@ for (const [iso, day] of Object.entries(raw.days)) {
 	totalKontakia += kontakia.length;
 	totalCommemorations += commemorations.length;
 	emitted.set(iso, {
-		headerText: day.headerText ?? "",
-		tone,
-		fastText: day.fastText ?? "",
 		commemorations,
 		troparia,
 		kontakia,
@@ -200,8 +195,6 @@ class Pool<T> {
 	}
 }
 
-const headers = new Pool<string>();
-const fasts = new Pool<string>();
 const hTitles = new Pool<string>();
 const hTexts = new Pool<string>();
 const cTexts = new Pool<string>();
@@ -210,15 +203,11 @@ const refs = new Pool<readonly [string, string]>();
 
 type CompactHymn = readonly [titleIdx: number, textIdx: number, group: number, saintRefIdxs: readonly number[]];
 type CompactCommem = readonly [rank: string, textIdx: number, minor: 0 | 1, livesRefIdxs: readonly number[]];
-/** Compact per-day record. All six fields index into pools:
- *  - `headerIdx` → `H`, `fastIdx` → `F`
+/** Compact per-day record. All three fields index into pools:
  *  - `commemArrIdx` → `A` (array of `CC`-pool indices)
  *  - `tropArrIdx`, `kontArrIdx` → `A` (array of `CH`-pool indices)
  */
 type CompactDay = readonly [
-	headerIdx: number,
-	tone: number | null,
-	fastIdx: number,
 	commemArrIdx: number,
 	tropArrIdx: number,
 	kontArrIdx: number,
@@ -273,9 +262,6 @@ function internArr(ii: readonly number[]): number {
 const compactDays: (readonly [string, CompactDay])[] = sortedDates.map((iso) => {
 	const f = emitted.get(iso)!;
 	const cd: CompactDay = [
-		headers.intern(f.headerText),
-		f.tone,
-		fasts.intern(f.fastText),
 		internArr(f.commemorations.map(internCommem)),
 		internArr(f.troparia.map(internHymn)),
 		internArr(f.kontakia.map(internHymn)),
@@ -283,19 +269,15 @@ const compactDays: (readonly [string, CompactDay])[] = sortedDates.map((iso) => 
 	return [iso, cd];
 });
 
-/** Pool of unique inner propers-triplets `[commemArrIdx, tropArrIdx,
- *  kontArrIdx]`. ~40 % of days in the 3-year window share an identical
- *  triplet (same saint commemorations + same propers), e.g. 2025-01-01
- *  and 2026-01-01 both commemorate the Circumcision + St. Basil the Great
- *  with byte-identical propers; only the `[headerIdx, tone, fastIdx]`
- *  prefix differs between the two years. */
+/** Pool of unique propers-triplets `[commemArrIdx, tropArrIdx,
+ *  kontArrIdx]`. A large fraction of days share an identical triplet
+ *  (same saint commemorations + same propers across years). */
 type InnerTriplet = readonly [number, number, number];
 const triPool = new Pool<InnerTriplet>();
-type CompactDayRow = readonly [headerIdx: number, tone: number | null, fastIdx: number, triIdx: number];
-const dayRows: (readonly [string, CompactDayRow])[] = compactDays.map(([iso, cd]) => {
-	const tri: InnerTriplet = [cd[3], cd[4], cd[5]];
+const dayRows: (readonly [string, number])[] = compactDays.map(([iso, cd]) => {
+	const tri: InnerTriplet = [cd[0], cd[1], cd[2]];
 	const triIdx = triPool.intern(tri, tri.join(","));
-	return [iso, [cd[0], cd[1], cd[2], triIdx]];
+	return [iso, triIdx];
 });
 
 // ---------------------------------------------------------------------------
@@ -353,18 +335,12 @@ lines.push(
 	"\treadonly lives: readonly { readonly name: string; readonly slug: string }[];",
 	"}",
 	"",
-	"/** HTOC day-level facts: title line, tone, fast rule, commemoration list,",
-	" *  and the day's propers. */",
-	"export interface DayFacts {",
-	'\t/** Header line as scraped, e.g. `"28th Week after Pentecost. Tone two."`. */',
-	"\treadonly headerText: string;",
-	"\t/** Resurrectional tone of the week (1..8), or `null` on Bright Week and",
-	"\t *  Great Feasts of the Lord where HTOC does not print a tone. */",
-	"\treadonly tone: number | null;",
-	'\t/** Fast-rule display string, e.g. `"Nativity (St. Philip\'s Fast). By',
-	'\t *  Monastic Charter: Strict Fast (Bread, Vegetables, Fruits)"`. Empty',
-	"\t *  string on non-fast days. */",
-	"\treadonly fastText: string;",
+	"/** HTOC per-day facts stored in the vendored lookup table. Lacks",
+	" *  `headerText`, `tone`, and the fasting rule because those are",
+	" *  100 %-reproducible from the paschal + Julian cycle at any date;",
+	" *  the engine layer composes them on top of this record to produce",
+	" *  the full `DayFacts` shape. */",
+	"export interface DayFactsPartial {",
 	"\t/** Full commemoration list as published by HTOC, in display order. */",
 	"\treadonly commemorations: readonly Commemoration[];",
 	"\t/** Day's troparia in HTOC publication order. */",
@@ -373,16 +349,26 @@ lines.push(
 	"\treadonly kontakia: readonly Hymn[];",
 	"}",
 	"",
+	"/** HTOC day-level facts: title line, tone, commemoration list, and the",
+	" *  day's propers. Produced by the engine's `getDayFacts()` /",
+	" *  `DAY_FACTS_BY_ISO` by composing synthesized `headerText` + `tone`",
+	" *  on top of the raw `DayFactsPartial` stored here. */",
+	"export interface DayFacts extends DayFactsPartial {",
+	'\t/** Header line as scraped, e.g. `"28th Week after Pentecost. Tone two."`. */',
+	"\treadonly headerText: string;",
+	"\t/** Resurrectional tone of the week (1..8), or `null` on Bright Week and",
+	"\t *  Great Feasts of the Lord where HTOC does not print a tone. */",
+	"\treadonly tone: number | null;",
+	"}",
+	"",
 	"// ---------------------------------------------------------------------------",
 	"// Interned string pools. HTOC content repeats heavily across the 3-year",
-	"// vendored corpus (recurring forefeast troparia, octoechos cycle, 23 unique",
-	"// fast strings used by 1095 days, ...), so each unique string lives here",
-	"// once and per-day records reference it by integer index.",
+	"// vendored corpus (recurring forefeast troparia, octoechos cycle, ...), so",
+	"// each unique string lives here once and per-day records reference it by",
+	"// integer index.",
 	"// ---------------------------------------------------------------------------",
 	"",
 );
-lines.push(emitStringPool("H", "/** Unique header lines (one per day's title bar). */", headers.items));
-lines.push(emitStringPool("F", "/** Unique fast-rule display strings. */", fasts.items));
 lines.push(emitStringPool("HT", "/** Unique hymn titles (troparia + kontakia). */", hTitles.items));
 lines.push(emitStringPool("HX", "/** Unique hymn texts (troparia + kontakia). */", hTexts.items));
 lines.push(emitStringPool("CT", "/** Unique commemoration display texts. */", cTexts.items));
@@ -431,15 +417,14 @@ for (const t of triPool.items) lines.push(`\t${JSON.stringify(t)},`);
 lines.push("];", "");
 
 lines.push(
-	"/** Compact per-day row. `[headerIdx, tone, fastIdx, triIdx]` where",
-	" *  `triIdx` indexes into `T` for the day's propers. Hydrated by `hyDay()`",
-	" *  into the public `DayFacts` shape with no behavioral change. */",
-	"type CD = readonly [number, number | null, number, number];",
-	"",
-	"const D: readonly (readonly [string, CD])[] = [",
+	"/** Compact per-day row: a single `triIdx` indexing into `T` for the",
+	" *  day's propers triplet. Hydrated by `hyDay()` into the public",
+	" *  `DayFactsPartial` shape; `DayFacts` (with headerText + tone) is",
+	" *  built on top of this at the engine layer. */",
+	"const D: readonly (readonly [string, number])[] = [",
 );
-for (const [iso, row] of dayRows) {
-	lines.push(`\t[${JSON.stringify(iso)},${JSON.stringify(row)}],`);
+for (const [iso, triIdx] of dayRows) {
+	lines.push(`\t[${JSON.stringify(iso)},${triIdx}],`);
 }
 lines.push(
 	"];",
@@ -462,21 +447,20 @@ lines.push(
 	"\t\tlives: c[3].map((j) => ({ name: R[j]![0], slug: R[j]![1] })),",
 	"\t};",
 	"}",
-	"function hyDay(c: CD): DayFacts {",
-	"\tconst tri = T[c[3]]!;",
+	"function hyDay(triIdx: number): DayFactsPartial {",
+	"\tconst tri = T[triIdx]!;",
 	"\treturn {",
-	"\t\theaderText: H[c[0]]!,",
-	"\t\ttone: c[1],",
-	"\t\tfastText: F[c[2]]!,",
 	"\t\tcommemorations: A[tri[0]]!.map(hyCommem),",
 	"\t\ttroparia: A[tri[1]]!.map(hyHymn),",
 	"\t\tkontakia: A[tri[2]]!.map(hyHymn),",
 	"\t};",
 	"}",
 	"",
-	"/** ISO-date → HTOC day facts for that day.",
-	" *  Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */",
-	"export const DAY_FACTS_BY_ISO: ReadonlyMap<string, DayFacts> = new Map(",
+	"/** ISO-date → HTOC per-day facts (commemorations + propers) for that",
+	" *  day. The engine layer wraps this with synthesized `headerText`,",
+	" *  `tone`, and the fasting rule to form the public `DAY_FACTS_BY_ISO`",
+	" *  map. Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */",
+	"export const DAY_FACTS_PARTIAL_BY_ISO: ReadonlyMap<string, DayFactsPartial> = new Map(",
 	"\tD.map(([iso, cd]) => [iso, hyDay(cd)] as const),",
 	");",
 	"",
@@ -494,7 +478,6 @@ console.log(
 	`wrote ${OUTPUT.replace(process.cwd(), "")} — ${emitted.size} days, ` +
 		`${totalCommemorations} commemorations, ${totalTroparia} troparia, ` +
 		`${totalKontakia} kontakia; pools: ` +
-		`H=${headers.items.length} F=${fasts.items.length} ` +
 		`HT=${hTitles.items.length} HX=${hTexts.items.length} ` +
 		`CT=${cTexts.items.length} R=${refs.items.length} ` +
 		`CH=${hymnPool.items.length} CC=${commemPool.items.length} ` +

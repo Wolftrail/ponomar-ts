@@ -6,7 +6,7 @@
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { SAINTS_BY_ISO } from "../../src/data/saints.ts";
+import { SAINTS_BY_ISO } from "../../src/engine/saints.ts";
 import type { Saint } from "../../src/data/saints.ts";
 import { getOrthodoxPascha } from "../../src/paschalion.ts";
 import { fromGregorian } from "../../src/core/calendar/jdate.ts";

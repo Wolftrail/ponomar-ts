@@ -1,7 +1,7 @@
 import test from "node:test";
 import { strict as assert } from "node:assert";
 
-import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/engine/dayFacts.ts";
 import { computeDayContext } from "../src/engine/day.ts";
 import {
 	getCommemorationsForAnyYear,

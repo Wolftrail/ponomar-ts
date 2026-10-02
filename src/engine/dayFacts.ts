@@ -2,22 +2,18 @@
 // corpus window `getDayFacts` returns the HTOC-published record verbatim
 // (perfect fidelity). Outside the window it composes a best-effort record:
 // `headerText`, `tone`, and `commemorations` come from the algorithmic layers
-// (Phases A/B/C1-C5), while `fastText`, `troparia`, and `kontakia` are empty
-// because they are HTOC publication content without an algorithmic analog.
-//
-// Phase D (plan: capstone). Previously this file only returned data within the
-// vendored window and `null` elsewhere; now the engine answers for any year.
+// (Phases A/B/C1-C5); `troparia`/`kontakia` are empty because they are HTOC
+// publication content without an algorithmic analog.
 
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
-import { DAY_FACTS_BY_ISO } from "../data/dayFacts.ts";
-import type { Commemoration, DayFacts, Hymn } from "../data/dayFacts.ts";
+import { DAY_FACTS_PARTIAL_BY_ISO } from "../data/dayFacts.ts";
+import type { Commemoration, DayFacts, DayFactsPartial, Hymn } from "../data/dayFacts.ts";
 import { getCommemorationsForAnyYear } from "./commemorations.ts";
-import { computeDayContext } from "./day.ts";
+import { computeDayContext, type DayContext } from "./day.ts";
 import { renderHeaderText } from "./headerText.ts";
 import { getOctoechosTone } from "./tone.ts";
 
-export type { Commemoration, DayFacts, Hymn } from "../data/dayFacts.ts";
-export { DAY_FACTS_BY_ISO } from "../data/dayFacts.ts";
+export type { Commemoration, DayFacts, DayFactsPartial, Hymn } from "../data/dayFacts.ts";
 
 function toIso(d: CalendarDate): string {
 	const mm = String(d.month).padStart(2, "0");
@@ -25,12 +21,44 @@ function toIso(d: CalendarDate): string {
 	return `${d.year}-${mm}-${dd}`;
 }
 
+function parseIso(iso: string): CalendarDate {
+	return {
+		year: +iso.slice(0, 4),
+		month: +iso.slice(5, 7),
+		day: +iso.slice(8, 10),
+	};
+}
+
 const EMPTY_HYMNS: readonly Hymn[] = [];
+
+function hydrate(ctx: DayContext, partial: DayFactsPartial): DayFacts {
+	return {
+		headerText: renderHeaderText(ctx),
+		tone: getOctoechosTone(ctx),
+		commemorations: partial.commemorations,
+		troparia: partial.troparia,
+		kontakia: partial.kontakia,
+	};
+}
+
+/** ISO-date → HTOC-published day facts for that day. Hydrated once at
+ *  module load by overlaying synthesized `headerText` + `tone` (both
+ *  100% algorithmic — see `scripts/analysis/{header,tone}-validate.ts`)
+ *  on top of the raw `DayFactsPartial` entries emitted by the codegen.
+ *  Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */
+export const DAY_FACTS_BY_ISO: ReadonlyMap<string, DayFacts> = (() => {
+	const out = new Map<string, DayFacts>();
+	for (const [iso, partial] of DAY_FACTS_PARTIAL_BY_ISO) {
+		const ctx = computeDayContext(parseIso(iso));
+		out.set(iso, hydrate(ctx, partial));
+	}
+	return out;
+})();
 
 /** Return the HTOC-published day facts for `gregorian`. Within the vendored
  *  corpus window (2025-2027) this is the published record verbatim; outside
- *  the window it is an algorithmic best-effort with `headerText`, `tone`, and
- *  `commemorations` populated and `fastText`/`troparia`/`kontakia` empty. */
+ *  the window it is an algorithmic best-effort with `headerText`, `tone`,
+ *  and `commemorations` populated and `troparia`/`kontakia` empty. */
 export function getDayFacts(gregorian: CalendarDate): DayFacts {
 	const vendored = DAY_FACTS_BY_ISO.get(toIso(gregorian));
 	if (vendored !== undefined) return vendored;
@@ -41,7 +69,6 @@ export function getDayFacts(gregorian: CalendarDate): DayFacts {
 	return {
 		headerText,
 		tone,
-		fastText: "",
 		commemorations,
 		troparia: EMPTY_HYMNS,
 		kontakia: EMPTY_HYMNS,
@@ -50,7 +77,7 @@ export function getDayFacts(gregorian: CalendarDate): DayFacts {
 
 /** True when `gregorian` falls inside the vendored HTOC corpus window
  *  (2025-01-01 through 2027-12-31), so `getDayFacts` returns the
- *  HTOC-published record verbatim including `fastText`/`troparia`/`kontakia`. */
+ *  HTOC-published record verbatim including `troparia`/`kontakia`. */
 export function isVendoredDate(gregorian: CalendarDate): boolean {
 	return DAY_FACTS_BY_ISO.has(toIso(gregorian));
 }

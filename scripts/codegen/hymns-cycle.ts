@@ -16,7 +16,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import type { Hymn } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 

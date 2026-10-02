@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/engine/dayFacts.ts";
 import { computeDayContext } from "../src/engine/day.ts";
 import {
 	getOctoechosTone,

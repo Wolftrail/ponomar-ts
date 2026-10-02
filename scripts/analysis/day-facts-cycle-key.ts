@@ -3,7 +3,7 @@
 // window? If yes, we can expose a year-independent lookup. Reports collision
 // counts for several candidate key schemes.
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import type { DayFacts } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 

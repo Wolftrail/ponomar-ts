@@ -50,6 +50,28 @@ export interface FastingResult {
 	readonly permitted: FastingPermissions;
 	/** True when the day fell into no matching period at all (default = no-fast). */
 	readonly isDefault: boolean;
+	/** Which multi-day fasting period `ctx` falls in, or `null` on a day
+	 *  without a scheduled fast (feast days, Pentecostarion weekdays, etc.).
+	 *  Weekly Wed/Fri fasts and the eves of major feasts are `"weekly"`. */
+	readonly period: FastingPeriod;
+}
+
+/** Multi-day fasting period kind for a given civil day, plus whether the
+ *  day is the eve (one-day transition) of that period. Independent of
+ *  language and typikon tradition — consumers compose these with their
+ *  own level/period labels. */
+export type FastingPeriodKind =
+	| "great-lent"
+	| "apostles"
+	| "dormition"
+	| "nativity"
+	| "weekly";
+
+export interface FastingPeriod {
+	readonly kind: FastingPeriodKind | null;
+	/** True on the single-day transition into a major fast
+	 *  (Forgiveness Sunday → Great Lent, etc.). */
+	readonly isEve: boolean;
 }
 
 const CANONICAL: ReadonlyMap<FastingCase, FastingLevel> = new Map([
@@ -68,6 +90,44 @@ const CANONICAL: ReadonlyMap<FastingCase, FastingLevel> = new Map([
 export function getFasting(gregorian: CalendarDate): FastingResult {
 	const day = getLiturgicalDay(gregorian);
 	return computeFastingFromContext(day.context, day.dRank);
+}
+
+/** Classify `ctx` into a multi-day fasting period (Great Lent, Apostles',
+ *  Dormition, Nativity/St. Philip's) plus eve-of-period transitions.
+ *  Returns `kind: "weekly"` for weekly Wed/Fri outside the major fasts,
+ *  and `kind: null` for feast days / no-fast days. */
+export function getFastingPeriod(ctx: DayContext): FastingPeriod {
+	const { nday, dow, julian } = ctx;
+	if (nday === -49) return { kind: "great-lent", isEve: true };
+	if (nday >= -48 && nday <= -1) return { kind: "great-lent", isEve: false };
+	if (nday === 56) return { kind: "apostles", isEve: true };
+	if (nday >= 57 && isBeforeJulian(julian.month, julian.day, 6, 29))
+		return { kind: "apostles", isEve: false };
+	if (julian.month === 7 && julian.day === 31)
+		return { kind: "dormition", isEve: true };
+	if (julian.month === 8 && julian.day >= 1 && julian.day <= 14)
+		return { kind: "dormition", isEve: false };
+	if (julian.month === 11 && julian.day === 14)
+		return { kind: "nativity", isEve: true };
+	if (
+		(julian.month === 11 && julian.day >= 15) ||
+		(julian.month === 12 && julian.day <= 24)
+	) {
+		return { kind: "nativity", isEve: false };
+	}
+	if (dow === 3 || dow === 5) return { kind: "weekly", isEve: false };
+	return { kind: null, isEve: false };
+}
+
+function isBeforeJulian(
+	mo: number,
+	day: number,
+	targetMo: number,
+	targetDay: number,
+): boolean {
+	if (mo < targetMo) return true;
+	if (mo > targetMo) return false;
+	return day < targetDay;
 }
 
 /** Lower-level fasting computation that takes a pre-built `DayContext` and
@@ -95,6 +155,7 @@ export function computeFastingFromContext(
 		level: CANONICAL.get(code) ?? "custom",
 		permitted: parsePermissions(code),
 		isDefault,
+		period: getFastingPeriod(ctx),
 	};
 }
 

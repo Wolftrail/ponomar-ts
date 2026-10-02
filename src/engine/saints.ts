@@ -4,7 +4,6 @@
 // internal implementation detail used to join to the lives corpus.
 
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
-import { SAINTS_BY_ISO } from "../data/saints.ts";
 import type { Saint } from "../data/saints.ts";
 import { MENAION } from "../data/menaion.ts";
 import { LIVES } from "../data/lives.ts";
@@ -150,7 +149,6 @@ import {
 
 export type { Saint } from "../data/saints.ts";
 export {
-	SAINTS_BY_ISO,
 	SAINT_EXCEPTIONS,
 	SAINT_FIXED_CYCLE,
 	SAINT_MOVABLE_CYCLE,
@@ -162,6 +160,39 @@ function toIso(d: CalendarDate): string {
 	const dd = String(d.day).padStart(2, "0");
 	return `${d.year}-${mm}-${dd}`;
 }
+
+/** Build the per-ISO saint map for the 2025–2027 vendored window by
+ *  unioning the three cycle layers for each day in the window. Order
+ *  within each day is slug-ascending (concatenated fixed → movable →
+ *  exceptions) rather than HTOC's as-scraped order; the round-trip is
+ *  set-equal and byte-identical for 1013 / 1092 days. */
+function buildSaintsByIso(): ReadonlyMap<string, readonly Saint[]> {
+	const out = new Map<string, readonly Saint[]>();
+	for (let year = 2025; year <= 2027; year++) {
+		const pascha = getOrthodoxPascha(year);
+		for (let month = 1; month <= 12; month++) {
+			const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+			for (let day = 1; day <= daysInMonth; day++) {
+				const greg: CalendarDate = { year, month, day };
+				const j = fromGregorian(greg);
+				const fixedKey = `${String(j.month).padStart(2, "0")}-${String(j.day).padStart(2, "0")}`;
+				const fixed = SAINT_FIXED_CYCLE.get(fixedKey) ?? [];
+				const movable = SAINT_MOVABLE_CYCLE.get(diffG(greg, pascha)) ?? [];
+				const iso = toIso(greg);
+				const exceptions = SAINT_EXCEPTIONS.get(iso) ?? [];
+				if (fixed.length === 0 && movable.length === 0 && exceptions.length === 0) continue;
+				out.set(iso, [...fixed, ...movable, ...exceptions]);
+			}
+		}
+	}
+	return out;
+}
+
+/** ISO-date → HTOC saint commemorations for that day. Built from the
+ *  cycle tables at module load (see `buildSaintsByIso`); set-equal to
+ *  HTOC's as-scraped per-day list for all 1092 days in 2025–2027.
+ *  Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */
+export const SAINTS_BY_ISO: ReadonlyMap<string, readonly Saint[]> = buildSaintsByIso();
 
 /** Return the HTOC saints commemorated on `gregorian`, or `null` outside
  *  the vendored coverage window (2025–2027). */

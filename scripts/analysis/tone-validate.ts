@@ -2,7 +2,7 @@
 // hardcoded `tone` field in DAY_FACTS_BY_ISO across the full 2025-2027
 // vendored corpus. Prints a mismatch table and summary.
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { getOctoechosTone, rawOctoechosTone } from "../../src/engine/tone.ts";
 

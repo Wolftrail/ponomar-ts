@@ -74,20 +74,14 @@ for (const s of raw.saints) {
 	}
 }
 
-const sortedDates = [...byDate.keys()].sort();
-
 // ---------------------------------------------------------------------------
 // Entry-level dedup
 // ---------------------------------------------------------------------------
 // HTOC's saint corpus is naturally cyclic: each canonical saint is
 // commemorated on one Julian date (fixed cycle) or one Pascha-offset
-// (movable cycle), so across the 3-year vendored window each distinct
-// `EmittedEntry` appears on ~3 ISO dates. The previous emit inlined the
-// full entry at every (iso, saint) row, duplicating ~2/3 of the bytes.
-// We now intern each unique entry once into a shared pool and reference
-// it from the per-day bucket by integer index. The public
-// `SAINTS_BY_ISO: ReadonlyMap<string, readonly Saint[]>` keeps
-// identical shape and values.
+// (movable cycle), so each distinct `EmittedEntry` appears on 1 or 2
+// cycle-table buckets. We intern each unique entry once into a shared
+// pool (`E`) referenced by integer index from the cycle tables below.
 
 const entryIndex = new Map<string, number>();
 const entryPool: EmittedEntry[] = [];
@@ -101,10 +95,103 @@ function internEntry(e: EmittedEntry): number {
 	return i;
 }
 
-const compactByIso: (readonly [string, readonly number[]])[] = sortedDates.map((iso) => {
-	const bucket = byDate.get(iso)!;
-	return [iso, bucket.map(internEntry)] as const;
-});
+// ---------------------------------------------------------------------------
+// Cycle classification (populates entryPool)
+// ---------------------------------------------------------------------------
+
+const paschaCache = new Map<number, CalendarDate>();
+function paschaFor(year: number): CalendarDate {
+	let p = paschaCache.get(year);
+	if (p === undefined) {
+		p = getOrthodoxPascha(year);
+		paschaCache.set(year, p);
+	}
+	return p;
+}
+function parseIso(iso: string): CalendarDate {
+	return {
+		year: +iso.slice(0, 4),
+		month: +iso.slice(5, 7),
+		day: +iso.slice(8, 10),
+	};
+}
+function julianMd(iso: string): string {
+	const j = fromGregorian(parseIso(iso));
+	return `${String(j.month).padStart(2, "0")}-${String(j.day).padStart(2, "0")}`;
+}
+function paschaOffset(iso: string): number {
+	const g = parseIso(iso);
+	return diffG(g, paschaFor(g.year));
+}
+
+const fixedCycle = new Map<string, number[]>();
+const movableCycle = new Map<number, number[]>();
+const cycleExceptions = new Map<string, number[]>();
+
+for (const s of raw.saints) {
+	const m = s.href.match(/\/los\/([^/]+\/[^.]+)/);
+	const slug = m?.[1] ?? s.href;
+	const entry: EmittedEntry = {
+		slug,
+		cycle: s.cycle,
+		names: s.names,
+		rank: s.ranks[0] ?? "0",
+		text: s.texts[0] ?? "",
+	};
+	const idx = internEntry(entry);
+
+	if (s.cycle === "fixed") {
+		const keys = new Set(s.dates.map(julianMd));
+		if (keys.size === 1) {
+			const k = keys.values().next().value as string;
+			let bucket = fixedCycle.get(k);
+			if (bucket === undefined) {
+				bucket = [];
+				fixedCycle.set(k, bucket);
+			}
+			bucket.push(idx);
+		} else {
+			for (const iso of s.dates) {
+				let bucket = cycleExceptions.get(iso);
+				if (bucket === undefined) {
+					bucket = [];
+					cycleExceptions.set(iso, bucket);
+				}
+				bucket.push(idx);
+			}
+		}
+	} else {
+		const offs = new Set(s.dates.map(paschaOffset));
+		if (offs.size === 1) {
+			const o = offs.values().next().value as number;
+			let bucket = movableCycle.get(o);
+			if (bucket === undefined) {
+				bucket = [];
+				movableCycle.set(o, bucket);
+			}
+			bucket.push(idx);
+		} else {
+			for (const iso of s.dates) {
+				let bucket = cycleExceptions.get(iso);
+				if (bucket === undefined) {
+					bucket = [];
+					cycleExceptions.set(iso, bucket);
+				}
+				bucket.push(idx);
+			}
+		}
+	}
+}
+
+const sortBySlug = (idxs: number[]): number[] =>
+	[...idxs].sort((a, b) => entryPool[a]!.slug.localeCompare(entryPool[b]!.slug));
+for (const k of [...fixedCycle.keys()]) fixedCycle.set(k, sortBySlug(fixedCycle.get(k)!));
+for (const k of [...movableCycle.keys()]) movableCycle.set(k, sortBySlug(movableCycle.get(k)!));
+for (const k of [...cycleExceptions.keys()]) cycleExceptions.set(k, sortBySlug(cycleExceptions.get(k)!));
+
+const sortedFixedKeys = [...fixedCycle.keys()].sort();
+const sortedMovableKeys = [...movableCycle.keys()].sort((a, b) => a - b);
+const sortedExceptionKeys = [...cycleExceptions.keys()].sort();
 
 // ---------------------------------------------------------------------------
 // Secondary string pools
@@ -218,22 +305,9 @@ lines.push(
 	"\t};",
 	"}",
 	"",
-	"/** Compact per-day index: `[iso, entryIdxs]`. */",
-	"const D: readonly (readonly [string, readonly number[]])[] = [",
-);
-for (const [iso, idxs] of compactByIso) {
-	lines.push(`\t[${JSON.stringify(iso)}, ${JSON.stringify(idxs)}],`);
-}
-lines.push(
-	"];",
-	"",
-	"/** ISO-date → HTOC saint commemorations for that day.",
-	" *  Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */",
-	"export const SAINTS_BY_ISO: ReadonlyMap<string, readonly Saint[]> = new Map(",
-	"\tD.map(([iso, idxs]) => [iso, idxs.map(hyEntry)] as const),",
-	");",
-	"",
-	"/** Total number of (iso, saint) rows. */",
+	"/** Total number of (iso, saint) rows across the vendored corpus window.",
+	" *  Historical count kept for diagnostics after `SAINTS_BY_ISO` was moved",
+	" *  to a lazy engine-layer rebuild from the cycle tables below. */",
 	`export const SAINTS_ROW_COUNT = ${raw.saints.reduce((n, s) => n + s.dates.length, 0)};`,
 	"",
 );
@@ -256,117 +330,16 @@ lines.push(
 //     forefeast in Russian + Byzantine calendars).
 //   • 27 of 36 movable saints share a single Pascha offset (75%); the
 //     Apostles' Fast float accounts for the 9 exceptions.
-//   • Cycle tables are set-equal to `SAINTS_BY_ISO` for all 1092 days
-//     in the window; byte-identical for 1013 days (79 days differ only in
-//     ordering of same-day saints — the ISO map preserves HTOC's scrape
-//     order while the cycle tables use slug-sort).
-
-const paschaCache = new Map<number, CalendarDate>();
-function paschaFor(year: number): CalendarDate {
-	let p = paschaCache.get(year);
-	if (p === undefined) {
-		p = getOrthodoxPascha(year);
-		paschaCache.set(year, p);
-	}
-	return p;
-}
-function parseIso(iso: string): CalendarDate {
-	return {
-		year: +iso.slice(0, 4),
-		month: +iso.slice(5, 7),
-		day: +iso.slice(8, 10),
-	};
-}
-/** Julian "MM-DD" for a Gregorian ISO date. */
-function julianMd(iso: string): string {
-	const j = fromGregorian(parseIso(iso));
-	return `${String(j.month).padStart(2, "0")}-${String(j.day).padStart(2, "0")}`;
-}
-/** Days from Pascha (negative = before). */
-function paschaOffset(iso: string): number {
-	const g = parseIso(iso);
-	return diffG(g, paschaFor(g.year));
-}
-
-const fixedCycle = new Map<string, number[]>();
-const movableCycle = new Map<number, number[]>();
-const cycleExceptions = new Map<string, number[]>();
-
-// Build canonical-saint → encounter-order mapping from raw.saints iteration,
-// then classify each by cycle stability across all its dates.
-for (const s of raw.saints) {
-	const m = s.href.match(/\/los\/([^/]+\/[^.]+)/);
-	const slug = m?.[1] ?? s.href;
-	const entry: EmittedEntry = {
-		slug,
-		cycle: s.cycle,
-		names: s.names,
-		rank: s.ranks[0] ?? "0",
-		text: s.texts[0] ?? "",
-	};
-	const idx = internEntry(entry);
-
-	if (s.cycle === "fixed") {
-		const keys = new Set(s.dates.map(julianMd));
-		if (keys.size === 1) {
-			const k = keys.values().next().value as string;
-			let bucket = fixedCycle.get(k);
-			if (bucket === undefined) {
-				bucket = [];
-				fixedCycle.set(k, bucket);
-			}
-			bucket.push(idx);
-		} else {
-			for (const iso of s.dates) {
-				let bucket = cycleExceptions.get(iso);
-				if (bucket === undefined) {
-					bucket = [];
-					cycleExceptions.set(iso, bucket);
-				}
-				bucket.push(idx);
-			}
-		}
-	} else {
-		const offs = new Set(s.dates.map(paschaOffset));
-		if (offs.size === 1) {
-			const o = offs.values().next().value as number;
-			let bucket = movableCycle.get(o);
-			if (bucket === undefined) {
-				bucket = [];
-				movableCycle.set(o, bucket);
-			}
-			bucket.push(idx);
-		} else {
-			for (const iso of s.dates) {
-				let bucket = cycleExceptions.get(iso);
-				if (bucket === undefined) {
-					bucket = [];
-					cycleExceptions.set(iso, bucket);
-				}
-				bucket.push(idx);
-			}
-		}
-	}
-}
-
-// Deterministic slug-sort within each cycle bucket.
-const sortBySlug = (idxs: number[]): number[] =>
-	[...idxs].sort((a, b) => entryPool[a]!.slug.localeCompare(entryPool[b]!.slug));
-for (const k of [...fixedCycle.keys()]) fixedCycle.set(k, sortBySlug(fixedCycle.get(k)!));
-for (const k of [...movableCycle.keys()]) movableCycle.set(k, sortBySlug(movableCycle.get(k)!));
-for (const k of [...cycleExceptions.keys()]) cycleExceptions.set(k, sortBySlug(cycleExceptions.get(k)!));
-
-const sortedFixedKeys = [...fixedCycle.keys()].sort();
-const sortedMovableKeys = [...movableCycle.keys()].sort((a, b) => a - b);
-const sortedExceptionKeys = [...cycleExceptions.keys()].sort();
+//   • The three tables are a full decomposition of the HTOC corpus; the
+//     engine layer builds `SAINTS_BY_ISO` by unioning them.
 
 lines.push(
 	"// ---------------------------------------------------------------------------",
-	"// Cycle tables (any-year lookup)",
+	"// Cycle tables (any-year lookup — source of truth)",
 	"// ---------------------------------------------------------------------------",
-	"// `SAINTS_BY_ISO` above is bounded to the 3-year vendored window.",
-	"// The tables below decompose the same corpus into three cycle layers so",
-	"// callers can resolve saints for ANY Gregorian year:",
+	"// The three tables below decompose the HTOC saint corpus into three",
+	"// cycle layers so callers can resolve saints for ANY Gregorian year",
+	"// (not just the vendored window):",
 	"//   fixed    → keyed by Julian MM-DD (menaion cycle)",
 	"//   movable  → keyed by Pascha offset in days (pentecostarion cycle)",
 	"//   exceptions → keyed by ISO date for saints whose cycle key drifts",
@@ -374,7 +347,8 @@ lines.push(
 	"//                 Apostles' Fast floats)",
 	"// The three bucket contents are entry-pool indexes slug-sorted within",
 	"// each key. Union = full saint list; order inside each cycle is",
-	"// slug-ascending, concatenated fixed→movable→exceptions.",
+	"// slug-ascending, concatenated fixed→movable→exceptions. The engine",
+	"// layer builds `SAINTS_BY_ISO` on top of these tables.",
 	"",
 	"/** Compact fixed-cycle map: `[julianMmDd, entryIdxs]`. */",
 	"const CF: readonly (readonly [string, readonly number[]])[] = [",

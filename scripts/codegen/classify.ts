@@ -14,7 +14,7 @@
 //   transferred:     per-year "transferred from X to this day" composite.
 //   fixed-julian:    everything else — includes multi-day fixed feasts.
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import type { Commemoration } from "../../src/data/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 

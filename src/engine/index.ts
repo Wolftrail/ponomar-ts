@@ -9,10 +9,9 @@ import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
 import { computeFastingFromContext } from "./fasting.ts";
-import { renderFastText } from "./fastText.ts";
+import type { FastingResult } from "./fasting.ts";
 import { getDayFacts, isVendoredDate } from "./dayFacts.ts";
 import type { Commemoration, Hymn } from "./dayFacts.ts";
-import { getFastTextForAnyYear } from "./fastText.ts";
 import { getHymnsForAnyYear } from "./hymns.ts";
 import { projectCommemorations } from "./projection.ts";
 import { getDayRank, getSaintsFor, unmapRank } from "./saints.ts";
@@ -45,10 +44,13 @@ export interface LiturgicalDay {
 	 *  header verbatim; outside the window it is composed algorithmically
 	 *  via `renderHeaderText`. */
 	readonly headerText: string;
-	/** HTOC's fast-rule display string. Empty on non-fast days and for
-	 *  dates outside the vendored HTOC coverage window; see `getFasting`
-	 *  for the structured `FastingPermissions`. */
-	readonly fastText: string;
+	/** Structured fasting rule for the day: the 7-bit permission `case`,
+	 *  the canonical `level` (`"strict"` / `"oil"` / `"fish"` / ...),
+	 *  explicit `permitted` flags, and the multi-day `period` the day
+	 *  falls in. Replaces the pre-rc.19 string `fastText`; consumers who
+	 *  want an English label can use `renderFastText(context, fasting.level)`
+	 *  from `./fastText.ts`. */
+	readonly fasting: FastingResult;
 	/** Day's troparia as published by HTOC (titles + text + saint linkage
 	 *  via `slug` to `saints[].slug`). Empty for dates outside the
 	 *  vendored HTOC coverage window. */
@@ -128,31 +130,24 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const tone = isVendoredDate(gregorian)
 		? facts.tone
 		: (facts.tone ?? engineTone);
-	// Outside the vendored window, HTOC publication fields (fastText, troparia,
-	// kontakia) are empty by default. Compose them algorithmically from the
-	// position-stable cycle maps + a template-driven fast-rule renderer so
-	// year 2028+ gets near-full HTOC fidelity.
-	let fastText = facts.fastText;
+	// Outside the vendored window, HTOC publication fields (troparia,
+	// kontakia) are empty by default. Compose them algorithmically from
+	// the position-stable cycle maps so year 2028+ gets near-full HTOC
+	// fidelity.
 	let troparia = facts.troparia;
 	let kontakia = facts.kontakia;
 	if (!isVendoredDate(gregorian)) {
-		const pivoted = getFastTextForAnyYear(context);
-		if (pivoted !== null) {
-			fastText = pivoted;
-		} else {
-			const fasting = computeFastingFromContext(context, dRank);
-			fastText = renderFastText(context, fasting.level);
-		}
 		const hymns = getHymnsForAnyYear(context, tone);
 		troparia = hymns.troparia;
 		kontakia = hymns.kontakia;
 	}
+	const fasting = computeFastingFromContext(context, dRank);
 	return {
 		context,
 		saints,
 		commemorations,
 		headerText,
-		fastText,
+		fasting,
 		troparia,
 		kontakia,
 		paschalSaints,
@@ -241,9 +236,12 @@ export type {
 	FastingCase,
 	FastingLevel,
 	FastingPermissions,
+	FastingPeriod,
+	FastingPeriodKind,
 	FastingResult,
 } from "./fasting.ts";
-export { getFasting } from "./fasting.ts";
+export { getFasting, getFastingPeriod } from "./fasting.ts";
+export { renderFastText, getFastingPeriodName } from "./fastText.ts";
 export {
 	getOctoechosTone,
 	isToneSuppressed,

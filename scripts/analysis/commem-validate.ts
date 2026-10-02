@@ -3,7 +3,7 @@
 // markers. The gap is movable overlays (paschal/triodion/DOW-shift), which
 // are left to later sub-phases.
 
-import { DAY_FACTS_BY_ISO } from "../../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../../src/engine/dayFacts.ts";
 import { computeDayContext } from "../../src/engine/day.ts";
 import { getCommemorationsForAnyYear } from "../../src/engine/commemorations.ts";
 

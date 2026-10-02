@@ -1,6 +1,6 @@
 {
   "name": "ponomar-ts",
-  "version": "1.0.0-rc.18",
+  "version": "1.0.0-rc.19",
   "description": "TypeScript port of the Ponomar Orthodox liturgics engine: paschal date math, Typicon rule dispatcher, saint & reading resolution.",
   "keywords": [
     "orthodox",
@@ -96,7 +96,7 @@
     "prepublishOnly": "npm run codegen -- --check && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.20.5",
     "typescript": "^5.7.0"
   }
 }

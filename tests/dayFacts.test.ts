@@ -1,7 +1,7 @@
 import test from "node:test";
 import { strict as assert } from "node:assert";
 
-import { DAY_FACTS_BY_ISO } from "../src/data/dayFacts.ts";
+import { DAY_FACTS_BY_ISO } from "../src/engine/dayFacts.ts";
 import {
 	getDayFacts,
 	isVendoredDate,
@@ -38,7 +38,6 @@ test("getDayFacts never returns null outside the vendored window", () => {
 		assert.equal(typeof facts.headerText, "string");
 		assert.ok(facts.headerText.length > 0, `${y}-${m}-${d}: headerText must be non-empty`);
 		assert.ok(Array.isArray(facts.commemorations));
-		assert.equal(facts.fastText, "", `${y}-${m}-${d}: fastText must be empty outside vendored window`);
 		assert.deepEqual(facts.troparia, []);
 		assert.deepEqual(facts.kontakia, []);
 	}
@@ -69,13 +68,13 @@ test("getLiturgicalDay populates commemorations + headerText for any year", () =
 	assert.ok(day.tone === null || (day.tone >= 1 && day.tone <= 8));
 });
 
-test("in-window getLiturgicalDay keeps HTOC-verbatim fastText / troparia / kontakia", () => {
-	// Pick a Great Lent weekday where HTOC prints a non-empty fastText.
+test("in-window getLiturgicalDay keeps HTOC-verbatim troparia / kontakia", () => {
+	// Pick a Great Lent weekday for sanity.
 	const day = getLiturgicalDay({ year: 2025, month: 3, day: 5 });
 	const vendored = DAY_FACTS_BY_ISO.get("2025-03-05")!;
-	assert.equal(day.fastText, vendored.fastText);
 	assert.equal(day.troparia, vendored.troparia);
 	assert.equal(day.kontakia, vendored.kontakia);
 	assert.equal(day.headerText, vendored.headerText);
 	assert.equal(day.tone, vendored.tone);
+	assert.equal(day.fasting.period.kind, "great-lent");
 });
