@@ -10,7 +10,7 @@
 // produce two different English translations of the same hymn and
 // drift against HTOC's authoritative wording.
 //
-// Dates outside the vendored HTOC coverage window (2025–2027) therefore
+// Dates outside the vendored HTOC coverage window (2025–2030) therefore
 // return empty arrays. Composing a Pascha / Great Feast order of
 // service is still possible via `composeService`, which emits opaque
 // `create` directives that consumers fill from language packs.

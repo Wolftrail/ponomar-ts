@@ -43,8 +43,10 @@ vendor/*
 !vendor/ponomar
 
 # Third-party research corpora (scraped for reverse-engineering only, not
-# redistributed). See scripts/scrape-htoc.ts and scripts/scrape-htoc-full.ts.
+# redistributed). See scripts/scrape.ts and scripts/scrape-full.ts.
 tests/fixtures/htoc.json
+tests/fixtures/full-*.json
+# Keep the legacy htoc-prefixed glob for backward compat.
 tests/fixtures/htoc-full-*.json
 
 # Analysis outputs (see scripts/analysis/).

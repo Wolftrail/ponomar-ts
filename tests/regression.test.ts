@@ -6,8 +6,8 @@
 //      apostol, Liturgy gospel, and festal Matins gospel. These run
 //      unconditionally — they don't need the scraped corpus on disk.
 //
-//   2. **Corpus-wide budgets.** When the `tests/fixtures/htoc-full-*.json`
-//      files are present (they're gitignored), we run the full 1095-day
+//   2. **Corpus-wide budgets.** When the `tests/fixtures/full-*.json`
+//      files are present (they're gitignored), we run the full vendored
 //      comparison and assert coverage floors. Values are the current
 //      measured baseline minus a small slack margin, so intentional
 //      regressions in later data changes will fail. Improvements will nudge
@@ -311,9 +311,9 @@ describe("getReadings", () => {
 	});
 
 	test("Dates outside the vendored window still return algorithmic refs", () => {
-		// 2028 and 2024 have no HTOC fixtures — the Ponomar engine still
+		// 2033 and 2024 have no HTOC fixtures — the Ponomar engine still
 		// computes a daily rjadovoje liturgy pair + matins gospel on Sunday.
-		const future = getReadings({ year: 2028, month: 1, day: 1 });
+		const future = getReadings({ year: 2033, month: 1, day: 1 });
 		const past = getReadings({ year: 2024, month: 12, day: 31 });
 		for (const refs of [future, past]) {
 			const liturgy = refs.filter((r) => r.service === "liturgy");
@@ -331,7 +331,7 @@ describe("getReadings", () => {
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const FIXTURES_DIR = resolve(HERE, "fixtures");
-const CORPUS_YEARS = [2025, 2026, 2027] as const;
+const CORPUS_YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 const CORPUS_PATHS = CORPUS_YEARS.map((y) =>
 	resolve(FIXTURES_DIR, `full-${y}.json`),
 );
@@ -339,13 +339,13 @@ const CORPUS_PRESENT = CORPUS_PATHS.every((p) => existsSync(p));
 
 // Budgets — these are the current baseline minus a small slack. Improve
 // the engine to nudge these upward; do not relax them without justification.
-// Measured 2026-10-01 on 1095 days after `allSaints` was reseated on
-// HTOC's own commemoration list (synthetic cIds + HTOC rank glyph).
+// Measured on the 2025–2030 vendored corpus after `allSaints` was reseated
+// on HTOC's own commemoration list (synthetic cIds + HTOC rank glyph).
 const BUDGET = {
 	commemorationCoveragePct: 100.0, // measured: 100% (allSaints is HTOC-sourced)
 	readingCoveragePct: 99.5, // measured: 100% (up from 97.9% pre-eviction-fix, 88.8% pre-saint-lectionary, 83.4% pre-daily-lectionary)
 	toneMatchPctOfBothPresent: 100.0, // measured: 100% when both non-null
-	perDayReadingOnlyMaxAvg: 0.02, // measured: 0/1095 = 0 (was 0.08 pre-eviction-fix, 0.42 pre-saint-lectionary)
+	perDayReadingOnlyMaxAvg: 0.02, // measured: 0 across the vendored corpus (was 0.08 pre-eviction-fix, 0.42 pre-saint-lectionary)
 } as const;
 
 function collectEngineReadings(cal: CalendarDate): ReadingRef[] {

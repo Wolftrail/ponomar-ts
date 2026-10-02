@@ -18,7 +18,7 @@ export type { DailyLectionaryEntry } from "../data/dailyLectionary.ts";
 export { DAILY_LECTIONARY } from "../data/dailyLectionary.ts";
 
 /** Return the HTOC daily-cycle Liturgy Apostol+Gospel picks for `ctx`, or
- *  `null` if `ctx` falls outside the vendored 2025–2027 coverage window
+ *  `null` if `ctx` falls outside the vendored 2025–2030 coverage window
  *  (or on a slot HTOC didn't emit rjadovoje readings for). */
 export function getDailyLectionary(
 	ctx: DayContext,

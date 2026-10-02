@@ -11,6 +11,55 @@ notice.
 
 ## [Unreleased]
 
+### Changed
+
+- **Vendored HTOC window extended from 3 → 6 years (2025–2027 → 2025–2030).**
+  New scrapes under `tests/fixtures/full-{2028,2029,2030}.json` add 1,096
+  days of HTOC day-page records (2,191 days total). Every data table and
+  cycle map regenerated from the extended corpus:
+  - `DAY_FACTS_BY_ISO` grows from 1,095 → 2,191 entries (`src/data/dayFacts.ts`).
+  - `SAINTS_BY_ISO` grows from 1,092 → 2,185 ISO dates (`src/data/saints.ts`).
+  - `DAILY_LECTIONARY` grows from 880 → 1,763 slots.
+  - `SAINT_LECTIONARY` grows from ~710 → 1,423 dates.
+  - Decomposed cycle maps (`fixedCommemorations.ts`, `paschalMovables.ts`,
+    `dowMovables.ts`, `hymnsCycle.ts`, `nameOverlay.ts`) regenerated from
+    the stricter 6-year stability bar — only patterns that reproduce in
+    every corpus year are emitted.
+  - `isVendoredDate(d)` now returns `true` for the entire
+    `2025-01-01 … 2030-12-31` range.
+- **Hymns classifier: `sunday-tone` eligibility tightened.** Requires at
+  least `⌈1.5 × corpusYears⌉` total occurrences (previously: any Sunday
+  identity with a stable tone). Prevents position-specific Sunday propers
+  (e.g. Sunday Before Nativity "Three Youths" kontakion) from being
+  misclassified as octoechos-tracking and firing on every tone-II Sunday.
+  Position-specific identities now fall through to `dow-julian-window`
+  where emission is restricted to observed `(dow, julianKey)` pairs.
+  Measured impact on 6-year corpus: kontakia set-mismatches 48 → 13
+  (−73 %), all-5-fields set-equal reproduction 95.48 % → 96.94 %.
+- **Internal scratch-file naming unified.** Dropped the legacy `htoc-`
+  prefix from `scripts/analysis/` scratch outputs: `scratch/htoc-days.json`
+  → `scratch/days.json` and `scratch/htoc-saints.json` →
+  `scratch/saints.json`. Codegen and analysis readers updated accordingly.
+  Fixture naming (`tests/fixtures/htoc-full-*.json` → `full-*.json`)
+  completes the rc.18 "drop htoc- prefix" migration started on the scraper
+  side.
+
+### Current reproduction accuracy (6-year corpus, 2,191 days)
+
+| Field            | Exact-order | Set-equal | Mismatch |
+| ---------------- | ----------: | --------: | -------: |
+| `headerText`     |    100.00 % |         — |        — |
+| `tone`           |    100.00 % |         — |        — |
+| `commemorations` |          0% |   97.40 % |   2.60 % |
+| `troparia`       |     75.26 % |   24.14 % |   0.59 % |
+| `kontakia`       |     80.69 % |   18.71 % |   0.59 % |
+
+All-5-fields set-equal across every vendored day: **2,124 / 2,191 (96.94 %)**.
+The 2.60 % commemoration mismatch is dominated by DOW-shift rules whose
+single-year coincidence under the old 3-year window turned out not to
+reproduce under 6 years (e.g. "Synaxis of Novgorod Nizhny saints — Sunday
+after August 26"); these are candidates for future classifier refinement.
+
 ## [1.0.0-rc.20] — 2026-10-02
 
 ### Added

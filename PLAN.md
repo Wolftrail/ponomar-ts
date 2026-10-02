@@ -463,7 +463,8 @@ the per-RC detail. The macro arc:
 
 - **Phase 12a — HTOC overlay** *(rc.1 – rc.6)*. Vendored the full HTOC
   day-page scrape for the 2025 – 2027 window (1,095 days) at
-  [tests/fixtures/htoc-full-{2025,2026,2027}.json](tests/fixtures/).
+  [tests/fixtures/full-{2025,2026,2027}.json](tests/fixtures/) —
+  later extended to 2025 – 2030 in rc.21.
   Added `LiturgicalDay.commemorations` (full HTOC day-page list,
   superset of `allSaints`), replaced `LiturgicalDay.tone` with HTOC's
   printed tone in-window, pivoted `getPropers` to source troparia /
@@ -565,10 +566,8 @@ Still open for `1.0.0` plain:
   fields reproduce ≥ 99 % and sequences ≥ 90 %, `DAY_FACTS_BY_ISO`
   itself can shrink to the exceptions overlay and the three cycle
   maps become the primary source.
-- Possible extension of the vendored window to 2028 – 2030 (fixture
-  scrapes already present under
-  [tests/fixtures/htoc-full-20{28,29,30}.json](tests/fixtures/) but
-  not yet consumed by codegen).
+- Possible further extension of the vendored window beyond 2030
+  (fixture scrape is idempotent via `scripts/scrape-full.ts`).
 - Soak and cut `1.0.0` once the API has been stable across a full
   development cycle for a downstream consumer (the Bible site app
   per [AGENTS.md](AGENTS.md)).

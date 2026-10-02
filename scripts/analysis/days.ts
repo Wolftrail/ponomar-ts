@@ -1,4 +1,4 @@
-// Project the scraped HTOC corpus (`tests/fixtures/htoc-full-<year>.json`)
+// Project the scraped HTOC corpus (`tests/fixtures/full-<year>.json`)
 // down to a day-level view: one record per ISO date with the header
 // context, tone, fast text, scripture, troparia, and kontakia.
 // Commemorations are omitted (covered by scratch/htoc-saints.json). Each
@@ -306,7 +306,7 @@ if (!existsSync(SCRATCH_DIR)) mkdirSync(SCRATCH_DIR, { recursive: true });
 
 const outPath = resolve(SCRATCH_DIR, "days.json");
 const payload = {
-	source: "tests/fixtures/htoc-full-<year>.json",
+	source: "tests/fixtures/full-<year>.json",
 	years: [...YEARS],
 	generatedAt: new Date().toISOString(),
 	count: Object.keys(days).length,
@@ -314,7 +314,7 @@ const payload = {
 };
 
 writeFileSync(outPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
-console.log(`Wrote ${payload.count} days to scratch/htoc-days.json`);
+console.log(`Wrote ${payload.count} days to scratch/days.json`);
 console.log(
 	`  scripture: ${scriptureTotal} total, ${scriptureWithNote} with note, ${scriptureOffice} office/positional, ${scriptureAttributed} attributed to saint(s)`,
 );

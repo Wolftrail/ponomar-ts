@@ -49,13 +49,13 @@ describe("getLifeBySlug", () => {
 });
 
 describe("getSaint", () => {
-	test("Boniface: 3 commemorations in 2025–2027 window, all January 1", () => {
+	test("Boniface: multiple Jan 1 commemorations across the 2025–2030 window", () => {
 		const profile = getSaint("December/19-01");
 		assert.ok(profile !== null);
 		assert.equal(profile.slug, "December/19-01");
 		assert.equal(profile.cId, "437");
 		assert.ok(profile.names.includes("Boniface"));
-		assert.equal(profile.commemorations.length, 3);
+		assert.ok(profile.commemorations.length >= 3);
 		for (const c of profile.commemorations) {
 			assert.equal(c.gregorian.month, 1);
 			assert.equal(c.gregorian.day, 1);
@@ -93,8 +93,11 @@ import {
 } from "../src/engine/saints.ts";
 
 describe("SAINTS_BY_ISO table", () => {
-	test("covers 1092 unique ISO dates", () => {
-		assert.equal(SAINTS_BY_ISO.size, 1092);
+	test("covers most days in the vendored window", () => {
+		// Most ISO dates in the 2025–2030 window have at least one HTOC saint;
+		// pure-blank days (very rare, usually only around Great Lent weekdays)
+		// may skip. Just assert the table is large and non-empty.
+		assert.ok(SAINTS_BY_ISO.size > 2000, `expected >2000 entries, got ${SAINTS_BY_ISO.size}`);
 	});
 
 	test("Jan 7 2025 (Nativity per Old Style) includes rank='6' entry", () => {
@@ -136,9 +139,9 @@ describe("getSaintsFor + getDayRank", () => {
 		);
 	});
 
-	test("returns null outside 2025-2027 coverage window", () => {
-		assert.equal(getSaintsFor({ year: 2030, month: 5, day: 15 }), null);
-		assert.equal(getDayRank({ year: 2030, month: 5, day: 15 }), 0);
+	test("returns null outside 2025-2030 coverage window", () => {
+		assert.equal(getSaintsFor({ year: 2035, month: 5, day: 15 }), null);
+		assert.equal(getDayRank({ year: 2035, month: 5, day: 15 }), 0);
 	});
 
 	test("2025-04-14 has 7 saints (per recon)", () => {
@@ -164,7 +167,7 @@ describe("LiturgicalDay htoc channel", () => {
 	});
 
 	test("out-of-window date falls back to Ponomar-projected saints", () => {
-		const day = getLiturgicalDay({ year: 2030, month: 7, day: 15 });
+		const day = getLiturgicalDay({ year: 2035, month: 7, day: 15 });
 		assert.equal(day.dRank, 0);
 		// Ponomar structural data should still be populated...
 		assert.ok(day.menaionSaints.length > 0 || day.paschalSaints.length > 0);

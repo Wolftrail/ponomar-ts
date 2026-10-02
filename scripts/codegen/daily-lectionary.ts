@@ -1,7 +1,7 @@
 // Codegen for `src/data/dailyLectionary.ts`.
 //
 // Extracts every "no-note" Liturgy scripture citation from the HTOC corpus
-// fixtures (`tests/fixtures/htoc-full-*.json`), keys each by `(ndayF, doy)`
+// fixtures (`tests/fixtures/full-*.json`), keys each by `(ndayF, doy)`
 // — the pair we've verified is deterministic and collision-free across
 // years — and emits a static TS module. Runs manually via
 // `node --experimental-strip-types scripts/codegen/daily-lectionary.ts`.
@@ -23,7 +23,7 @@ import type { Corpus } from "../analysis/corpus.ts";
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const FIXTURES_DIR = resolve(HERE, "..", "..", "tests", "fixtures");
 const OUT_PATH = resolve(HERE, "..", "..", "src", "data", "dailyLectionary.ts");
-const YEARS = [2025, 2026, 2027] as const;
+const YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 
 const GOSPEL_BOOKS = new Set(["Mt", "Mk", "Lk", "Jn"]);
 

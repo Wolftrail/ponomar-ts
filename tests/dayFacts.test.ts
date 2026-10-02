@@ -16,20 +16,22 @@ test("getDayFacts returns vendored record verbatim within window", () => {
 	}
 });
 
-test("isVendoredDate marks the 2025–2027 window", () => {
+test("isVendoredDate marks the 2025–2030 window", () => {
 	assert.equal(isVendoredDate({ year: 2024, month: 12, day: 31 }), false);
 	assert.equal(isVendoredDate({ year: 2025, month: 1, day: 1 }), true);
 	assert.equal(isVendoredDate({ year: 2026, month: 7, day: 15 }), true);
 	assert.equal(isVendoredDate({ year: 2027, month: 12, day: 31 }), true);
-	assert.equal(isVendoredDate({ year: 2028, month: 1, day: 1 }), false);
+	assert.equal(isVendoredDate({ year: 2028, month: 2, day: 29 }), true);
+	assert.equal(isVendoredDate({ year: 2030, month: 12, day: 31 }), true);
+	assert.equal(isVendoredDate({ year: 2031, month: 1, day: 1 }), false);
 });
 
 test("getDayFacts never returns null outside the vendored window", () => {
 	const samples: Array<[number, number, number]> = [
 		[2024, 1, 7],
 		[2024, 4, 7],
-		[2028, 3, 17],
-		[2030, 9, 1],
+		[2031, 3, 17],
+		[2035, 9, 1],
 		[2050, 12, 25],
 	];
 	for (const [y, m, d] of samples) {

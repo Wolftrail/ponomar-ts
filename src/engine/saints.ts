@@ -75,7 +75,7 @@ export interface SaintProfile {
 	/** Ponomar lives-corpus identifier when a positional menaion match exists. */
 	readonly cId: string | null;
 	readonly names: readonly string[];
-	/** Every Gregorian date in the vendored HTOC window (2025–2027) where
+	/** Every Gregorian date in the vendored HTOC window (2025–2030) where
 	 *  this saint is commemorated, in chronological order. */
 	readonly commemorations: readonly SaintCommemoration[];
 	readonly life: Life | null;
@@ -161,14 +161,14 @@ function toIso(d: CalendarDate): string {
 	return `${d.year}-${mm}-${dd}`;
 }
 
-/** Build the per-ISO saint map for the 2025–2027 vendored window by
+/** Build the per-ISO saint map for the 2025–2030 vendored window by
  *  unioning the three cycle layers for each day in the window. Order
  *  within each day is slug-ascending (concatenated fixed → movable →
  *  exceptions) rather than HTOC's as-scraped order; the round-trip is
- *  set-equal and byte-identical for 1013 / 1092 days. */
+ *  set-equal across every vendored day. */
 function buildSaintsByIso(): ReadonlyMap<string, readonly Saint[]> {
 	const out = new Map<string, readonly Saint[]>();
-	for (let year = 2025; year <= 2027; year++) {
+	for (let year = 2025; year <= 2030; year++) {
 		const pascha = getOrthodoxPascha(year);
 		for (let month = 1; month <= 12; month++) {
 			const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
@@ -190,12 +190,12 @@ function buildSaintsByIso(): ReadonlyMap<string, readonly Saint[]> {
 
 /** ISO-date → HTOC saint commemorations for that day. Built from the
  *  cycle tables at module load (see `buildSaintsByIso`); set-equal to
- *  HTOC's as-scraped per-day list for all 1092 days in 2025–2027.
- *  Coverage: 2025-01-01 through 2027-12-31 (vendored corpus window). */
+ *  HTOC's as-scraped per-day list across the vendored window.
+ *  Coverage: 2025-01-01 through 2030-12-31 (vendored corpus window). */
 export const SAINTS_BY_ISO: ReadonlyMap<string, readonly Saint[]> = buildSaintsByIso();
 
 /** Return the HTOC saints commemorated on `gregorian`, or `null` outside
- *  the vendored coverage window (2025–2027). */
+ *  the vendored coverage window (2025–2030). */
 export function getSaintsFor(
 	gregorian: CalendarDate,
 ): readonly Saint[] | null {
@@ -203,7 +203,7 @@ export function getSaintsFor(
 }
 
 /** Return the HTOC saints commemorated on `gregorian` for any Gregorian
- *  year (not limited to the 2025–2027 vendored window).
+ *  year (not limited to the 2025–2030 vendored window).
  *
  *  Resolution strategy:
  *   1. If the date lies in the vendored window, return the historical

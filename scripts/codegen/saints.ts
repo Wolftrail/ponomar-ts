@@ -1,10 +1,10 @@
-// Codegen: reads `scratch/htoc-saints.json` (produced by the recon script)
+// Codegen: reads `scratch/saints.json` (produced by the recon script)
 // and emits `src/data/saints.ts` — a per-ISO-date lookup table of HTOC
 // saint commemorations with rank glyphs, canonical URL, name list, and
 // display text. Keyed by ISO date so lookups are trivially deterministic.
 //
 // Run:   node --experimental-strip-types scripts/codegen/saints.ts
-// Reads: scratch/htoc-saints.json
+// Reads: scratch/saints.json
 // Emits: src/data/saints.ts
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -33,7 +33,7 @@ interface SaintsFile {
 	readonly saints: readonly SaintRecord[];
 }
 
-const INPUT = resolve(process.cwd(), "scratch/htoc-saints.json");
+const INPUT = resolve(process.cwd(), "scratch/saints.json");
 const OUTPUT = resolve(process.cwd(), "src/data/saints.ts");
 
 const raw = JSON.parse(readFileSync(INPUT, "utf8")) as SaintsFile;

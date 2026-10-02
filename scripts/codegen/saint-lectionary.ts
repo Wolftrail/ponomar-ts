@@ -26,7 +26,7 @@ const OUT_PATH = resolve(
 	"data",
 	"saintLectionary.ts",
 );
-const YEARS = [2025, 2026, 2027] as const;
+const YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 
 const GOSPEL_BOOKS = new Set(["Mt", "Mk", "Lk", "Jn"]);
 

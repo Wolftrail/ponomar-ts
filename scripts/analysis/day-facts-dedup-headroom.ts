@@ -11,10 +11,10 @@ interface RawHymn { readonly title: string; readonly text: string; readonly grou
 interface RawDay { readonly troparia: readonly RawHymn[]; readonly kontakia: readonly RawHymn[]; }
 interface RawCommem { readonly rank: string; readonly text: string; readonly minor: boolean; readonly lives: readonly { readonly name: string; readonly href: string }[]; }
 
-const DAYS = JSON.parse(readFileSync(resolve("scratch/htoc-days.json"), "utf8")) as { readonly days: Readonly<Record<string, RawDay>> };
+const DAYS = JSON.parse(readFileSync(resolve("scratch/days.json"), "utf8")) as { readonly days: Readonly<Record<string, RawDay>> };
 const COMMEMS = new Map<string, readonly RawCommem[]>();
-for (const y of [2025, 2026, 2027]) {
-	const fx = JSON.parse(readFileSync(resolve(`tests/fixtures/htoc-full-${y}.json`), "utf8")) as { readonly days: Readonly<Record<string, { readonly commemorations: readonly RawCommem[] }>> };
+for (const y of [2025, 2026, 2027, 2028, 2029, 2030]) {
+	const fx = JSON.parse(readFileSync(resolve(`tests/fixtures/full-${y}.json`), "utf8")) as { readonly days: Readonly<Record<string, { readonly commemorations: readonly RawCommem[] }>> };
 	for (const [iso, d] of Object.entries(fx.days)) COMMEMS.set(iso, d.commemorations ?? []);
 }
 

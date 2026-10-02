@@ -1,7 +1,7 @@
 // Extract every unique Life-of-Saint link from the scraped HTOC corpus
-// (`tests/fixtures/htoc-full-<year>.json`). Deduplicated by href; each
+// (`tests/fixtures/full-<year>.json`). Deduplicated by href; each
 // record keeps the distinct display names seen and the sorted ISO dates
-// on which the link appeared. Writes `scratch/htoc-saints.json`.
+// on which the link appeared. Writes `scratch/saints.json`.
 //
 // Usage:
 //   node --experimental-strip-types scripts/analysis/saints.ts
@@ -76,7 +76,7 @@ if (!existsSync(SCRATCH_DIR)) mkdirSync(SCRATCH_DIR, { recursive: true });
 
 const outPath = resolve(SCRATCH_DIR, "saints.json");
 const payload = {
-	source: "tests/fixtures/htoc-full-<year>.json",
+	source: "tests/fixtures/full-<year>.json",
 	years: [...YEARS],
 	generatedAt: new Date().toISOString(),
 	count: saints.length,
@@ -88,5 +88,5 @@ const fixed = saints.filter((s) => s.cycle === "fixed").length;
 const movable = saints.length - fixed;
 console.log(
 	`Wrote ${saints.length} unique saints ` +
-		`(${fixed} fixed, ${movable} movable) to scratch/htoc-saints.json`,
+		`(${fixed} fixed, ${movable} movable) to scratch/saints.json`,
 );

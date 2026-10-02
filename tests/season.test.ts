@@ -1,5 +1,5 @@
 // Season classifier + Pentecost/Lenten week counters + Sviatki check +
-// header renderer. Validated against the 1095-day vendored HTOC corpus.
+// header renderer. Validated against the 2025–2030 vendored HTOC corpus.
 
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
@@ -89,7 +89,7 @@ describe("isSviatki", () => {
 });
 
 describe("renderHeaderText matches all vendored HTOC facts", () => {
-	for (const year of [2025, 2026, 2027] as const) {
+	for (const year of [2025, 2026, 2027, 2028, 2029, 2030] as const) {
 		test(`${year} corpus matches HTOC headerText`, () => {
 			let seen = 0;
 			let mismatches = 0;
@@ -109,7 +109,7 @@ describe("renderHeaderText matches all vendored HTOC facts", () => {
 		});
 	}
 
-	test("full 2025-2027 corpus matches (1095 days)", () => {
+	test("full 2025-2030 corpus matches", () => {
 		let seen = 0;
 		let mismatches = 0;
 		for (const [iso, facts] of DAY_FACTS_BY_ISO) {
@@ -117,7 +117,7 @@ describe("renderHeaderText matches all vendored HTOC facts", () => {
 			const got = renderHeaderText(ctxFromIso(iso));
 			if (got !== facts.headerText) mismatches++;
 		}
-		assert.equal(seen, 1095);
+		assert.equal(seen, DAY_FACTS_BY_ISO.size);
 		assert.equal(mismatches, 0, `${mismatches} mismatches across ${seen} vendored days`);
 	});
 });

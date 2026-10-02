@@ -330,14 +330,14 @@ export { computeDayContext };
 // pericopes HTOC's day page publishes (daily rjadovoje liturgy pair +
 // matins gospel + any noted saint-lectionary / Royal Hours entries).
 // Pure derivation on top of the main engine; no fixture-window gate.
-// Inside the vendored 2025–2027 corpus, HTOC-tagged refs provide
+// Inside the vendored 2025–2030 corpus, HTOC-tagged refs provide
 // ground-truth output; outside that window the Ponomar algorithm fills
 // in from menaion/triodion/pentecostarion/paschalion data.
 
 /** Return every scripture HTOC's day page would publish for `gregorian`:
  *  liturgy apostol+gospel, matins gospel, and any noted entry (Royal
  *  Hours, saint's apostol/gospel, Vespers OT prophecy). For in-window
- *  dates (2025–2027) the result matches HTOC's published feed verbatim;
+ *  dates (2025–2030) the result matches HTOC's published feed verbatim;
  *  for out-of-window dates it is the Ponomar algorithm's best
  *  approximation using the same underlying menaion data. */
 export function getReadings(gregorian: CalendarDate): readonly ReadingRef[] {

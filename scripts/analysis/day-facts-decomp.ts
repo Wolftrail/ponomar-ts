@@ -51,13 +51,13 @@ interface FixtureFile {
 }
 
 const DAYS = JSON.parse(
-	readFileSync(resolve("scratch/htoc-days.json"), "utf8"),
+	readFileSync(resolve("scratch/days.json"), "utf8"),
 ) as { readonly days: Readonly<Record<string, RawDay>> };
-const FIXTURE_YEARS = [2025, 2026, 2027] as const;
+const FIXTURE_YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 const commemorations = new Map<string, readonly RawCommemoration[]>();
 for (const y of FIXTURE_YEARS) {
 	const fx = JSON.parse(
-		readFileSync(resolve(`tests/fixtures/htoc-full-${y}.json`), "utf8"),
+		readFileSync(resolve(`tests/fixtures/full-${y}.json`), "utf8"),
 	) as FixtureFile;
 	for (const [iso, day] of Object.entries(fx.days)) {
 		commemorations.set(iso, day.commemorations ?? []);

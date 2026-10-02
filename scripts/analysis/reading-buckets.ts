@@ -1,5 +1,5 @@
 // Categorize the HTOC vs. engine reading deltas so we can pick the biggest
-// bucket to fix first. Reads `tests/fixtures/htoc-full-*.json`, runs the
+// bucket to fix first. Reads `tests/fixtures/full-*.json`, runs the
 // same reading comparator as `metrics.ts`, then classifies every only
 // (readings the engine misses) and every engineOnly (readings the engine
 // emits but HTOC omits) into a small set of service-context buckets. The

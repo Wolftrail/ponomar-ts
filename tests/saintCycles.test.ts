@@ -112,7 +112,7 @@ describe("getSaintsForAnyYear (out-of-window cycle synthesis)", () => {
 });
 
 describe("getSaintsFor (window-only; unchanged behavior)", () => {
-	test("still returns null outside 2025-2027", () => {
-		assert.equal(getSaintsFor({ year: 2030, month: 5, day: 15 }), null);
+	test("still returns null outside 2025-2030", () => {
+		assert.equal(getSaintsFor({ year: 2035, month: 5, day: 15 }), null);
 	});
 });

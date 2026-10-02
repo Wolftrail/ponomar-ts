@@ -14,7 +14,7 @@ import type { Corpus } from "./corpus.ts";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const FIXTURES_DIR = resolve(HERE, "..", "..", "tests", "fixtures");
-const YEARS = [2025, 2026, 2027] as const;
+const YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 
 interface Reading {
 	readonly citation: string;

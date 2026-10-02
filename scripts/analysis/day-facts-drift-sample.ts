@@ -7,12 +7,12 @@ import { difference as diffG, type CalendarDate } from "../../src/core/calendar/
 import { fromGregorian } from "../../src/core/calendar/jdate.ts";
 import { getOrthodoxPascha } from "../../src/paschalion.ts";
 
-const DAYS = JSON.parse(readFileSync(resolve("scratch/htoc-days.json"), "utf8")) as {
+const DAYS = JSON.parse(readFileSync(resolve("scratch/days.json"), "utf8")) as {
 	readonly days: Readonly<Record<string, { readonly headerText: string; readonly tone: number | string; readonly fastText: string }>>;
 };
 const COMMEMS = new Map<string, readonly { rank: string; text: string; minor: boolean }[]>();
-for (const y of [2025, 2026, 2027]) {
-	const fx = JSON.parse(readFileSync(resolve(`tests/fixtures/htoc-full-${y}.json`), "utf8")) as {
+for (const y of [2025, 2026, 2027, 2028, 2029, 2030]) {
+	const fx = JSON.parse(readFileSync(resolve(`tests/fixtures/full-${y}.json`), "utf8")) as {
 		readonly days: Readonly<Record<string, { readonly commemorations: readonly { rank: string; text: string; minor: boolean }[] }>>;
 	};
 	for (const [iso, d] of Object.entries(fx.days)) {

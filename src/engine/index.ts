@@ -24,7 +24,7 @@ import { resolveSaints } from "./resolve.ts";
 export interface LiturgicalDay {
 	readonly context: DayContext;
 	/** Primary saint commemoration list, HTOC-faithful. For dates in the
-	 *  vendored HTOC coverage window (2025–2027) this is HTOC's own list
+	 *  vendored HTOC coverage window (2025–2030) this is HTOC's own list
 	 *  verbatim. For dates outside, it is projected from the Ponomar
 	 *  structural lists below (with the HTOC name overlay applied to
 	 *  `text`). Prefer this for display. */
@@ -34,13 +34,13 @@ export interface LiturgicalDay {
 	 *  a navigable life page (e.g. New Hieromartyrs, Fast Day markers, minor
 	 *  Greek/Celtic/Russian commemorations). Superset of
 	 *  {@link LiturgicalDay.saints}, which is the cId-linked navigable subset.
-	 *  Within the vendored HTOC window (2025–2027) this is HTOC's own list
+	 *  Within the vendored HTOC window (2025–2030) this is HTOC's own list
 	 *  verbatim; outside the window it is composed algorithmically via
 	 *  `getCommemorationsForAnyYear` (fixed-Julian + paschal/triodion-movable
 	 *  + DOW-shift + season markers + per-year transfer overlays). */
 	readonly commemorations: readonly Commemoration[];
 	/** HTOC's header line, e.g. `"28 th Week after Pentecost. Tone two."`.
-	 *  Within the vendored HTOC window (2025–2027) this is HTOC's printed
+	 *  Within the vendored HTOC window (2025–2030) this is HTOC's printed
 	 *  header verbatim; outside the window it is composed algorithmically
 	 *  via `renderHeaderText`. */
 	readonly headerText: string;
@@ -87,7 +87,7 @@ export interface LiturgicalDay {
 	readonly saintsDRank: number;
 	/** Resurrectional tone of the week (1..8), or `null` outside the
 	 * eight-tone cycle (Great Lent, Bright Week, Great Feasts of the Lord).
-	 * Within the vendored HTOC window (2025–2027) this is HTOC's printed
+	 * Within the vendored HTOC window (2025–2030) this is HTOC's printed
 	 * tone verbatim; outside the window it is the algorithmic
 	 * `getOctoechosTone` (validated 100% against the vendored corpus),
 	 * with upstream `Day.getTone()` as a final fallback. */

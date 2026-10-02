@@ -1,4 +1,4 @@
-// Load the scraped HTOC corpus (`tests/fixtures/htoc-full-<YEAR>.json`)
+// Load the scraped HTOC corpus (`tests/fixtures/full-<YEAR>.json`)
 // for a fixed list of years. Shared by every script under
 // `scripts/analysis/`. Read-only utility — no engine imports.
 
@@ -58,7 +58,7 @@ export interface Corpus {
 	readonly days: Record<string, Day>;
 }
 
-export const YEARS = [2025, 2026, 2027] as const;
+export const YEARS = [2025, 2026, 2027, 2028, 2029, 2030] as const;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const FIXTURES_DIR = resolve(HERE, "..", "..", "tests", "fixtures");

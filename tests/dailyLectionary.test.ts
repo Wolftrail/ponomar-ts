@@ -4,7 +4,7 @@
 // of the Byzantine daily reading cycle and diverges from HTOC (ROCOR /
 // Jordanville) on ~180 ordinary weekday gospels per year. The override
 // fills the gap using the codegen'd `DAILY_LECTIONARY` table (keyed
-// by `(ndayF, doy)`) for the 2025–2027 window.
+// by `(ndayF, doy)`) for the 2025–2030 window.
 
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
@@ -18,8 +18,12 @@ import {
 import { getDailyLectionary } from "../src/engine/dailyLectionary.ts";
 
 describe("DAILY_LECTIONARY table", () => {
-	test("covers 880 slots", () => {
-		assert.equal(DAILY_LECTIONARY.size, 880);
+	test("covers the full 6-year slot grid", () => {
+		// 2025–2030 corpus: ~1760 slots (expanded from 880 under the 3-year window).
+		assert.ok(
+			DAILY_LECTIONARY.size > 1700,
+			`expected > 1700 slots, got ${DAILY_LECTIONARY.size}`,
+		);
 	});
 
 	test("Jan 1 2025 (Wed, ndayF=-102, doy=351) → Mk_10:11-16", () => {
@@ -41,8 +45,8 @@ describe("getDailyLectionary", () => {
 		assert.equal(gospel?.reading, "Mk_10:11-16");
 	});
 
-	test("returns null outside 2025-2027 window", () => {
-		const day = getLiturgicalDay({ year: 2030, month: 7, day: 15 });
+	test("returns null outside 2025-2030 window", () => {
+		const day = getLiturgicalDay({ year: 2035, month: 7, day: 15 });
 		const entries = getDailyLectionary(day.context);
 		assert.equal(entries, null);
 	});

@@ -1,7 +1,7 @@
 // HTOC-faithful `headerText` renderer. Composes title + tone + seasonal
 // marker + fast marker into the exact string HTOC prints on each day page.
 //
-// Validated against the 1095-day vendored corpus (2025-2027) — see
+// Validated against the vendored HTOC corpus (2025-2030) — see
 // `scripts/analysis/header-validate.ts`.
 
 import type { DayContext } from "./day.ts";

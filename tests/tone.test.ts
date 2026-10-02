@@ -1,4 +1,4 @@
-// Octoechos tone computer: validated against all 1095 vendored HTOC day
+// Octoechos tone computer: validated against all vendored HTOC day
 // facts, plus hand-checked anchor cases.
 
 import assert from "node:assert/strict";
@@ -91,7 +91,7 @@ describe("rawOctoechosTone — 8-week cycle", () => {
 });
 
 describe("getOctoechosTone matches all vendored HTOC facts", () => {
-	for (const year of [2025, 2026, 2027] as const) {
+	for (const year of [2025, 2026, 2027, 2028, 2029, 2030] as const) {
 		test(`${year} corpus matches HTOC tone`, () => {
 			let seen = 0;
 			let mismatches = 0;
@@ -111,7 +111,7 @@ describe("getOctoechosTone matches all vendored HTOC facts", () => {
 		});
 	}
 
-	test("full 2025-2027 corpus matches (1095 days)", () => {
+	test("full 2025-2030 corpus matches", () => {
 		let mismatches = 0;
 		let seen = 0;
 		for (const [iso, facts] of DAY_FACTS_BY_ISO) {
@@ -119,7 +119,7 @@ describe("getOctoechosTone matches all vendored HTOC facts", () => {
 			const got = getOctoechosTone(ctxFromIso(iso));
 			if (got !== facts.tone) mismatches++;
 		}
-		assert.equal(seen, 1095);
+		assert.equal(seen, DAY_FACTS_BY_ISO.size);
 		assert.equal(mismatches, 0, `${mismatches} mismatches across ${seen} vendored days`);
 	});
 });

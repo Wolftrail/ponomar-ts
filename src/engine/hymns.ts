@@ -1,7 +1,7 @@
 // Compose HTOC troparia and kontakia for any civil year by consulting the
 // four position-stable cycle maps emitted by
 // `scripts/codegen/hymns-cycle.ts`. Covers ~99 % of occurrences
-// observed in the vendored 2025-2027 window; the small residue is
+// observed in the vendored 2025-2030 window; the small residue is
 // out-of-observed-window moveable Sundays whose Julian date falls
 // outside the window the vendored data spans.
 

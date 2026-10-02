@@ -47,7 +47,7 @@ Concretely:
   Synaxes of Russian / Siberian / Belarusian saints, and other
   commemorations proper to the Moscow Patriarchate / ROCOR usage.
   `LiturgicalDay.commemorations` surfaces HTOC's day-page list verbatim
-  (16 229 entries across the vendored 2025–2027 window).
+  (across the vendored 2025–2030 window).
 - **English display text and biographies** — HTOC publishes in English;
   this project ships English strings. Native-language rendering (Church
   Slavonic, Russian, Greek) is a consumer concern.
@@ -174,7 +174,7 @@ fast.permitted.oil;           // false
 
 // Saint-centric facade — resolve the slug HTOC uses in `/saints/<slug>` routes
 const saint = getSaint("December/19-01"); // Boniface of Tarsus
-saint?.commemorations.length; // 1 (Dec 19 Gregorian, in the 2025–2027 window)
+saint?.commemorations.length; // 1 (Dec 19 Gregorian, in the 2025–2030 window)
 saint?.life?.text;            // biographical prose, English
 
 // Bible reference parser (78 books, 163 aliases)

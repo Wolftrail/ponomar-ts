@@ -62,7 +62,7 @@ shifts to a Lucan cycle lives in upstream's static day XML
 XML is correct, our output is correct; if upstream has a numbering bug,
 we inherit it. In practice `getDailyReadings` now runs HTOC's
 saint-lectionary layer on top of the structural picks, so for the
-vendored 2025–2027 window the Lucan handoff follows HTOC's published
+vendored 2025–2030 window the Lucan handoff follows HTOC's published
 choice regardless of what Ponomar's structural XML says.
 
 ### Propers outside the HTOC coverage window
@@ -71,7 +71,7 @@ Two surfaces behave differently here:
 
 - `LiturgicalDay.troparia` / `.kontakia` returned by `getLiturgicalDay`
   **are populated for any Gregorian year**. Inside the vendored
-  2025–2027 window they are HTOC's published hymns verbatim; outside the
+  2025–2030 window they are HTOC's published hymns verbatim; outside the
   window they are composed from four position-stable cycle maps
   (`FIXED_HYMNS_CYCLE` keyed by Julian MM-DD, `PASCHAL_HYMNS_CYCLE` keyed
   by signed days from Pascha, `SUNDAY_TONE_HYMNS_CYCLE` keyed by tone,

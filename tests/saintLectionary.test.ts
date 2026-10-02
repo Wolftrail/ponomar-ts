@@ -15,7 +15,7 @@ import {
 } from "../src/data/saintLectionary.ts";
 
 describe("SAINT_LECTIONARY table", () => {
-	test("covers the vendored corpus window (2025-2027)", () => {
+	test("covers the vendored corpus window (2025-2030)", () => {
 		assert.ok(
 			SAINT_LECTIONARY_SIZE > 700,
 			`expected > 700 dates, got ${SAINT_LECTIONARY_SIZE}`,
