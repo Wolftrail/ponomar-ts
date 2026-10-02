@@ -362,7 +362,7 @@ lines.push(
 	"}",
 	"",
 	"// ---------------------------------------------------------------------------",
-	"// Interned string pools. HTOC content repeats heavily across the 3-year",
+	"// Interned string pools. HTOC content repeats heavily across the vendored",
 	"// vendored corpus (recurring forefeast troparia, octoechos cycle, ...), so",
 	"// each unique string lives here once and per-day records reference it by",
 	"// integer index.",

@@ -1,6 +1,6 @@
 // Codegen: emits the HTOC hymn (troparion + kontakion) cycle maps.
 // Classifies every hymn-identity (unique title + text + saints tuple) in the
-// vendored 2025-2027 corpus by position stability. A hymn-identity is
+// vendored 2025-2030 corpus by position stability. A hymn-identity is
 // reproducible under classification X when every occurrence of it falls on
 // a key that is X-stable (present in every vendored year). Each hymn gets
 // at most one classification but may be emitted under multiple keys within
@@ -17,7 +17,7 @@
 //                      Fathers of the 7th Ecumenical Council). Emits
 //                      on observed (dow, julianKey) pairs only.
 //   unstable:          skipped (DOW-shift beyond observed window; not
-//                      reproducible from 3 years of data)
+//                      reproducible from the vendored corpus)
 //
 // Mirror of `fixed-commemorations.ts` + `paschal-movables.ts` for hymns.
 //

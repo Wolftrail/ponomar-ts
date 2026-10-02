@@ -46,6 +46,17 @@ notice.
   (e.g. 2029-01-08). Measured impact on 6-year corpus: troparia
   set-mismatches 13 → 1, kontakia 13 → 2, all-5-fields set-equal
   reproduction 96.94 % → 97.35 %.
+- **Commemoration classifier: `fixed-julian` eligibility tightened.**
+  Requires either `years >= 2` or `julianKeys >= 2`, so single-year
+  single-day composites (e.g. a one-off "transferred to Thursday, June 1"
+  annotation on a given year's May 21, or a one-year appearance of
+  "Saturday the Nativity …" that happened to land in exactly one vendored
+  Saturday) no longer lock onto a Julian date and emit every year. Those
+  entries now fall through to `dow-shift`, where they are either picked up
+  by an explicit title rule in `dow-movables.ts` (correct DOW-conditioned
+  emission) or safely skipped. Measured impact on 6-year corpus:
+  commemoration set-mismatches 57 → 42 (−26 %, 25 fewer extras),
+  all-5-fields set-equal reproduction 97.35 % → **98.04 %**.
 - **Internal scratch-file naming unified.** Dropped the legacy `htoc-`
   prefix from `scripts/analysis/` scratch outputs: `scratch/htoc-days.json`
   → `scratch/days.json` and `scratch/htoc-saints.json` →
@@ -60,15 +71,17 @@ notice.
 | ---------------- | ----------: | --------: | -------: |
 | `headerText`     |    100.00 % |         — |        — |
 | `tone`           |    100.00 % |         — |        — |
-| `commemorations` |          0% |   97.40 % |   2.60 % |
+| `commemorations` |          0% |   98.08 % |   1.92 % |
 | `troparia`       |     75.31 % |   24.65 % |   0.05 % |
 | `kontakia`       |     81.15 % |   18.76 % |   0.09 % |
 
-All-5-fields set-equal across every vendored day: **2,133 / 2,191 (97.35 %)**.
-The 2.60 % commemoration mismatch is dominated by DOW-shift rules whose
-single-year coincidence under the old 3-year window turned out not to
-reproduce under 6 years (e.g. "Synaxis of Novgorod Nizhny saints — Sunday
-after August 26"); these are candidates for future classifier refinement.
+All-5-fields set-equal across every vendored day: **2,148 / 2,191 (98.04 %)**.
+The remaining 1.92 % commemoration mismatch is dominated by (a) Julian
+Feb 29 commemorations whose non-leap-year transfer (to Feb 28 or Mar 1)
+is not yet modeled, and (b) a residue of DOW-anchor rules (e.g. "Synaxis
+of all saints of Nizhny Novgorod — Sunday after August 26") whose text
+appears in only some of the vendored years; these are candidates for
+future per-year gating.
 
 ## [1.0.0-rc.20] — 2026-10-02
 

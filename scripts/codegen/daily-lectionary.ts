@@ -7,7 +7,7 @@
 // `node --experimental-strip-types scripts/codegen/daily-lectionary.ts`.
 //
 // The key insight from `scripts/analysis/derive-daily-lectionary.ts`:
-// 880 no-note slots across 2025–2027 map to 880 distinct `(ndayF, doy)`
+// no-note slots across the vendored window map to distinct `(ndayF, doy)`
 // keys with zero collisions. That means the HTOC daily lectionary can be
 // mirrored losslessly by a hash table.
 

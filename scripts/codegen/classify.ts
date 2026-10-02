@@ -67,7 +67,7 @@ function matchesAny(text: string, patterns: readonly RegExp[]): boolean {
 
 /**
  * Classify every occurrence of every commemoration in the vendored corpus.
- * Returns one entry per raw occurrence (so a 3-year-stable commemoration
+ * Returns one entry per raw occurrence (so a corpus-stable commemoration
  * contributes 3 entries, each with the same classification).
  */
 export function classifyAll(): ClassifiedOccurrence[] {
@@ -113,7 +113,13 @@ export function classifyAll(): ClassifiedOccurrence[] {
 		// Multi-day fixed feasts: every (year × julianKey) combination is
 		// occupied. Includes the single-Julian case (julianKeys.size===1) and
 		// shared-text-across-saints case (one entry per date per year).
-		if (!isSelfDescribedMovable && yearJulianPairs.size === years.size * julianKeys.size) {
+		// Require either multi-year coverage or multi-day span to prevent
+		// single-year composites (e.g. "transferred to Thursday, June 1" one-off
+		// annotations, DOW-shift headers that happened to land in only one
+		// corpus year) from being locked to a fixed Julian date and emitted
+		// for every future year.
+		const multiYearOrMultiDay = years.size >= 2 || julianKeys.size >= 2;
+		if (!isSelfDescribedMovable && multiYearOrMultiDay && yearJulianPairs.size === years.size * julianKeys.size) {
 			textClass.set(k, "fixed-julian");
 			continue;
 		}
