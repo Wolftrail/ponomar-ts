@@ -147,10 +147,14 @@ describe("HTOC keystones", () => {
 		describe(k.label, () => {
 			test(`emits commemoration cId=${k.cId} matching "${k.commemNameFragment}"`, () => {
 				const day = getLiturgicalDay(k.civil);
-				const saint = day.allSaints.find((s) => s.cId === k.cId);
+				// Keystones key off Ponomar's XML cIds (numeric), which live on
+				// the structural lists; `day.allSaints` is now HTOC-sourced and
+				// carries synthetic `htoc:` cIds instead.
+				const structural = [...day.paschalSaints, ...day.menaionSaints];
+				const saint = structural.find((s) => s.cId === k.cId);
 				assert.ok(
 					saint !== undefined,
-					`expected saint cId=${k.cId} in day.allSaints; got [${day.allSaints
+					`expected saint cId=${k.cId} in structural lists; got [${structural
 						.map((s) => s.cId)
 						.join(", ")}]`,
 				);
@@ -335,10 +339,10 @@ const CORPUS_PRESENT = CORPUS_PATHS.every((p) => existsSync(p));
 
 // Budgets — these are the current baseline minus a small slack. Improve
 // the engine to nudge these upward; do not relax them without justification.
-// Measured 2026-10-01 on 1095 days after the HTOC daily-lectionary
-// eviction fix for conflicting Ponomar sequential readings.
+// Measured 2026-10-01 on 1095 days after `allSaints` was reseated on
+// HTOC's own commemoration list (synthetic cIds + HTOC rank glyph).
 const BUDGET = {
-	commemorationCoveragePct: 34.5, // measured: 35.6%
+	commemorationCoveragePct: 100.0, // measured: 100% (allSaints is HTOC-sourced)
 	readingCoveragePct: 99.5, // measured: 100% (up from 97.9% pre-eviction-fix, 88.8% pre-htoc-saint-lectionary, 83.4% pre-htoc-daily-lectionary)
 	toneMatchPctOfBothPresent: 100.0, // measured: 100% when both non-null
 	perDayReadingHtocOnlyMaxAvg: 0.02, // measured: 0/1095 = 0 (was 0.08 pre-eviction-fix, 0.42 pre-htoc-saint-lectionary)

@@ -22,6 +22,7 @@ import { resolve } from "node:path";
 import type { CalendarDate } from "../../src/core/calendar/pcalendar.ts";
 import { getLiturgicalDay } from "../../src/engine/index.ts";
 import { getHtocDayFacts } from "../../src/engine/htocDayFacts.ts";
+import { unmapHtocRank } from "../../src/engine/htocSaints.ts";
 import { getOrderedLiturgyReadings } from "../../src/engine/orderedLiturgy.ts";
 import { getOrderedMatinsReadings } from "../../src/engine/orderedMatins.ts";
 import { getDailyReadings } from "../../src/engine/readings.ts";
@@ -72,12 +73,12 @@ interface CommemorationRankObs {
 
 /** Fold the engine's 9-tier rank scale onto HTOC's 6-tier glyph scale for
  *  apples-to-apples comparison. Engine distinguishes Pascha (8) vs Lord (7)
- *  vs Theotokos (6) vs Vigil (5); HTOC uses "6" for every Great Feast and
- *  "4" for both Vigil and Polyeleos. */
+ *  vs Theotokos (6) vs Vigil (5); HTOC uses "6" for every Great Feast.
+ *  Engine ranks are now sourced from HTOC's own glyph via `mapHtocRank`,
+ *  so `unmapHtocRank` is the exact inverse except for the deliberate
+ *  `{"1", "o"} → 1` collapse (both tiers round-trip to `"1"`). */
 function normalizeEngineRankToHtocGlyph(rank: number): string {
-	if (rank >= 6) return "6";
-	if (rank >= 4) return "4";
-	return String(rank);
+	return unmapHtocRank(rank);
 }
 
 interface Aggregate {
@@ -337,7 +338,7 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 		`- Days where \`day.commemorations.length\` disagrees with the HTOC corpus count: **${agg.userFacingCommemorationCountMismatches}**`,
 	);
 	l.push("");
-	l.push("**Structural coverage** — the metrics below compare the Ponomar-XML-derived `LiturgicalDay.allSaints` list (which carries `cId`, `church.rank`, `tone` and other structural fields) against the HTOC published list. This diagnoses how well our XML processing recovers HTOC's text. The gap is dominated by New Hieromartyrs (20th-century Russian martyrs) and other HTOC addenda that live outside the vendored Ponomar `xml/` corpus. These saints already appear verbatim on `day.commemorations` for user-facing display.");
+	l.push("**Structural coverage** — the metrics below compare the HTOC-sourced `LiturgicalDay.allSaints` list (synthetic `htoc:` cIds, HTOC rank glyph on `church.rank`) against the HTOC published commemoration list that fed it. Since `allSaints` is now a direct projection of HTOC's own list, coverage is 100.0% by construction; this section is kept for continuity with historical reports.");
 	l.push("");
 	l.push(`- Matched (aggregate): **${agg.commemorationMatched}**`);
 	l.push(`- HTOC-only (aggregate): **${agg.commemorationHtocOnly}**`);
@@ -348,7 +349,7 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 	l.push("");
 	l.push("#### Commemorations by HTOC rank-glyph bucket");
 	l.push("");
-	l.push("HTOC's rank glyphs: `6` Great Feast / `4` Vigil-Polyeleos / `3` Doxology (red cross) / `2` Six-stich / `1` Simple commemoration / `0` No sign / `o` Octoechos (weekday saints, including most New Hieromartyrs).");
+	l.push("HTOC's rank glyphs: `6` Great Feast / `5` Vigil / `4` Polyeleos / `3` Doxology / `2` Six-stich / `1` Simple commemoration / `0` No sign / `o` Octoechos (weekday saints, including most New Hieromartyrs).");
 	l.push("");
 	l.push("| bucket | matched | htocOnly | coverage% |");
 	l.push("| --- | ---:| ---:| ---:|");
@@ -412,7 +413,7 @@ function renderSummary(agg: Aggregate, sampleRows: DayMetric[]): string {
 	for (const [k, v] of rankRows) l.push(`| \`${k}\` | ${v} |`);
 	l.push("");
 	l.push(
-		"Note: engine rank is only present for ~6/3371 cIds in the vendored corpus plus what `rankOverlay.ts` adds — that's why almost every match is engineRank-undefined and doesn't appear here. Engine rank is folded onto HTOC's 6-tier glyph scale before comparison (8/7/6 → \"6\", 5/4 → \"4\") so Great-Feasts-of-the-Lord (engine rank 7) and Vigil-rank saints (engine rank 5) match HTOC's coarser tiers cleanly.",
+		"Note: `LiturgicalDay.allSaints` is now the HTOC-published commemoration list projected into `ResolvedSaint` shape (synthetic `htoc:` cIds, `church.rank` sourced from HTOC's own glyph via `mapHtocRank`). The round-trip through `unmapHtocRank` is a bijection on `{\"6\", \"5\", \"4\", \"3\", \"2\", \"0\"}`; HTOC `\"1\"` (simple) and `\"o\"` (octoechos) deliberately collapse onto Ponomar rank 1 and both round-trip to `\"1\"`.",
 	);
 	l.push("");
 	l.push("## Worst 20 days by commemoration delta (htocOnly + engineOnly)");

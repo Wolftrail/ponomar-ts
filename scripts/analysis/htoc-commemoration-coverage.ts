@@ -7,20 +7,29 @@
 
 import type { CalendarDate } from "../../src/core/calendar/pcalendar.ts";
 import { getLiturgicalDay } from "../../src/engine/index.ts";
+import { unmapHtocRank } from "../../src/engine/htocSaints.ts";
 import { compareCommemorations, tokens } from "./comparators.ts";
 import { iterCorpus } from "./corpus.ts";
 import type { HtocCommemoration } from "./corpus.ts";
 
-/** Normalize the engine's 9-tier rank (0..8) onto HTOC's 6-tier glyph. */
+/** Normalize the engine's rank onto HTOC's glyph. Engine ranks are now
+ *  sourced from HTOC's own glyph via `mapHtocRank`, so `unmapHtocRank` is
+ *  the exact inverse except that HTOC `"1"` (simple) and `"o"` (octoechos)
+ *  both collapse to Ponomar 1; callers must treat `{"1", "o"}` as a single
+ *  equivalence class when comparing. */
 function normalizeEngineRankToHtocGlyph(rank: number): string {
-	if (rank >= 6) return "6";
-	if (rank >= 4) return "4";
-	return String(rank);
+	return unmapHtocRank(rank);
+}
+
+function glyphEqual(engineGlyph: string, htocGlyph: string): boolean {
+	if (engineGlyph === htocGlyph) return true;
+	return engineGlyph === "1" && htocGlyph === "o";
 }
 
 const RANK_LABELS: Readonly<Record<string, string>> = {
 	"6": "Great Feast",
-	"4": "Vigil/Polyeleos",
+	"5": "Vigil",
+	"4": "Polyeleos",
 	"3": "Doxology (red cross)",
 	"2": "Six-stich (black bracket)",
 	"1": "Simple commemoration",
@@ -28,7 +37,7 @@ const RANK_LABELS: Readonly<Record<string, string>> = {
 	o: "Octoechos / weekday",
 };
 
-const BUCKETS = ["6", "4", "3", "2", "1", "0", "o", "other"] as const;
+const BUCKETS = ["6", "5", "4", "3", "2", "1", "0", "o", "other"] as const;
 type Bucket = (typeof BUCKETS)[number];
 
 function bucketOfHtoc(c: HtocCommemoration): Bucket {
@@ -76,7 +85,7 @@ for (const { iso, day: htocDay } of iterCorpus()) {
 		perBucket[b].matched++;
 		if (m.engineRank !== undefined) {
 			const engineGlyph = normalizeEngineRankToHtocGlyph(m.engineRank);
-			if (engineGlyph !== htocComm.rank) {
+			if (!glyphEqual(engineGlyph, htocComm.rank)) {
 				engineOnlyRankMismatch++;
 				const key = `${htocComm.rank}→${engineGlyph}`;
 				rankConfusion.set(key, (rankConfusion.get(key) ?? 0) + 1);

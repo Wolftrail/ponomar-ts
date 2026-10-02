@@ -8,8 +8,13 @@
 import type { CalendarDate } from "../core/calendar/pcalendar.ts";
 import type { DayContext } from "./day.ts";
 import { computeDayContext } from "./day.ts";
+import { computeFastingFromContext } from "./fasting.ts";
+import { renderFastText } from "./fastText.ts";
 import { getHtocDayFacts, isHtocVendoredDate } from "./htocDayFacts.ts";
 import type { HtocCommemoration, HtocHymn } from "./htocDayFacts.ts";
+import { getHtocFastTextForAnyYear } from "./htocFastText.ts";
+import { getHtocHymnsForAnyYear } from "./htocHymns.ts";
+import { projectHtocCommemorations } from "./htocProjection.ts";
 import { getHtocDayRank, getHtocSaintsFor, unmapHtocRank } from "./htocSaints.ts";
 import type { HtocSaint } from "./htocSaints.ts";
 import { selectMenaionEntry, selectPaschalCycleEntry } from "./lookup.ts";
@@ -59,12 +64,21 @@ export interface LiturgicalDay {
 	/** Structural saints from the fixed Menaion at Julian MM-DD, Cmd-filtered.
 	 *  See the note on {@link LiturgicalDay.paschalSaints}. */
 	readonly menaionSaints: readonly ResolvedSaint[];
-	/** Union of {@link LiturgicalDay.paschalSaints} then
-	 *  {@link LiturgicalDay.menaionSaints}, in that order. Structural; see
-	 *  the note on {@link LiturgicalDay.paschalSaints}. */
+	/** HTOC's published commemoration list projected into `ResolvedSaint`
+	 *  shape: `cId` is synthetic (`htoc:<slug>` or `htoc:anon:<slug>`),
+	 *  `name.nominative` is HTOC's printed text, and `church.rank` comes
+	 *  from HTOC's own rank glyph via {@link mapHtocRank}. Order mirrors
+	 *  HTOC's day page. This is the authoritative "who is commemorated
+	 *  today" list; use {@link LiturgicalDay.paschalSaints} /
+	 *  {@link LiturgicalDay.menaionSaints} when you need Ponomar's
+	 *  structural cIds (e.g. to look up readings or hymns in the XML
+	 *  corpus). */
 	readonly allSaints: readonly ResolvedSaint[];
-	/** Highest `church.rank` across `allSaints` (0 if none). Matches upstream
-	 * `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())`. */
+	/** Highest `church.rank` across the Ponomar structural lists
+	 *  (`paschalSaints` ∪ `menaionSaints`). Matches upstream
+	 *  `Math.max(SolarCycle.getDayRank(), PaschalCycle.getDayRank())` and
+	 *  drives service/template selection. See {@link LiturgicalDay.htocDRank}
+	 *  for HTOC's own rank ceiling. */
 	readonly dRank: number;
 	/** Highest rank across `saints` on Ponomar's numeric scale (via
 	 *  `mapHtocRank`). `0` when HTOC has no ranked commemoration. */
@@ -84,7 +98,7 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const menaion = selectMenaionEntry(context);
 	const paschalSaints = paschal ? resolveSaints(paschal, context) : [];
 	const menaionSaints = menaion ? resolveSaints(menaion, context) : [];
-	const allSaints = [...paschalSaints, ...menaionSaints];
+	const structural: readonly ResolvedSaint[] = [...paschalSaints, ...menaionSaints];
 	const htocCovered = getHtocSaintsFor(gregorian);
 	const saints: readonly HtocSaint[] = htocCovered !== null
 		? htocCovered
@@ -92,13 +106,11 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const htocDRank = htocCovered !== null ? getHtocDayRank(gregorian) : 0;
 	const htocFacts = getHtocDayFacts(gregorian);
 	const headerText = htocFacts.headerText;
-	const fastText = htocFacts.fastText;
 	const commemorations = htocFacts.commemorations;
-	const troparia = htocFacts.troparia;
-	const kontakia = htocFacts.kontakia;
+	const allSaints = projectHtocCommemorations(commemorations);
 	let dRank = 0;
 	let toneRaw: number | null = null;
-	for (const s of allSaints) {
+	for (const s of structural) {
 		if (s.church?.rank !== undefined && s.church.rank > dRank) {
 			dRank = s.church.rank;
 		}
@@ -116,6 +128,25 @@ export function getLiturgicalDay(gregorian: CalendarDate): LiturgicalDay {
 	const tone = isHtocVendoredDate(gregorian)
 		? htocFacts.tone
 		: (htocFacts.tone ?? engineTone);
+	// Outside the vendored window, HTOC publication fields (fastText, troparia,
+	// kontakia) are empty by default. Compose them algorithmically from the
+	// position-stable cycle maps + a template-driven fast-rule renderer so
+	// year 2028+ gets near-full HTOC fidelity.
+	let fastText = htocFacts.fastText;
+	let troparia = htocFacts.troparia;
+	let kontakia = htocFacts.kontakia;
+	if (!isHtocVendoredDate(gregorian)) {
+		const pivoted = getHtocFastTextForAnyYear(context);
+		if (pivoted !== null) {
+			fastText = pivoted;
+		} else {
+			const fasting = computeFastingFromContext(context, dRank);
+			fastText = renderFastText(context, fasting.level);
+		}
+		const hymns = getHtocHymnsForAnyYear(context, tone);
+		troparia = hymns.troparia;
+		kontakia = hymns.kontakia;
+	}
 	return {
 		context,
 		saints,

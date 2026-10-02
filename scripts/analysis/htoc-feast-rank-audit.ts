@@ -3,14 +3,9 @@
 
 import type { CalendarDate } from "../../src/core/calendar/pcalendar.ts";
 import { getLiturgicalDay } from "../../src/engine/index.ts";
+import { unmapHtocRank } from "../../src/engine/htocSaints.ts";
 import { compareCommemorations } from "./comparators.ts";
 import { iterCorpus } from "./corpus.ts";
-
-function normalizeEngineRankToHtocGlyph(rank: number): string {
-	if (rank >= 6) return "6";
-	if (rank >= 4) return "4";
-	return String(rank);
-}
 
 function toCal(iso: string): CalendarDate {
 	const [y, m, d] = iso.split("-").map((s) => Number.parseInt(s, 10));
@@ -43,8 +38,13 @@ for (const { iso, day: htocDay } of iterCorpus()) {
 	const cmp = compareCommemorations(htocDay.commemorations, engineDay.allSaints);
 	for (const m of cmp.matched) {
 		if (m.engineRank === undefined) continue;
-		const engineGlyph = normalizeEngineRankToHtocGlyph(m.engineRank);
-		if (engineGlyph !== m.htocRank) {
+		const engineGlyph = unmapHtocRank(m.engineRank);
+		// `mapHtocRank` deliberately collapses HTOC "1" (simple) and "o"
+		// (octoechos / weekday) onto Ponomar 1; the round-trip through
+		// `unmapHtocRank` can't tell them apart, so treat them as equivalent.
+		const equivalent = engineGlyph === m.htocRank
+			|| (engineGlyph === "1" && m.htocRank === "o");
+		if (!equivalent) {
 			console.log(`${iso}  htoc=${m.htocRank} engine=${m.engineRank}(${engineGlyph})`);
 			console.log(`  htoc:   ${m.htocText.replace(/\s+/g, " ").slice(0, 100)}`);
 			console.log(`  engine: ${m.engineName}`);

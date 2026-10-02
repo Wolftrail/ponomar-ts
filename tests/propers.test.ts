@@ -57,10 +57,16 @@ describe("getPropers — runtime API (HTOC-sourced)", () => {
 		assert.ok(r.troparia.length >= 1);
 	});
 
-	test("dates outside the HTOC coverage window return empty arrays", () => {
+	test("dates outside the HTOC coverage window compose propers from the cycle maps", () => {
+		// Phase D composer: fixed-Julian + paschal-movable + sunday-tone cycles
+		// let out-of-window years inherit HTOC propers via position lookup.
+		// 2020-02-05 Gregorian is 2020-01-23 Julian (Hieromartyr Clement of Ancyra).
 		const r = getPropers({ year: 2020, month: 2, day: 5 });
-		assert.deepEqual(r.troparia, []);
-		assert.deepEqual(r.kontakia, []);
+		assert.ok(r.troparia.length > 0, "expected composed troparia");
+		assert.ok(
+			r.troparia.some((t) => /Clement/.test(t.title)),
+			"expected St. Clement troparion from fixed-Julian cycle",
+		);
 	});
 
 	test("kind: 'troparion' suppresses kontakia", () => {

@@ -73,15 +73,17 @@ describe("selectMenaionEntry", () => {
 });
 
 describe("getLiturgicalDay", () => {
-	test("returns paschal + menaion saints combined", () => {
+	test("exposes HTOC-sourced allSaints alongside structural paschal/menaion", () => {
 		const day = getLiturgicalDay({ year: 2024, month: 1, day: 7 });
 		assert.equal(day.context.julian.month, 12);
 		assert.equal(day.context.julian.day, 25);
 		assert.ok(day.menaionSaints.length > 0);
-		assert.equal(
-			day.allSaints.length,
-			day.paschalSaints.length + day.menaionSaints.length,
-		);
+		// `allSaints` is now the HTOC-published commemoration list projected
+		// into `ResolvedSaint` shape; its cardinality tracks `commemorations`.
+		assert.equal(day.allSaints.length, day.commemorations.length);
+		for (const s of day.allSaints) {
+			assert.match(s.cId, /^htoc:/);
+		}
 	});
 
 	test("Cmd-guarded saints get filtered", () => {

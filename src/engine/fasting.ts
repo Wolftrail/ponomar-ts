@@ -67,7 +67,18 @@ const CANONICAL: ReadonlyMap<FastingCase, FastingLevel> = new Map([
 /** Compute today's fasting rule for a Gregorian date. */
 export function getFasting(gregorian: CalendarDate): FastingResult {
 	const day = getLiturgicalDay(gregorian);
-	const vars = dslContext(day.context, { dRank: day.dRank });
+	return computeFastingFromContext(day.context, day.dRank);
+}
+
+/** Lower-level fasting computation that takes a pre-built `DayContext` and
+ *  `dRank` directly. Used by callers (e.g. `getLiturgicalDay`) that have
+ *  already computed those values and would otherwise cause recursion if
+ *  they called `getFasting` directly. */
+export function computeFastingFromContext(
+	ctx: DayContext,
+	dRank: number,
+): FastingResult {
+	const vars = dslContext(ctx, { dRank });
 	let winner: FastingCase | null = null;
 	for (const period of FASTING_RULES) {
 		if (period.cmd !== undefined && !evaluateBool(period.cmd, vars)) continue;
@@ -79,7 +90,7 @@ export function getFasting(gregorian: CalendarDate): FastingResult {
 	const isDefault = winner === null;
 	const code = winner ?? "1111111";
 	return {
-		context: day.context,
+		context: ctx,
 		case: code,
 		level: CANONICAL.get(code) ?? "custom",
 		permitted: parsePermissions(code),

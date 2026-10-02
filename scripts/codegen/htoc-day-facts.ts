@@ -117,12 +117,35 @@ function normalizeHymn(h: RawHymn): EmittedHymn {
 }
 
 function normalizeCommemoration(c: RawCommemoration): EmittedCommemoration {
+	const { rank, text } = normalizeKnownDrift(c.rank, c.text);
 	return {
-		rank: c.rank,
-		text: c.text,
+		rank,
+		text,
 		minor: c.minor,
 		lives: (c.lives ?? []).map((l) => ({ name: l.name, slug: hrefToSlug(l.href) })),
 	};
+}
+
+/**
+ * HTOC occasionally publishes the same movable feast with inconsistent rank
+ * glyphs and typography across years. We pin canonical values here so the
+ * vendored lookup table matches the composer's (deterministic) output.
+ *
+ * Known cases:
+ *  - "Synaxis of New Martyrs and Confessors of Kazakhstan" — HTOC drifts
+ *    rank between "0" and "1" and spells the date as "September 3 rd"
+ *    (with space) or "September 3rd". Canonical references (azbyka.ru:
+ *    tropar gl.7, kondak gl.5, canon gl.2, величание) support rank "1".
+ *    See `/memories/repo/htoc-data-drift.md`.
+ */
+function normalizeKnownDrift(rank: string, text: string): { rank: string; text: string } {
+	if (text.includes("New Martyrs and Confessors of Kazakhstan")) {
+		return {
+			rank: "1",
+			text: "Synaxis of New Martyrs and Confessors of Kazakhstan ( movable holiday on the Sunday after September 3rd ).",
+		};
+	}
+	return { rank, text };
 }
 
 const emitted = new Map<string, EmittedDay>();

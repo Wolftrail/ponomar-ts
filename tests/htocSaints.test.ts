@@ -29,19 +29,22 @@ describe("HTOC_SAINTS_BY_ISO table", () => {
 });
 
 describe("mapHtocRank", () => {
-	test("rank '6' Great Feast maps to Ponomar 7", () => {
+	test("rank '6' Great Feast promotes to Ponomar 7 (GFotL)", () => {
 		assert.equal(mapHtocRank("6"), 7);
 	});
-	test("rank '4' polyeleos maps to Ponomar 5 (vigil)", () => {
-		assert.equal(mapHtocRank("4"), 5);
+	test("rank '5' vigil maps to Ponomar 5", () => {
+		assert.equal(mapHtocRank("5"), 5);
 	});
-	test("rank '1' six-stich maps to Ponomar 2", () => {
-		assert.equal(mapHtocRank("1"), 2);
+	test("rank '4' polyeleos maps to Ponomar 4", () => {
+		assert.equal(mapHtocRank("4"), 4);
+	});
+	test("rank '1' simple commemoration maps to Ponomar 1", () => {
+		assert.equal(mapHtocRank("1"), 1);
 	});
 	test("rank '0' no-service maps to 0", () => {
 		assert.equal(mapHtocRank("0"), 0);
 	});
-	test("rank 'o' unranked maps to Ponomar 1", () => {
+	test("rank 'o' octoechos/weekday maps to Ponomar 1 (simple tier)", () => {
 		assert.equal(mapHtocRank("o"), 1);
 	});
 });
@@ -87,9 +90,12 @@ describe("LiturgicalDay htoc channel", () => {
 		assert.equal(day.htocDRank, 0);
 		// Ponomar structural data should still be populated...
 		assert.ok(day.menaionSaints.length > 0 || day.paschalSaints.length > 0);
-		// ...and `saints` should mirror it (projected from `allSaints`),
-		// not be empty — the engine must remain usable outside HTOC coverage.
-		assert.equal(day.saints.length, day.allSaints.length);
+		// ...and `saints` must remain non-empty (projected from the
+		// structural lists) — the engine stays usable outside HTOC coverage.
+		assert.ok(day.saints.length > 0);
 		for (const s of day.saints) assert.match(s.slug, /^ponomar\//);
+		// `allSaints` is now the HTOC-composed commemoration list (synthetic
+		// cIds), independent of `saints`.
+		assert.ok(day.allSaints.length > 0);
 	});
 });
