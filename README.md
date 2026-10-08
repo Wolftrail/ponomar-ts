@@ -24,6 +24,8 @@ const { apostol, gospel } = await getLiturgyReadings(day, "cu/ru");
 gospel[0]; // { reading: "Jn_20:1-10", rank: 8, commemoration: "9001" }
 ```
 
+`getMatinsReadings(day, language)` returns the Matins Gospel the same way.
+
 Fasting follows from the resolved day, and Bible references in the data parse into structured ranges (no Bible text is included):
 
 ```ts

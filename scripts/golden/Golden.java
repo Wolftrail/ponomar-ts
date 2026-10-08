@@ -19,7 +19,8 @@ public class Golden
 				case "dsl": dsl(out); break;
 				case "day": day(out, stride, args[3]); break;
 				case "fastconvert": fastconvert(out); break;
-				case "liturgy": liturgy(out, stride, args[3]); break;
+				case "liturgy": liturgy(out, stride, args[3], false); break;
+				case "matins": liturgy(out, stride, args[3], true); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -85,14 +86,50 @@ public class Golden
 		}
 	}
 
-	// The Liturgy readings Main.write() would show, as reading~rank~tag items. The tag of a commemoration's own
+	// As CaptureLiturgy, for Matins.Readings.
+	static class CaptureMatins extends Matins
+	{
+		java.util.Vector readings, ranks, tags;
+
+		CaptureMatins(OrderedHashtable info)
+		{
+			super(info);
+		}
+
+		@Override
+		public String format(java.util.Vector vectV, java.util.Vector vectR, java.util.Vector vectT)
+		{
+			readings = vectV;
+			ranks = vectR;
+			tags = vectT;
+			return "";
+		}
+
+		String captured()
+		{
+			StringBuilder text = new StringBuilder();
+			for (int i = 0; i < readings.size(); i++)
+			{
+				if (i > 0)
+				{
+					text.append('|');
+				}
+				text.append(readings.get(i)).append('~').append(ranks.get(i)).append('~').append(tags.get(i));
+			}
+			return text.toString();
+		}
+	}
+
+	// The Liturgy (or Matins) readings Main.write() would show, as reading~rank~tag items. The tag of a commemoration's own
 	// reading is its CId here (upstream uses its localized name); transferred sequential readings carry a weekday.
-	private static void liturgy(PrintWriter out, int stride, String yearList) throws Exception
+	private static void liturgy(PrintWriter out, int stride, String yearList, boolean matins) throws Exception
 	{
 		String[] languages = { "en/", "cu/ru/", "el/mono/" };
 		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
 		field.setAccessible(true);
-		out.println(String.join("\t", "language", "gs", "year", "month", "day", "apostol", "gospel"));
+		String section = matins ? "MATINS" : "LITURGY";
+		String[] types = matins ? new String[] { "matins" } : new String[] { "apostol", "gospel" };
+		out.println(String.join("\t", "language", "gs", "year", "month", "day", matins ? "matins" : "apostol\tgospel"));
 		for (String language : languages)
 		{
 			for (int gs = 0; gs <= 1; gs++)
@@ -138,16 +175,15 @@ public class Golden
 							for (Object item : (java.util.Vector) field.get(part))
 							{
 								Commemoration1 c = (Commemoration1) item;
-								Object table = c.getReadings().get("LITURGY");
+								Object table = c.getReadings().get(section);
 								if (table != null)
 								{
 									entries.add(new Object[] { table, Integer.valueOf(c.getRank()), c.getCId() });
 								}
 							}
 						}
-						String[] results = new String[2];
-						String[] types = { "apostol", "gospel" };
-						for (int t = 0; t < 2; t++)
+						String[] results = new String[types.length];
+						for (int t = 0; t < types.length; t++)
 						{
 							try
 							{
@@ -158,12 +194,16 @@ public class Golden
 								{
 									Object[] e = (Object[]) entry;
 									OrderedHashtable step = (OrderedHashtable) ((OrderedHashtable) e[0]).get(types[t]);
+									if (matins && step == null)
+									{
+										step = (OrderedHashtable) ((OrderedHashtable) e[0]).get("1");
+									}
 									readings.add(step != null ? step.get("Reading").toString() : "");
 									ranks.add(e[1]);
 									tags.add(e[2]);
 								}
-								// Main shows a type only when the first commemoration has it.
-								if (readings.isEmpty() || readings.get(0).equals(""))
+								// Main shows a Liturgy type only when the first commemoration has it; Matins whenever any has the section.
+								if (readings.isEmpty() || (!matins && readings.get(0).equals("")))
 								{
 									results[t] = "-";
 									continue;
@@ -172,16 +212,25 @@ public class Golden
 								readingsA.put("Readings", readings);
 								readingsA.put("Rank", ranks);
 								readingsA.put("Tag", tags);
-								CaptureLiturgy capture = new CaptureLiturgy(info);
-								capture.Readings(readingsA, types[t], today);
-								results[t] = capture.captured();
+								if (matins)
+								{
+									CaptureMatins capture = new CaptureMatins(info);
+									capture.Readings(readingsA, today);
+									results[t] = capture.captured();
+								}
+								else
+								{
+									CaptureLiturgy capture = new CaptureLiturgy(info);
+									capture.Readings(readingsA, types[t], today);
+									results[t] = capture.captured();
+								}
 							}
 							catch (Throwable error)
 							{
 								results[t] = "ERR";
 							}
 						}
-						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, results[0], results[1]));
+						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, String.join("\t", results)));
 					}
 				}
 			}

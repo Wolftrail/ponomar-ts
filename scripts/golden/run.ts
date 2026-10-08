@@ -64,12 +64,12 @@ function runFastConvert(): void {
 	runInVendor("fastconvert", join(sampleDir, "fastconvert.tsv"), "1");
 }
 
-function runLiturgy(): void {
-	const full = join(fullDir, "liturgy.tsv");
-	runInVendor("liturgy", full, "1", DAY_YEARS);
+function runReadings(mode: "liturgy" | "matins"): void {
+	const full = join(fullDir, `${mode}.tsv`);
+	runInVendor(mode, full, "1", DAY_YEARS);
 	const lines = readFileSync(full, "utf8").replace(/\r?\n$/, "").split(/\r?\n/);
 	const sample = [lines[0]!, ...lines.slice(1).filter((_, i) => i % DAY_SAMPLE_EVERY === 0)];
-	writeFileSync(join(sampleDir, "liturgy.tsv"), sample.join("\n") + "\n");
+	writeFileSync(join(sampleDir, `${mode}.tsv`), sample.join("\n") + "\n");
 }
 
 try {
@@ -80,15 +80,15 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
 			runDay();
 		} else if (mode === "fastconvert") {
 			runFastConvert();
-		} else if (mode === "liturgy") {
-			runLiturgy();
+		} else if (mode === "liturgy" || mode === "matins") {
+			runReadings(mode);
 		} else {
 			for (const [dir, stride] of [[fullDir, 1], [sampleDir, SAMPLE_STRIDE]] as const) {
 				runJava(mode, join(dir, `${mode}.csv`), stride);
