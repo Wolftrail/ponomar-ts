@@ -26,6 +26,16 @@ gospel[0]; // { reading: "Jn_20:1-10", rank: 8, commemoration: "9001" }
 
 `getMatinsReadings(day, language)` returns the Matins Gospel the same way.
 
+Names, lives and hymns come per commemoration:
+
+```ts
+import { commemorationLife, commemorationNames, nameForm } from "ponomar-ts";
+
+const names = await commemorationNames("9001", "en", day.variables);
+nameForm(names, "short"); // "Pascha"
+await commemorationLife("9001", "en"); // undefined when the commemoration has no life
+```
+
 Fasting follows from the resolved day, and Bible references in the data parse into structured ranges (no Bible text is included):
 
 ```ts

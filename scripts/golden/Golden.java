@@ -21,6 +21,7 @@ public class Golden
 				case "fastconvert": fastconvert(out); break;
 				case "liturgy": liturgy(out, stride, args[3], false); break;
 				case "matins": liturgy(out, stride, args[3], true); break;
+				case "lives": lives(out, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -231,6 +232,129 @@ public class Golden
 							}
 						}
 						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, String.join("\t", results)));
+					}
+				}
+			}
+		}
+	}
+
+	// Length and hash of the trimmed text, so long texts compare without being stored.
+	private static String fingerprint(String text)
+	{
+		String trimmed = text.trim();
+		return trimmed.length() + ":" + Integer.toHexString(trimmed.hashCode());
+	}
+
+	private static String clean(String text)
+	{
+		return text.replace('\t', ' ').replace('\n', ' ').replace('\r', ' ');
+	}
+
+	// What a commemoration's life file yields on each day it occurs: its names in every grammatical form, its life, and the
+	// Liturgy troparia and kontakia (as DoSaint1 shows them). One row per distinct result; the date says which context gave it.
+	private static void lives(PrintWriter out, String yearList) throws Exception
+	{
+		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		java.lang.reflect.Field commemorations = Day.class.getDeclaredField("OrderedCommemorations");
+		commemorations.setAccessible(true);
+		java.lang.reflect.Field information = Commemoration1.class.getDeclaredField("Information");
+		information.setAccessible(true);
+		java.lang.reflect.Field services = Commemoration1.class.getDeclaredField("ServiceInfo");
+		services.setAccessible(true);
+		String[] forms = { "Nominative", "Genetive", "Dative", "Possessive", "Short", "ShortF", "Name", "Index" };
+		String[] hymnNodes = { "/LITURGY/TROPARION", "/LITURGY/KONTAKION" };
+		out.println(String.join("\t", "language", "year", "month", "day", "cid", "nominative", "genitive", "dative", "possessive", "short", "shortF", "name", "index", "life", "copyright", "lifeId", "troparion1", "troparion2", "kontakion1", "kontakion2"));
+		java.util.Set<String> seen = new java.util.HashSet<String>();
+		for (String language : languages)
+		{
+			OrderedHashtable base = new OrderedHashtable();
+			base.put("LS", language);
+			String errorName = (String) new LanguagePack(base).Phrases.get("Commemoration3");
+			for (String yearText : yearList.split(","))
+			{
+				int year = Integer.parseInt(yearText);
+				JDate pascha = Paschalion.getPascha(year);
+				JDate previous = Paschalion.getPascha(year - 1);
+				JDate next = Paschalion.getPascha(year + 1);
+				long first = new JDate(1, 1, year).getJulianDay();
+				long last = new JDate(12, 31, year).getJulianDay();
+				for (long j = first; j <= last; j++)
+				{
+					JDate today = new JDate(j);
+					int nday = (int) JDate.difference(today, pascha);
+					int ndayP = (int) JDate.difference(today, previous);
+					OrderedHashtable info = new OrderedHashtable();
+					info.put("dow", today.getDayOfWeek());
+					info.put("doy", today.getDoy());
+					info.put("nday", nday);
+					info.put("ndayP", ndayP);
+					info.put("ndayF", (int) JDate.difference(today, next));
+					info.put("GS", 0);
+					info.put("LS", language);
+					info.put("Year", today.getYear());
+					info.put("dRank", 0);
+					info.put("Ideographic", "0");
+					info.put("ReadSep", "; ");
+
+					String folder = nday >= -70 && nday < 0 ? "xml/triodion/" : "xml/pentecostarion/";
+					int line = nday >= -70 && nday < 0 ? Math.abs(nday) : (nday < -70 ? ndayP + 1 : nday + 1);
+					int m = today.getMonth();
+					int d = today.getDay();
+					Day paschal = new Day(folder + (line >= 10 ? Integer.toString(line) : "0" + line), info);
+					Day menaion = new Day("xml/" + (m < 10 ? "0" + m : "" + m) + (d < 10 ? "/0" + d : "/" + d), info);
+
+					for (Day part : new Day[] { menaion, paschal })
+					{
+						for (Object item : (java.util.Vector) commemorations.get(part))
+						{
+							Commemoration1 c = (Commemoration1) item;
+							StringBuilder row = new StringBuilder(c.getCId());
+							for (String form : forms)
+							{
+								String value;
+								try
+								{
+									value = c.getGrammar(form);
+								}
+								catch (Throwable t)
+								{
+									value = "!";
+								}
+								// An error name means upstream found neither the form nor a nominative.
+								row.append('\t').append(value == null || value.equals(errorName) ? "-" : clean(value));
+							}
+							String life = c.getLife();
+							row.append('\t').append(life == null ? "-" : fingerprint(life));
+							String copyright = c.getLifeCopyright();
+							row.append('\t').append(copyright == null ? "-" : clean(copyright));
+							Object lifeId = ((OrderedHashtable) information.get(c)).get("LifeID");
+							row.append('\t').append(lifeId == null ? "-" : clean(lifeId.toString()));
+							OrderedHashtable service = (OrderedHashtable) services.get(c);
+							for (String node : hymnNodes)
+							{
+								for (String type : new String[] { "1", "2" })
+								{
+									Object stuff = service == null ? null : service.get(node);
+									Object hymn = stuff == null ? null : ((OrderedHashtable) stuff).get(type);
+									if (hymn == null)
+									{
+										row.append("\t-");
+										continue;
+									}
+									OrderedHashtable table = (OrderedHashtable) hymn;
+									Object tone = table.get("Tone");
+									Object podoben = table.get("Podoben");
+									Object text = table.get("text");
+									row.append('\t').append(tone == null ? "" : clean(tone.toString())).append('/').append(podoben == null ? "" : clean(podoben.toString())).append('/').append(text == null ? "-" : fingerprint(text.toString()));
+								}
+							}
+							String key = language + "\t" + row;
+							if (seen.add(key))
+							{
+								int at = key.indexOf('\t') + 1;
+								out.println(language + "\t" + year + "\t" + m + "\t" + d + "\t" + key.substring(at));
+							}
+						}
 					}
 				}
 			}

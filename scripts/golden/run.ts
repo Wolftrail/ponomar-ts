@@ -72,6 +72,15 @@ function runReadings(mode: "liturgy" | "matins"): void {
 	writeFileSync(join(sampleDir, `${mode}.tsv`), sample.join("\n") + "\n");
 }
 
+// One row per distinct result already; the committed fixture keeps every fifth.
+function runLives(): void {
+	const full = join(fullDir, "lives.tsv");
+	runInVendor("lives", full, "1", DAY_YEARS);
+	const lines = readFileSync(full, "utf8").replace(/\r?\n$/, "").split(/\r?\n/);
+	const sample = [lines[0]!, ...lines.slice(1).filter((_, i) => i % DAY_SAMPLE_EVERY === 0)];
+	writeFileSync(join(sampleDir, "lives.tsv"), sample.join("\n") + "\n");
+}
+
 try {
 	const sources = readdirSync(upstream)
 		.filter((f) => f.endsWith(".java"))
@@ -80,7 +89,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -89,6 +98,8 @@ try {
 			runFastConvert();
 		} else if (mode === "liturgy" || mode === "matins") {
 			runReadings(mode);
+		} else if (mode === "lives") {
+			runLives();
 		} else {
 			for (const [dir, stride] of [[fullDir, 1], [sampleDir, SAMPLE_STRIDE]] as const) {
 				runJava(mode, join(dir, `${mode}.csv`), stride);
