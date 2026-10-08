@@ -7,6 +7,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Local analysis output
+scratch/
+
 # Test output
 coverage/
 .nyc_output/

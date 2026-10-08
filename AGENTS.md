@@ -7,7 +7,7 @@ TypeScript reimplementation of the Ponomar Orthodox liturgics engine. The upstre
 ## Conventions
 
 - Node.js >= 20, ESM, strict TypeScript, zero runtime dependencies.
-- Tests use `node:test` and `--experimental-strip-types`.
+- Tests use `node:test` and `--experimental-strip-types`; strip-only mode forbids enums and constructor parameter properties.
 - Cite the corresponding upstream Ponomar file when porting behavior or data.
 - Public entry point: `src/index.ts`.
 - `npm run typecheck`, `npm test`, and `npm run build` validate the package.

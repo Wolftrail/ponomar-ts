@@ -4,12 +4,13 @@ A fresh TypeScript reimplementation of the Ponomar Orthodox liturgics engine. Th
 
 ## Current scope
 
-The first implemented function calculates Orthodox Pascha on the Julian calendar.
+Julian dates, calendar conversion, the Paschalion, and the expression language used by Ponomar's data files.
 
 ```ts
-import { getPascha } from "ponomar-ts";
+import { getPascha, evaluateBoolean } from "ponomar-ts";
 
-getPascha(2026); // { year: 2026, month: 3, day: 30 }
+getPascha(2026); // Julian 30 March 2026, plus its Julian day number
+evaluateBoolean("nday >= -48 && dow != 0", { nday: -10, dow: 3 }); // true
 ```
 
 ## Development
@@ -22,6 +23,8 @@ npm run typecheck
 npm test
 npm run build
 ```
+
+Tests compare against fixtures generated from the upstream Java code. `npm run golden` regenerates them and needs a JDK; it also writes exhaustive dumps to `scratch/golden/`, which the tests use when present.
 
 ## Licensing
 

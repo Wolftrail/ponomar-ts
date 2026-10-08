@@ -52,8 +52,9 @@
   "sideEffects": false,
   "scripts": {
     "clean": "node --experimental-strip-types scripts/clean.ts",
+    "golden": "node --experimental-strip-types scripts/golden/run.ts",
     "build": "npm run clean && tsc -p tsconfig.build.json",
-    "test": "node --test --experimental-strip-types tests/paschalion.test.ts",
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
