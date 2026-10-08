@@ -15,6 +15,15 @@ day.rank; // 8: Pascha
 day.paschal.commemorations; // [{ sid: [], cid: "9001", rank: 8 }]
 ```
 
+The Divine Liturgy's Epistle and Gospel readings for the day, after upstream's rules for suppressing and transferring the sequential readings:
+
+```ts
+import { getLiturgyReadings } from "ponomar-ts";
+
+const { apostol, gospel } = await getLiturgyReadings(day, "cu/ru");
+gospel[0]; // { reading: "Jn_20:1-10", rank: 8, commemoration: "9001" }
+```
+
 Fasting follows from the resolved day, and Bible references in the data parse into structured ranges (no Bible text is included):
 
 ```ts

@@ -90,7 +90,11 @@ async function resolvePart(
 
 export async function resolveDay(options: ResolveDayOptions): Promise<ResolvedDay> {
 	const { date, language } = options;
-	const variables = dayVariables(date, options.gospelScheme ?? 0);
+	return resolveDayWithVariables(date, dayVariables(date, options.gospelScheme ?? 0), language);
+}
+
+/** As `resolveDay`, with the day's variables given: upstream resolves a neighbouring day with its own variables but today's `Year`. */
+export async function resolveDayWithVariables(date: JulianDay, variables: DslContext, language: string): Promise<ResolvedDay> {
 	const selected = paschalFile(variables["nday"]!, variables["ndayP"]!);
 	const menaionKey = `${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
 

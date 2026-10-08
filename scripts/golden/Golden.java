@@ -19,6 +19,7 @@ public class Golden
 				case "dsl": dsl(out); break;
 				case "day": day(out, stride, args[3]); break;
 				case "fastconvert": fastconvert(out); break;
+				case "liturgy": liturgy(out, stride, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -46,6 +47,143 @@ public class Golden
 					text = "ERR";
 				}
 				out.println(language + "\t" + level + "\t" + String.valueOf(text).replace('\t', ' ').replace('\n', ' '));
+			}
+		}
+	}
+
+	// Hands DivineLiturgy1.Readings' result to the harness instead of formatting it with the Swing Bible window.
+	static class CaptureLiturgy extends DivineLiturgy1
+	{
+		java.util.Vector readings, ranks, tags;
+
+		CaptureLiturgy(OrderedHashtable info)
+		{
+			super(info);
+		}
+
+		@Override
+		public String format(java.util.Vector vectV, java.util.Vector vectR, java.util.Vector vectT)
+		{
+			readings = vectV;
+			ranks = vectR;
+			tags = vectT;
+			return "";
+		}
+
+		String captured()
+		{
+			StringBuilder text = new StringBuilder();
+			for (int i = 0; i < readings.size(); i++)
+			{
+				if (i > 0)
+				{
+					text.append('|');
+				}
+				text.append(readings.get(i)).append('~').append(ranks.get(i)).append('~').append(tags.get(i));
+			}
+			return text.toString();
+		}
+	}
+
+	// The Liturgy readings Main.write() would show, as reading~rank~tag items. The tag of a commemoration's own
+	// reading is its CId here (upstream uses its localized name); transferred sequential readings carry a weekday.
+	private static void liturgy(PrintWriter out, int stride, String yearList) throws Exception
+	{
+		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
+		field.setAccessible(true);
+		out.println(String.join("\t", "language", "gs", "year", "month", "day", "apostol", "gospel"));
+		for (String language : languages)
+		{
+			for (int gs = 0; gs <= 1; gs++)
+			{
+				for (String yearText : yearList.split(","))
+				{
+					int year = Integer.parseInt(yearText);
+					JDate pascha = Paschalion.getPascha(year);
+					JDate previous = Paschalion.getPascha(year - 1);
+					JDate next = Paschalion.getPascha(year + 1);
+					long first = new JDate(1, 1, year).getJulianDay();
+					long last = new JDate(12, 31, year).getJulianDay();
+					for (long j = first; j <= last; j += stride)
+					{
+						JDate today = new JDate(j);
+						int nday = (int) JDate.difference(today, pascha);
+						int ndayP = (int) JDate.difference(today, previous);
+						OrderedHashtable info = new OrderedHashtable();
+						info.put("dow", today.getDayOfWeek());
+						info.put("doy", today.getDoy());
+						info.put("nday", nday);
+						info.put("ndayP", ndayP);
+						info.put("ndayF", (int) JDate.difference(today, next));
+						info.put("GS", gs);
+						info.put("LS", language);
+						info.put("Year", today.getYear());
+						info.put("dRank", 0);
+						info.put("Ideographic", "0");
+						info.put("ReadSep", "; ");
+
+						String folder = nday >= -70 && nday < 0 ? "xml/triodion/" : "xml/pentecostarion/";
+						int line = nday >= -70 && nday < 0 ? Math.abs(nday) : (nday < -70 ? ndayP + 1 : nday + 1);
+						int m = today.getMonth();
+						int d = today.getDay();
+						Day paschal = new Day(folder + (line >= 10 ? Integer.toString(line) : "0" + line), info);
+						Day menaion = new Day("xml/" + (m < 10 ? "0" + m : "" + m) + (d < 10 ? "/0" + d : "/" + d), info);
+						info.put("dRank", Math.max(menaion.getDayRank(), paschal.getDayRank()));
+
+						// As Main: the menaion's commemorations first, then the Triodion or Pentecostarion's.
+						java.util.Vector entries = new java.util.Vector();
+						for (Day part : new Day[] { menaion, paschal })
+						{
+							for (Object item : (java.util.Vector) field.get(part))
+							{
+								Commemoration1 c = (Commemoration1) item;
+								Object table = c.getReadings().get("LITURGY");
+								if (table != null)
+								{
+									entries.add(new Object[] { table, Integer.valueOf(c.getRank()), c.getCId() });
+								}
+							}
+						}
+						String[] results = new String[2];
+						String[] types = { "apostol", "gospel" };
+						for (int t = 0; t < 2; t++)
+						{
+							try
+							{
+								java.util.Vector readings = new java.util.Vector();
+								java.util.Vector ranks = new java.util.Vector();
+								java.util.Vector tags = new java.util.Vector();
+								for (Object entry : entries)
+								{
+									Object[] e = (Object[]) entry;
+									OrderedHashtable step = (OrderedHashtable) ((OrderedHashtable) e[0]).get(types[t]);
+									readings.add(step != null ? step.get("Reading").toString() : "");
+									ranks.add(e[1]);
+									tags.add(e[2]);
+								}
+								// Main shows a type only when the first commemoration has it.
+								if (readings.isEmpty() || readings.get(0).equals(""))
+								{
+									results[t] = "-";
+									continue;
+								}
+								OrderedHashtable readingsA = new OrderedHashtable();
+								readingsA.put("Readings", readings);
+								readingsA.put("Rank", ranks);
+								readingsA.put("Tag", tags);
+								CaptureLiturgy capture = new CaptureLiturgy(info);
+								capture.Readings(readingsA, types[t], today);
+								results[t] = capture.captured();
+							}
+							catch (Throwable error)
+							{
+								results[t] = "ERR";
+							}
+						}
+						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, results[0], results[1]));
+					}
+				}
 			}
 		}
 	}

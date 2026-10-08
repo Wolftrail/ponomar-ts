@@ -16,6 +16,10 @@ export {
 export type { JulianDate } from "./paschalion.ts";
 export { NO_RANK, resolveDay } from "./engine/day.ts";
 export type { ResolveDayOptions, ResolvedCommemoration, ResolvedDay, ResolvedPart } from "./engine/day.ts";
+export { commemorationReadings } from "./engine/commemoration.ts";
+export type { ScriptureReading } from "./engine/commemoration.ts";
+export { getLiturgyReadings } from "./engine/liturgy.ts";
+export type { LiturgyReading, LiturgyReadings, LiturgyReadingType } from "./engine/liturgy.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";
