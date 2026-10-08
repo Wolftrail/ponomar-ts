@@ -1,0 +1,769 @@
+language	level	text
+en/	0000000	Fasting regulations: Strict fast : Monastic Rule: No Food 
+en/	0000001	Fasting regulations: Strict fast : Monastic Rule: Dry Food only 
+en/	0000010	Fasting regulations: Fast: Wine is permitted 
+en/	0000011	Fasting regulations: Strict fast : Monastic Rule: Hot Food without oil 
+en/	0000100	Fasting regulations:  Fast:  oil is permitted, while meat, diary products, fish, caviar, wine,  and dry food are forbidden
+en/	0000101	Fasting regulations:  Fast:  oil,  and dry food are permitted, while meat, diary products, fish, caviar,  and wine are forbidden
+en/	0000110	Fasting regulations:  Fast:  oil,  and wine are permitted, while meat, diary products, fish, caviar,  and dry food are forbidden
+en/	0000111	Fasting regulations: Fast: Wine and oil allowed 
+en/	0001000	Fasting regulations:  Fast:  caviar is permitted, while meat, diary products, fish, oil, wine,  and dry food are forbidden
+en/	0001001	Fasting regulations:  Fast:  caviar,  and dry food are permitted, while meat, diary products, fish, oil,  and wine are forbidden
+en/	0001010	Fasting regulations:  Fast:  caviar,  and wine are permitted, while meat, diary products, fish, oil,  and dry food are forbidden
+en/	0001011	Fasting regulations:  Fast:  caviar, wine,  and dry food are permitted, while meat, diary products, fish,  and oil are forbidden
+en/	0001100	Fasting regulations:  Fast:  caviar,  and oil are permitted, while meat, diary products, fish, wine,  and dry food are forbidden
+en/	0001101	Fasting regulations:  Fast:  caviar, oil,  and dry food are permitted, while meat, diary products, fish,  and wine are forbidden
+en/	0001110	Fasting regulations:  Fast:  caviar, oil,  and wine are permitted, while meat, diary products, fish,  and dry food are forbidden
+en/	0001111	Fasting regulations: Fast: Caviar, wine, and oil permitted 
+en/	0010000	Fasting regulations:  Fast:  fish is permitted, while meat, diary products, caviar, oil, wine,  and dry food are forbidden
+en/	0010001	Fasting regulations:  Fast:  fish,  and dry food are permitted, while meat, diary products, caviar, oil,  and wine are forbidden
+en/	0010010	Fasting regulations:  Fast:  fish,  and wine are permitted, while meat, diary products, caviar, oil,  and dry food are forbidden
+en/	0010011	Fasting regulations:  Fast:  fish, wine,  and dry food are permitted, while meat, diary products, caviar,  and oil are forbidden
+en/	0010100	Fasting regulations:  Fast:  fish,  and oil are permitted, while meat, diary products, caviar, wine,  and dry food are forbidden
+en/	0010101	Fasting regulations:  Fast:  fish, oil,  and dry food are permitted, while meat, diary products, caviar,  and wine are forbidden
+en/	0010110	Fasting regulations:  Fast:  fish, oil,  and wine are permitted, while meat, diary products, caviar,  and dry food are forbidden
+en/	0010111	Fasting regulations:  Fast:  fish, oil, wine,  and dry food are permitted, while meat, diary products,  and caviar are forbidden
+en/	0011000	Fasting regulations:  Fast:  fish,  and caviar are permitted, while meat, diary products, oil, wine,  and dry food are forbidden
+en/	0011001	Fasting regulations:  Fast:  fish, caviar,  and dry food are permitted, while meat, diary products, oil,  and wine are forbidden
+en/	0011010	Fasting regulations:  Fast:  fish, caviar,  and wine are permitted, while meat, diary products, oil,  and dry food are forbidden
+en/	0011011	Fasting regulations:  Fast:  fish, caviar, wine,  and dry food are permitted, while meat, diary products,  and oil are forbidden
+en/	0011100	Fasting regulations:  Fast:  fish, caviar,  and oil are permitted, while meat, diary products, wine,  and dry food are forbidden
+en/	0011101	Fasting regulations:  Fast:  fish, caviar, oil,  and dry food are permitted, while meat, diary products,  and wine are forbidden
+en/	0011110	Fasting regulations:  Fast:  fish, caviar, oil,  and wine are permitted, while meat, diary products,  and dry food are forbidden
+en/	0011111	Fasting regulations: Fast: Fish, wine, and oil allowed 
+en/	0100000	Fasting regulations:  Fast:  diary products is permitted, while meat, fish, caviar, oil, wine,  and dry food are forbidden
+en/	0100001	Fasting regulations:  Fast:  diary products,  and dry food are permitted, while meat, fish, caviar, oil,  and wine are forbidden
+en/	0100010	Fasting regulations:  Fast:  diary products,  and wine are permitted, while meat, fish, caviar, oil,  and dry food are forbidden
+en/	0100011	Fasting regulations:  Fast:  diary products, wine,  and dry food are permitted, while meat, fish, caviar,  and oil are forbidden
+en/	0100100	Fasting regulations:  Fast:  diary products,  and oil are permitted, while meat, fish, caviar, wine,  and dry food are forbidden
+en/	0100101	Fasting regulations:  Fast:  diary products, oil,  and dry food are permitted, while meat, fish, caviar,  and wine are forbidden
+en/	0100110	Fasting regulations:  Fast:  diary products, oil,  and wine are permitted, while meat, fish, caviar,  and dry food are forbidden
+en/	0100111	Fasting regulations:  Fast:  diary products, oil, wine,  and dry food are permitted, while meat, fish,  and caviar are forbidden
+en/	0101000	Fasting regulations:  Fast:  diary products,  and caviar are permitted, while meat, fish, oil, wine,  and dry food are forbidden
+en/	0101001	Fasting regulations:  Fast:  diary products, caviar,  and dry food are permitted, while meat, fish, oil,  and wine are forbidden
+en/	0101010	Fasting regulations:  Fast:  diary products, caviar,  and wine are permitted, while meat, fish, oil,  and dry food are forbidden
+en/	0101011	Fasting regulations:  Fast:  diary products, caviar, wine,  and dry food are permitted, while meat, fish,  and oil are forbidden
+en/	0101100	Fasting regulations:  Fast:  diary products, caviar,  and oil are permitted, while meat, fish, wine,  and dry food are forbidden
+en/	0101101	Fasting regulations:  Fast:  diary products, caviar, oil,  and dry food are permitted, while meat, fish,  and wine are forbidden
+en/	0101110	Fasting regulations:  Fast:  diary products, caviar, oil,  and wine are permitted, while meat, fish,  and dry food are forbidden
+en/	0101111	Fasting regulations:  Fast:  diary products, caviar, oil, wine,  and dry food are permitted, while meat,  and fish are forbidden
+en/	0110000	Fasting regulations:  Fast:  diary products,  and fish are permitted, while meat, caviar, oil, wine,  and dry food are forbidden
+en/	0110001	Fasting regulations:  Fast:  diary products, fish,  and dry food are permitted, while meat, caviar, oil,  and wine are forbidden
+en/	0110010	Fasting regulations:  Fast:  diary products, fish,  and wine are permitted, while meat, caviar, oil,  and dry food are forbidden
+en/	0110011	Fasting regulations:  Fast:  diary products, fish, wine,  and dry food are permitted, while meat, caviar,  and oil are forbidden
+en/	0110100	Fasting regulations:  Fast:  diary products, fish,  and oil are permitted, while meat, caviar, wine,  and dry food are forbidden
+en/	0110101	Fasting regulations:  Fast:  diary products, fish, oil,  and dry food are permitted, while meat, caviar,  and wine are forbidden
+en/	0110110	Fasting regulations:  Fast:  diary products, fish, oil,  and wine are permitted, while meat, caviar,  and dry food are forbidden
+en/	0110111	Fasting regulations:  Fast:  diary products, fish, oil, wine,  and dry food are permitted, while meat,  and caviar are forbidden
+en/	0111000	Fasting regulations:  Fast:  diary products, fish,  and caviar are permitted, while meat, oil, wine,  and dry food are forbidden
+en/	0111001	Fasting regulations:  Fast:  diary products, fish, caviar,  and dry food are permitted, while meat, oil,  and wine are forbidden
+en/	0111010	Fasting regulations:  Fast:  diary products, fish, caviar,  and wine are permitted, while meat, oil,  and dry food are forbidden
+en/	0111011	Fasting regulations:  Fast:  diary products, fish, caviar, wine,  and dry food are permitted, while meat,  and oil are forbidden
+en/	0111100	Fasting regulations:  Fast:  diary products, fish, caviar,  and oil are permitted, while meat, wine,  and dry food are forbidden
+en/	0111101	Fasting regulations:  Fast:  diary products, fish, caviar, oil,  and dry food are permitted, while meat,  and wine are forbidden
+en/	0111110	Fasting regulations:  Fast:  diary products, fish, caviar, oil,  and wine are permitted, while meat,  and dry food are forbidden
+en/	0111111	Fasting regulations: Fast: Meat is excluded 
+en/	1000000	Fasting regulations:  Fast:  meat is permitted, while diary products, fish, caviar, oil, wine,  and dry food are forbidden
+en/	1000001	Fasting regulations:  Fast:  meat,  and dry food are permitted, while diary products, fish, caviar, oil,  and wine are forbidden
+en/	1000010	Fasting regulations:  Fast:  meat,  and wine are permitted, while diary products, fish, caviar, oil,  and dry food are forbidden
+en/	1000011	Fasting regulations:  Fast:  meat, wine,  and dry food are permitted, while diary products, fish, caviar,  and oil are forbidden
+en/	1000100	Fasting regulations:  Fast:  meat,  and oil are permitted, while diary products, fish, caviar, wine,  and dry food are forbidden
+en/	1000101	Fasting regulations:  Fast:  meat, oil,  and dry food are permitted, while diary products, fish, caviar,  and wine are forbidden
+en/	1000110	Fasting regulations:  Fast:  meat, oil,  and wine are permitted, while diary products, fish, caviar,  and dry food are forbidden
+en/	1000111	Fasting regulations:  Fast:  meat, oil, wine,  and dry food are permitted, while diary products, fish,  and caviar are forbidden
+en/	1001000	Fasting regulations:  Fast:  meat,  and caviar are permitted, while diary products, fish, oil, wine,  and dry food are forbidden
+en/	1001001	Fasting regulations:  Fast:  meat, caviar,  and dry food are permitted, while diary products, fish, oil,  and wine are forbidden
+en/	1001010	Fasting regulations:  Fast:  meat, caviar,  and wine are permitted, while diary products, fish, oil,  and dry food are forbidden
+en/	1001011	Fasting regulations:  Fast:  meat, caviar, wine,  and dry food are permitted, while diary products, fish,  and oil are forbidden
+en/	1001100	Fasting regulations:  Fast:  meat, caviar,  and oil are permitted, while diary products, fish, wine,  and dry food are forbidden
+en/	1001101	Fasting regulations:  Fast:  meat, caviar, oil,  and dry food are permitted, while diary products, fish,  and wine are forbidden
+en/	1001110	Fasting regulations:  Fast:  meat, caviar, oil,  and wine are permitted, while diary products, fish,  and dry food are forbidden
+en/	1001111	Fasting regulations:  Fast:  meat, caviar, oil, wine,  and dry food are permitted, while diary products,  and fish are forbidden
+en/	1010000	Fasting regulations:  Fast:  meat,  and fish are permitted, while diary products, caviar, oil, wine,  and dry food are forbidden
+en/	1010001	Fasting regulations:  Fast:  meat, fish,  and dry food are permitted, while diary products, caviar, oil,  and wine are forbidden
+en/	1010010	Fasting regulations:  Fast:  meat, fish,  and wine are permitted, while diary products, caviar, oil,  and dry food are forbidden
+en/	1010011	Fasting regulations:  Fast:  meat, fish, wine,  and dry food are permitted, while diary products, caviar,  and oil are forbidden
+en/	1010100	Fasting regulations:  Fast:  meat, fish,  and oil are permitted, while diary products, caviar, wine,  and dry food are forbidden
+en/	1010101	Fasting regulations:  Fast:  meat, fish, oil,  and dry food are permitted, while diary products, caviar,  and wine are forbidden
+en/	1010110	Fasting regulations:  Fast:  meat, fish, oil,  and wine are permitted, while diary products, caviar,  and dry food are forbidden
+en/	1010111	Fasting regulations:  Fast:  meat, fish, oil, wine,  and dry food are permitted, while diary products,  and caviar are forbidden
+en/	1011000	Fasting regulations:  Fast:  meat, fish,  and caviar are permitted, while diary products, oil, wine,  and dry food are forbidden
+en/	1011001	Fasting regulations:  Fast:  meat, fish, caviar,  and dry food are permitted, while diary products, oil,  and wine are forbidden
+en/	1011010	Fasting regulations:  Fast:  meat, fish, caviar,  and wine are permitted, while diary products, oil,  and dry food are forbidden
+en/	1011011	Fasting regulations:  Fast:  meat, fish, caviar, wine,  and dry food are permitted, while diary products,  and oil are forbidden
+en/	1011100	Fasting regulations:  Fast:  meat, fish, caviar,  and oil are permitted, while diary products, wine,  and dry food are forbidden
+en/	1011101	Fasting regulations:  Fast:  meat, fish, caviar, oil,  and dry food are permitted, while diary products,  and wine are forbidden
+en/	1011110	Fasting regulations:  Fast:  meat, fish, caviar, oil,  and wine are permitted, while diary products,  and dry food are forbidden
+en/	1011111	Fasting regulations:  Fast:  meat, fish, caviar, oil, wine,  and dry food are permitted, while diary productsFast:  meat, fish, caviar, oil, wine,  and dry food are permitted, while diary products is forbidden
+en/	1100000	Fasting regulations:  Fast:  meat,  and diary products are permitted, while fish, caviar, oil, wine,  and dry food are forbidden
+en/	1100001	Fasting regulations:  Fast:  meat, diary products,  and dry food are permitted, while fish, caviar, oil,  and wine are forbidden
+en/	1100010	Fasting regulations:  Fast:  meat, diary products,  and wine are permitted, while fish, caviar, oil,  and dry food are forbidden
+en/	1100011	Fasting regulations:  Fast:  meat, diary products, wine,  and dry food are permitted, while fish, caviar,  and oil are forbidden
+en/	1100100	Fasting regulations:  Fast:  meat, diary products,  and oil are permitted, while fish, caviar, wine,  and dry food are forbidden
+en/	1100101	Fasting regulations:  Fast:  meat, diary products, oil,  and dry food are permitted, while fish, caviar,  and wine are forbidden
+en/	1100110	Fasting regulations:  Fast:  meat, diary products, oil,  and wine are permitted, while fish, caviar,  and dry food are forbidden
+en/	1100111	Fasting regulations:  Fast:  meat, diary products, oil, wine,  and dry food are permitted, while fish,  and caviar are forbidden
+en/	1101000	Fasting regulations:  Fast:  meat, diary products,  and caviar are permitted, while fish, oil, wine,  and dry food are forbidden
+en/	1101001	Fasting regulations:  Fast:  meat, diary products, caviar,  and dry food are permitted, while fish, oil,  and wine are forbidden
+en/	1101010	Fasting regulations:  Fast:  meat, diary products, caviar,  and wine are permitted, while fish, oil,  and dry food are forbidden
+en/	1101011	Fasting regulations:  Fast:  meat, diary products, caviar, wine,  and dry food are permitted, while fish,  and oil are forbidden
+en/	1101100	Fasting regulations:  Fast:  meat, diary products, caviar,  and oil are permitted, while fish, wine,  and dry food are forbidden
+en/	1101101	Fasting regulations:  Fast:  meat, diary products, caviar, oil,  and dry food are permitted, while fish,  and wine are forbidden
+en/	1101110	Fasting regulations:  Fast:  meat, diary products, caviar, oil,  and wine are permitted, while fish,  and dry food are forbidden
+en/	1101111	Fasting regulations:  Fast:  meat, diary products, caviar, oil, wine,  and dry food are permitted, while fishFast:  meat, diary products, caviar, oil, wine,  and dry food are permitted, while fish is forbidden
+en/	1110000	Fasting regulations:  Fast:  meat, diary products,  and fish are permitted, while caviar, oil, wine,  and dry food are forbidden
+en/	1110001	Fasting regulations:  Fast:  meat, diary products, fish,  and dry food are permitted, while caviar, oil,  and wine are forbidden
+en/	1110010	Fasting regulations:  Fast:  meat, diary products, fish,  and wine are permitted, while caviar, oil,  and dry food are forbidden
+en/	1110011	Fasting regulations:  Fast:  meat, diary products, fish, wine,  and dry food are permitted, while caviar,  and oil are forbidden
+en/	1110100	Fasting regulations:  Fast:  meat, diary products, fish,  and oil are permitted, while caviar, wine,  and dry food are forbidden
+en/	1110101	Fasting regulations:  Fast:  meat, diary products, fish, oil,  and dry food are permitted, while caviar,  and wine are forbidden
+en/	1110110	Fasting regulations:  Fast:  meat, diary products, fish, oil,  and wine are permitted, while caviar,  and dry food are forbidden
+en/	1110111	Fasting regulations:  Fast:  meat, diary products, fish, oil, wine,  and dry food are permitted, while caviarFast:  meat, diary products, fish, oil, wine,  and dry food are permitted, while caviar is forbidden
+en/	1111000	Fasting regulations:  Fast:  meat, diary products, fish,  and caviar are permitted, while oil, wine,  and dry food are forbidden
+en/	1111001	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and dry food are permitted, while oil,  and wine are forbidden
+en/	1111010	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and wine are permitted, while oil,  and dry food are forbidden
+en/	1111011	Fasting regulations:  Fast:  meat, diary products, fish, caviar, wine,  and dry food are permitted, while oilFast:  meat, diary products, fish, caviar, wine,  and dry food are permitted, while oil is forbidden
+en/	1111100	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and oil are permitted, while wine,  and dry food are forbidden
+en/	1111101	Fasting regulations:  Fast:  meat, diary products, fish, caviar, oil,  and dry food are permitted, while wineFast:  meat, diary products, fish, caviar, oil,  and dry food are permitted, while wine is forbidden
+en/	1111110	Fasting regulations:  Fast:  meat, diary products, fish, caviar, oil,  and wine are permitted, while dry foodFast:  meat, diary products, fish, caviar, oil,  and wine are permitted, while dry food is forbidden
+en/	1111111	Fasting regulations: Fast free 
+fr/	0000000	Les régulations du jeûne : Jeûne sévère  : Règle monastique : Aucunne nourriture 
+fr/	0000001	Les régulations du jeûne : Jeûne sévère  : Règle monastique : xénophagie 
+fr/	0000010	Les régulations du jeûne : Jeûne : Le vin est permit. 
+fr/	0000011	Les régulations du jeûne : Jeûne sévère  : Règle monastique : Nourriture chaude sans huile 
+fr/	0000100	Les régulations du jeûne :  Jeûne :  l'huile est permit ; et le viande, les produits lactières, le poisson, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	0000101	Les régulations du jeûne :  Jeûne :  l'huile,  et des nourritures secs sont permit ; et le viande, les produits lactières, le poisson, le caviar,  et le vin sont exclus
+fr/	0000110	Les régulations du jeûne :  Jeûne :  l'huile,  et le vin sont permit ; et le viande, les produits lactières, le poisson, le caviar,  et des nourritures secs sont exclus
+fr/	0000111	Les régulations du jeûne : Jeûne : Le vin et l'huile sont permit. 
+fr/	0001000	Les régulations du jeûne :  Jeûne :  le caviar est permit ; et le viande, les produits lactières, le poisson, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0001001	Les régulations du jeûne :  Jeûne :  le caviar,  et des nourritures secs sont permit ; et le viande, les produits lactières, le poisson, l'huile,  et le vin sont exclus
+fr/	0001010	Les régulations du jeûne :  Jeûne :  le caviar,  et le vin sont permit ; et le viande, les produits lactières, le poisson, l'huile,  et des nourritures secs sont exclus
+fr/	0001011	Les régulations du jeûne :  Jeûne :  le caviar, le vin,  et des nourritures secs sont permit ; et le viande, les produits lactières, le poisson,  et l'huile sont exclus
+fr/	0001100	Les régulations du jeûne :  Jeûne :  le caviar,  et l'huile sont permit ; et le viande, les produits lactières, le poisson, le vin,  et des nourritures secs sont exclus
+fr/	0001101	Les régulations du jeûne :  Jeûne :  le caviar, l'huile,  et des nourritures secs sont permit ; et le viande, les produits lactières, le poisson,  et le vin sont exclus
+fr/	0001110	Les régulations du jeûne :  Jeûne :  le caviar, l'huile,  et le vin sont permit ; et le viande, les produits lactières, le poisson,  et des nourritures secs sont exclus
+fr/	0001111	Les régulations du jeûne : Jeûne : Le caviar, le vin, et l'huile sont permit. 
+fr/	0010000	Les régulations du jeûne :  Jeûne :  le poisson est permit ; et le viande, les produits lactières, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0010001	Les régulations du jeûne :  Jeûne :  le poisson,  et des nourritures secs sont permit ; et le viande, les produits lactières, le caviar, l'huile,  et le vin sont exclus
+fr/	0010010	Les régulations du jeûne :  Jeûne :  le poisson,  et le vin sont permit ; et le viande, les produits lactières, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	0010011	Les régulations du jeûne :  Jeûne :  le poisson, le vin,  et des nourritures secs sont permit ; et le viande, les produits lactières, le caviar,  et l'huile sont exclus
+fr/	0010100	Les régulations du jeûne :  Jeûne :  le poisson,  et l'huile sont permit ; et le viande, les produits lactières, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	0010101	Les régulations du jeûne :  Jeûne :  le poisson, l'huile,  et des nourritures secs sont permit ; et le viande, les produits lactières, le caviar,  et le vin sont exclus
+fr/	0010110	Les régulations du jeûne :  Jeûne :  le poisson, l'huile,  et le vin sont permit ; et le viande, les produits lactières, le caviar,  et des nourritures secs sont exclus
+fr/	0010111	Les régulations du jeûne :  Jeûne :  le poisson, l'huile, le vin,  et des nourritures secs sont permit ; et le viande, les produits lactières,  et le caviar sont exclus
+fr/	0011000	Les régulations du jeûne :  Jeûne :  le poisson,  et le caviar sont permit ; et le viande, les produits lactières, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0011001	Les régulations du jeûne :  Jeûne :  le poisson, le caviar,  et des nourritures secs sont permit ; et le viande, les produits lactières, l'huile,  et le vin sont exclus
+fr/	0011010	Les régulations du jeûne :  Jeûne :  le poisson, le caviar,  et le vin sont permit ; et le viande, les produits lactières, l'huile,  et des nourritures secs sont exclus
+fr/	0011011	Les régulations du jeûne :  Jeûne :  le poisson, le caviar, le vin,  et des nourritures secs sont permit ; et le viande, les produits lactières,  et l'huile sont exclus
+fr/	0011100	Les régulations du jeûne :  Jeûne :  le poisson, le caviar,  et l'huile sont permit ; et le viande, les produits lactières, le vin,  et des nourritures secs sont exclus
+fr/	0011101	Les régulations du jeûne :  Jeûne :  le poisson, le caviar, l'huile,  et des nourritures secs sont permit ; et le viande, les produits lactières,  et le vin sont exclus
+fr/	0011110	Les régulations du jeûne :  Jeûne :  le poisson, le caviar, l'huile,  et le vin sont permit ; et le viande, les produits lactières,  et des nourritures secs sont exclus
+fr/	0011111	Les régulations du jeûne : Jeûne : Le poisson, le vin, et l'huile sont permit. 
+fr/	0100000	Les régulations du jeûne :  Jeûne :  les produits lactières est permit ; et le viande, le poisson, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0100001	Les régulations du jeûne :  Jeûne :  les produits lactières,  et des nourritures secs sont permit ; et le viande, le poisson, le caviar, l'huile,  et le vin sont exclus
+fr/	0100010	Les régulations du jeûne :  Jeûne :  les produits lactières,  et le vin sont permit ; et le viande, le poisson, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	0100011	Les régulations du jeûne :  Jeûne :  les produits lactières, le vin,  et des nourritures secs sont permit ; et le viande, le poisson, le caviar,  et l'huile sont exclus
+fr/	0100100	Les régulations du jeûne :  Jeûne :  les produits lactières,  et l'huile sont permit ; et le viande, le poisson, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	0100101	Les régulations du jeûne :  Jeûne :  les produits lactières, l'huile,  et des nourritures secs sont permit ; et le viande, le poisson, le caviar,  et le vin sont exclus
+fr/	0100110	Les régulations du jeûne :  Jeûne :  les produits lactières, l'huile,  et le vin sont permit ; et le viande, le poisson, le caviar,  et des nourritures secs sont exclus
+fr/	0100111	Les régulations du jeûne :  Jeûne :  les produits lactières, l'huile, le vin,  et des nourritures secs sont permit ; et le viande, le poisson,  et le caviar sont exclus
+fr/	0101000	Les régulations du jeûne :  Jeûne :  les produits lactières,  et le caviar sont permit ; et le viande, le poisson, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0101001	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar,  et des nourritures secs sont permit ; et le viande, le poisson, l'huile,  et le vin sont exclus
+fr/	0101010	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar,  et le vin sont permit ; et le viande, le poisson, l'huile,  et des nourritures secs sont exclus
+fr/	0101011	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar, le vin,  et des nourritures secs sont permit ; et le viande, le poisson,  et l'huile sont exclus
+fr/	0101100	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar,  et l'huile sont permit ; et le viande, le poisson, le vin,  et des nourritures secs sont exclus
+fr/	0101101	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar, l'huile,  et des nourritures secs sont permit ; et le viande, le poisson,  et le vin sont exclus
+fr/	0101110	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar, l'huile,  et le vin sont permit ; et le viande, le poisson,  et des nourritures secs sont exclus
+fr/	0101111	Les régulations du jeûne :  Jeûne :  les produits lactières, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et le viande,  et le poisson sont exclus
+fr/	0110000	Les régulations du jeûne :  Jeûne :  les produits lactières,  et le poisson sont permit ; et le viande, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0110001	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson,  et des nourritures secs sont permit ; et le viande, le caviar, l'huile,  et le vin sont exclus
+fr/	0110010	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson,  et le vin sont permit ; et le viande, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	0110011	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le vin,  et des nourritures secs sont permit ; et le viande, le caviar,  et l'huile sont exclus
+fr/	0110100	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson,  et l'huile sont permit ; et le viande, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	0110101	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, l'huile,  et des nourritures secs sont permit ; et le viande, le caviar,  et le vin sont exclus
+fr/	0110110	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, l'huile,  et le vin sont permit ; et le viande, le caviar,  et des nourritures secs sont exclus
+fr/	0110111	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, l'huile, le vin,  et des nourritures secs sont permit ; et le viande,  et le caviar sont exclus
+fr/	0111000	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson,  et le caviar sont permit ; et le viande, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	0111001	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar,  et des nourritures secs sont permit ; et le viande, l'huile,  et le vin sont exclus
+fr/	0111010	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar,  et le vin sont permit ; et le viande, l'huile,  et des nourritures secs sont exclus
+fr/	0111011	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar, le vin,  et des nourritures secs sont permit ; et le viande,  et l'huile sont exclus
+fr/	0111100	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar,  et l'huile sont permit ; et le viande, le vin,  et des nourritures secs sont exclus
+fr/	0111101	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar, l'huile,  et des nourritures secs sont permit ; et le viande,  et le vin sont exclus
+fr/	0111110	Les régulations du jeûne :  Jeûne :  les produits lactières, le poisson, le caviar, l'huile,  et le vin sont permit ; et le viande,  et des nourritures secs sont exclus
+fr/	0111111	Les régulations du jeûne : Jeûne : Le viande est exclus. 
+fr/	1000000	Les régulations du jeûne :  Jeûne :  le viande est permit ; et les produits lactières, le poisson, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1000001	Les régulations du jeûne :  Jeûne :  le viande,  et des nourritures secs sont permit ; et les produits lactières, le poisson, le caviar, l'huile,  et le vin sont exclus
+fr/	1000010	Les régulations du jeûne :  Jeûne :  le viande,  et le vin sont permit ; et les produits lactières, le poisson, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	1000011	Les régulations du jeûne :  Jeûne :  le viande, le vin,  et des nourritures secs sont permit ; et les produits lactières, le poisson, le caviar,  et l'huile sont exclus
+fr/	1000100	Les régulations du jeûne :  Jeûne :  le viande,  et l'huile sont permit ; et les produits lactières, le poisson, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	1000101	Les régulations du jeûne :  Jeûne :  le viande, l'huile,  et des nourritures secs sont permit ; et les produits lactières, le poisson, le caviar,  et le vin sont exclus
+fr/	1000110	Les régulations du jeûne :  Jeûne :  le viande, l'huile,  et le vin sont permit ; et les produits lactières, le poisson, le caviar,  et des nourritures secs sont exclus
+fr/	1000111	Les régulations du jeûne :  Jeûne :  le viande, l'huile, le vin,  et des nourritures secs sont permit ; et les produits lactières, le poisson,  et le caviar sont exclus
+fr/	1001000	Les régulations du jeûne :  Jeûne :  le viande,  et le caviar sont permit ; et les produits lactières, le poisson, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1001001	Les régulations du jeûne :  Jeûne :  le viande, le caviar,  et des nourritures secs sont permit ; et les produits lactières, le poisson, l'huile,  et le vin sont exclus
+fr/	1001010	Les régulations du jeûne :  Jeûne :  le viande, le caviar,  et le vin sont permit ; et les produits lactières, le poisson, l'huile,  et des nourritures secs sont exclus
+fr/	1001011	Les régulations du jeûne :  Jeûne :  le viande, le caviar, le vin,  et des nourritures secs sont permit ; et les produits lactières, le poisson,  et l'huile sont exclus
+fr/	1001100	Les régulations du jeûne :  Jeûne :  le viande, le caviar,  et l'huile sont permit ; et les produits lactières, le poisson, le vin,  et des nourritures secs sont exclus
+fr/	1001101	Les régulations du jeûne :  Jeûne :  le viande, le caviar, l'huile,  et des nourritures secs sont permit ; et les produits lactières, le poisson,  et le vin sont exclus
+fr/	1001110	Les régulations du jeûne :  Jeûne :  le viande, le caviar, l'huile,  et le vin sont permit ; et les produits lactières, le poisson,  et des nourritures secs sont exclus
+fr/	1001111	Les régulations du jeûne :  Jeûne :  le viande, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et les produits lactières,  et le poisson sont exclus
+fr/	1010000	Les régulations du jeûne :  Jeûne :  le viande,  et le poisson sont permit ; et les produits lactières, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1010001	Les régulations du jeûne :  Jeûne :  le viande, le poisson,  et des nourritures secs sont permit ; et les produits lactières, le caviar, l'huile,  et le vin sont exclus
+fr/	1010010	Les régulations du jeûne :  Jeûne :  le viande, le poisson,  et le vin sont permit ; et les produits lactières, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	1010011	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le vin,  et des nourritures secs sont permit ; et les produits lactières, le caviar,  et l'huile sont exclus
+fr/	1010100	Les régulations du jeûne :  Jeûne :  le viande, le poisson,  et l'huile sont permit ; et les produits lactières, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	1010101	Les régulations du jeûne :  Jeûne :  le viande, le poisson, l'huile,  et des nourritures secs sont permit ; et les produits lactières, le caviar,  et le vin sont exclus
+fr/	1010110	Les régulations du jeûne :  Jeûne :  le viande, le poisson, l'huile,  et le vin sont permit ; et les produits lactières, le caviar,  et des nourritures secs sont exclus
+fr/	1010111	Les régulations du jeûne :  Jeûne :  le viande, le poisson, l'huile, le vin,  et des nourritures secs sont permit ; et les produits lactières,  et le caviar sont exclus
+fr/	1011000	Les régulations du jeûne :  Jeûne :  le viande, le poisson,  et le caviar sont permit ; et les produits lactières, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1011001	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar,  et des nourritures secs sont permit ; et les produits lactières, l'huile,  et le vin sont exclus
+fr/	1011010	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar,  et le vin sont permit ; et les produits lactières, l'huile,  et des nourritures secs sont exclus
+fr/	1011011	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar, le vin,  et des nourritures secs sont permit ; et les produits lactières,  et l'huile sont exclus
+fr/	1011100	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar,  et l'huile sont permit ; et les produits lactières, le vin,  et des nourritures secs sont exclus
+fr/	1011101	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar, l'huile,  et des nourritures secs sont permit ; et les produits lactières,  et le vin sont exclus
+fr/	1011110	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar, l'huile,  et le vin sont permit ; et les produits lactières,  et des nourritures secs sont exclus
+fr/	1011111	Les régulations du jeûne :  Jeûne :  le viande, le poisson, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et les produits lactièresJeûne :  le viande, le poisson, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et les produits lactières est exclus
+fr/	1100000	Les régulations du jeûne :  Jeûne :  le viande,  et les produits lactières sont permit ; et le poisson, le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1100001	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières,  et des nourritures secs sont permit ; et le poisson, le caviar, l'huile,  et le vin sont exclus
+fr/	1100010	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières,  et le vin sont permit ; et le poisson, le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	1100011	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le vin,  et des nourritures secs sont permit ; et le poisson, le caviar,  et l'huile sont exclus
+fr/	1100100	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières,  et l'huile sont permit ; et le poisson, le caviar, le vin,  et des nourritures secs sont exclus
+fr/	1100101	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, l'huile,  et des nourritures secs sont permit ; et le poisson, le caviar,  et le vin sont exclus
+fr/	1100110	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, l'huile,  et le vin sont permit ; et le poisson, le caviar,  et des nourritures secs sont exclus
+fr/	1100111	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, l'huile, le vin,  et des nourritures secs sont permit ; et le poisson,  et le caviar sont exclus
+fr/	1101000	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières,  et le caviar sont permit ; et le poisson, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1101001	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar,  et des nourritures secs sont permit ; et le poisson, l'huile,  et le vin sont exclus
+fr/	1101010	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar,  et le vin sont permit ; et le poisson, l'huile,  et des nourritures secs sont exclus
+fr/	1101011	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar, le vin,  et des nourritures secs sont permit ; et le poisson,  et l'huile sont exclus
+fr/	1101100	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar,  et l'huile sont permit ; et le poisson, le vin,  et des nourritures secs sont exclus
+fr/	1101101	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar, l'huile,  et des nourritures secs sont permit ; et le poisson,  et le vin sont exclus
+fr/	1101110	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar, l'huile,  et le vin sont permit ; et le poisson,  et des nourritures secs sont exclus
+fr/	1101111	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et le poissonJeûne :  le viande, les produits lactières, le caviar, l'huile, le vin,  et des nourritures secs sont permit ; et le poisson est exclus
+fr/	1110000	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières,  et le poisson sont permit ; et le caviar, l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1110001	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson,  et des nourritures secs sont permit ; et le caviar, l'huile,  et le vin sont exclus
+fr/	1110010	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson,  et le vin sont permit ; et le caviar, l'huile,  et des nourritures secs sont exclus
+fr/	1110011	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le vin,  et des nourritures secs sont permit ; et le caviar,  et l'huile sont exclus
+fr/	1110100	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson,  et l'huile sont permit ; et le caviar, le vin,  et des nourritures secs sont exclus
+fr/	1110101	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, l'huile,  et des nourritures secs sont permit ; et le caviar,  et le vin sont exclus
+fr/	1110110	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, l'huile,  et le vin sont permit ; et le caviar,  et des nourritures secs sont exclus
+fr/	1110111	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, l'huile, le vin,  et des nourritures secs sont permit ; et le caviarJeûne :  le viande, les produits lactières, le poisson, l'huile, le vin,  et des nourritures secs sont permit ; et le caviar est exclus
+fr/	1111000	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson,  et le caviar sont permit ; et l'huile, le vin,  et des nourritures secs sont exclus
+fr/	1111001	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar,  et des nourritures secs sont permit ; et l'huile,  et le vin sont exclus
+fr/	1111010	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar,  et le vin sont permit ; et l'huile,  et des nourritures secs sont exclus
+fr/	1111011	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar, le vin,  et des nourritures secs sont permit ; et l'huileJeûne :  le viande, les produits lactières, le poisson, le caviar, le vin,  et des nourritures secs sont permit ; et l'huile est exclus
+fr/	1111100	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar,  et l'huile sont permit ; et le vin,  et des nourritures secs sont exclus
+fr/	1111101	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar, l'huile,  et des nourritures secs sont permit ; et le vinJeûne :  le viande, les produits lactières, le poisson, le caviar, l'huile,  et des nourritures secs sont permit ; et le vin est exclus
+fr/	1111110	Les régulations du jeûne :  Jeûne :  le viande, les produits lactières, le poisson, le caviar, l'huile,  et le vin sont permit ; et des nourritures secsJeûne :  le viande, les produits lactières, le poisson, le caviar, l'huile,  et le vin sont permit ; et des nourritures secs est exclus
+fr/	1111111	Les régulations du jeûne : Aucun jeûne 
+cu/ru/	0000000	Указания пищи: Строгий пост : Монастырская кухня: Строгий пост 
+cu/ru/	0000001	Указания пищи: Строгий пост : Монастырская кухня: Сухоядение 
+cu/ru/	0000010	Указания пищи: Пост: Разрешается вино 
+cu/ru/	0000011	Указания пищи: Строгий пост : Монастырская кухня: Пища без растительного масла 
+cu/ru/	0000100	Указания пищи:  Пост:  растительное масло  разрешается, пока мясо, молочные продукты, рыба, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	0000101	Указания пищи:  Пост:  растительное масло,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыба, рыбная икпа,  и вино  запрещается
+cu/ru/	0000110	Указания пищи:  Пост:  растительное масло,  и вино  разрешается, пока мясо, молочные продукты, рыба, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	0000111	Указания пищи: Пост: разрешается вино и растительное масло 
+cu/ru/	0001000	Указания пищи:  Пост:  рыбная икпа  разрешается, пока мясо, молочные продукты, рыба, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0001001	Указания пищи:  Пост:  рыбная икпа,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыба, растительное масло,  и вино  запрещается
+cu/ru/	0001010	Указания пищи:  Пост:  рыбная икпа,  и вино  разрешается, пока мясо, молочные продукты, рыба, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0001011	Указания пищи:  Пост:  рыбная икпа, вино,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыба,  и растительное масло  запрещается
+cu/ru/	0001100	Указания пищи:  Пост:  рыбная икпа,  и растительное масло  разрешается, пока мясо, молочные продукты, рыба, вино,  и сухофрукты  запрещается
+cu/ru/	0001101	Указания пищи:  Пост:  рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыба,  и вино  запрещается
+cu/ru/	0001110	Указания пищи:  Пост:  рыбная икпа, растительное масло,  и вино  разрешается, пока мясо, молочные продукты, рыба,  и сухофрукты  запрещается
+cu/ru/	0001111	Указания пищи: Пост: Разрешается рыбная икра 
+cu/ru/	0010000	Указания пищи:  Пост:  рыба  разрешается, пока мясо, молочные продукты, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0010001	Указания пищи:  Пост:  рыба,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	0010010	Указания пищи:  Пост:  рыба,  и вино  разрешается, пока мясо, молочные продукты, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0010011	Указания пищи:  Пост:  рыба, вино,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	0010100	Указания пищи:  Пост:  рыба,  и растительное масло  разрешается, пока мясо, молочные продукты, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	0010101	Указания пищи:  Пост:  рыба, растительное масло,  и сухофрукты  разрешается, пока мясо, молочные продукты, рыбная икпа,  и вино  запрещается
+cu/ru/	0010110	Указания пищи:  Пост:  рыба, растительное масло,  и вино  разрешается, пока мясо, молочные продукты, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	0010111	Указания пищи:  Пост:  рыба, растительное масло, вино,  и сухофрукты  разрешается, пока мясо, молочные продукты,  и рыбная икпа  запрещается
+cu/ru/	0011000	Указания пищи:  Пост:  рыба,  и рыбная икпа  разрешается, пока мясо, молочные продукты, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0011001	Указания пищи:  Пост:  рыба, рыбная икпа,  и сухофрукты  разрешается, пока мясо, молочные продукты, растительное масло,  и вино  запрещается
+cu/ru/	0011010	Указания пищи:  Пост:  рыба, рыбная икпа,  и вино  разрешается, пока мясо, молочные продукты, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0011011	Указания пищи:  Пост:  рыба, рыбная икпа, вино,  и сухофрукты  разрешается, пока мясо, молочные продукты,  и растительное масло  запрещается
+cu/ru/	0011100	Указания пищи:  Пост:  рыба, рыбная икпа,  и растительное масло  разрешается, пока мясо, молочные продукты, вино,  и сухофрукты  запрещается
+cu/ru/	0011101	Указания пищи:  Пост:  рыба, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока мясо, молочные продукты,  и вино  запрещается
+cu/ru/	0011110	Указания пищи:  Пост:  рыба, рыбная икпа, растительное масло,  и вино  разрешается, пока мясо, молочные продукты,  и сухофрукты  запрещается
+cu/ru/	0011111	Указания пищи: Пост: разрешается рыба 
+cu/ru/	0100000	Указания пищи:  Пост:  молочные продукты  разрешается, пока мясо, рыба, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0100001	Указания пищи:  Пост:  молочные продукты,  и сухофрукты  разрешается, пока мясо, рыба, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	0100010	Указания пищи:  Пост:  молочные продукты,  и вино  разрешается, пока мясо, рыба, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0100011	Указания пищи:  Пост:  молочные продукты, вино,  и сухофрукты  разрешается, пока мясо, рыба, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	0100100	Указания пищи:  Пост:  молочные продукты,  и растительное масло  разрешается, пока мясо, рыба, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	0100101	Указания пищи:  Пост:  молочные продукты, растительное масло,  и сухофрукты  разрешается, пока мясо, рыба, рыбная икпа,  и вино  запрещается
+cu/ru/	0100110	Указания пищи:  Пост:  молочные продукты, растительное масло,  и вино  разрешается, пока мясо, рыба, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	0100111	Указания пищи:  Пост:  молочные продукты, растительное масло, вино,  и сухофрукты  разрешается, пока мясо, рыба,  и рыбная икпа  запрещается
+cu/ru/	0101000	Указания пищи:  Пост:  молочные продукты,  и рыбная икпа  разрешается, пока мясо, рыба, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0101001	Указания пищи:  Пост:  молочные продукты, рыбная икпа,  и сухофрукты  разрешается, пока мясо, рыба, растительное масло,  и вино  запрещается
+cu/ru/	0101010	Указания пищи:  Пост:  молочные продукты, рыбная икпа,  и вино  разрешается, пока мясо, рыба, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0101011	Указания пищи:  Пост:  молочные продукты, рыбная икпа, вино,  и сухофрукты  разрешается, пока мясо, рыба,  и растительное масло  запрещается
+cu/ru/	0101100	Указания пищи:  Пост:  молочные продукты, рыбная икпа,  и растительное масло  разрешается, пока мясо, рыба, вино,  и сухофрукты  запрещается
+cu/ru/	0101101	Указания пищи:  Пост:  молочные продукты, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока мясо, рыба,  и вино  запрещается
+cu/ru/	0101110	Указания пищи:  Пост:  молочные продукты, рыбная икпа, растительное масло,  и вино  разрешается, пока мясо, рыба,  и сухофрукты  запрещается
+cu/ru/	0101111	Указания пищи:  Пост:  молочные продукты, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока мясо,  и рыба  запрещается
+cu/ru/	0110000	Указания пищи:  Пост:  молочные продукты,  и рыба  разрешается, пока мясо, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0110001	Указания пищи:  Пост:  молочные продукты, рыба,  и сухофрукты  разрешается, пока мясо, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	0110010	Указания пищи:  Пост:  молочные продукты, рыба,  и вино  разрешается, пока мясо, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0110011	Указания пищи:  Пост:  молочные продукты, рыба, вино,  и сухофрукты  разрешается, пока мясо, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	0110100	Указания пищи:  Пост:  молочные продукты, рыба,  и растительное масло  разрешается, пока мясо, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	0110101	Указания пищи:  Пост:  молочные продукты, рыба, растительное масло,  и сухофрукты  разрешается, пока мясо, рыбная икпа,  и вино  запрещается
+cu/ru/	0110110	Указания пищи:  Пост:  молочные продукты, рыба, растительное масло,  и вино  разрешается, пока мясо, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	0110111	Указания пищи:  Пост:  молочные продукты, рыба, растительное масло, вино,  и сухофрукты  разрешается, пока мясо,  и рыбная икпа  запрещается
+cu/ru/	0111000	Указания пищи:  Пост:  молочные продукты, рыба,  и рыбная икпа  разрешается, пока мясо, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	0111001	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа,  и сухофрукты  разрешается, пока мясо, растительное масло,  и вино  запрещается
+cu/ru/	0111010	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа,  и вино  разрешается, пока мясо, растительное масло,  и сухофрукты  запрещается
+cu/ru/	0111011	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа, вино,  и сухофрукты  разрешается, пока мясо,  и растительное масло  запрещается
+cu/ru/	0111100	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа,  и растительное масло  разрешается, пока мясо, вино,  и сухофрукты  запрещается
+cu/ru/	0111101	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока мясо,  и вино  запрещается
+cu/ru/	0111110	Указания пищи:  Пост:  молочные продукты, рыба, рыбная икпа, растительное масло,  и вино  разрешается, пока мясо,  и сухофрукты  запрещается
+cu/ru/	0111111	Указания пищи: Масленца (пища без мяса) 
+cu/ru/	1000000	Указания пищи:  Пост:  мясо  разрешается, пока молочные продукты, рыба, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1000001	Указания пищи:  Пост:  мясо,  и сухофрукты  разрешается, пока молочные продукты, рыба, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	1000010	Указания пищи:  Пост:  мясо,  и вино  разрешается, пока молочные продукты, рыба, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1000011	Указания пищи:  Пост:  мясо, вино,  и сухофрукты  разрешается, пока молочные продукты, рыба, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	1000100	Указания пищи:  Пост:  мясо,  и растительное масло  разрешается, пока молочные продукты, рыба, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	1000101	Указания пищи:  Пост:  мясо, растительное масло,  и сухофрукты  разрешается, пока молочные продукты, рыба, рыбная икпа,  и вино  запрещается
+cu/ru/	1000110	Указания пищи:  Пост:  мясо, растительное масло,  и вино  разрешается, пока молочные продукты, рыба, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	1000111	Указания пищи:  Пост:  мясо, растительное масло, вино,  и сухофрукты  разрешается, пока молочные продукты, рыба,  и рыбная икпа  запрещается
+cu/ru/	1001000	Указания пищи:  Пост:  мясо,  и рыбная икпа  разрешается, пока молочные продукты, рыба, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1001001	Указания пищи:  Пост:  мясо, рыбная икпа,  и сухофрукты  разрешается, пока молочные продукты, рыба, растительное масло,  и вино  запрещается
+cu/ru/	1001010	Указания пищи:  Пост:  мясо, рыбная икпа,  и вино  разрешается, пока молочные продукты, рыба, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1001011	Указания пищи:  Пост:  мясо, рыбная икпа, вино,  и сухофрукты  разрешается, пока молочные продукты, рыба,  и растительное масло  запрещается
+cu/ru/	1001100	Указания пищи:  Пост:  мясо, рыбная икпа,  и растительное масло  разрешается, пока молочные продукты, рыба, вино,  и сухофрукты  запрещается
+cu/ru/	1001101	Указания пищи:  Пост:  мясо, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока молочные продукты, рыба,  и вино  запрещается
+cu/ru/	1001110	Указания пищи:  Пост:  мясо, рыбная икпа, растительное масло,  и вино  разрешается, пока молочные продукты, рыба,  и сухофрукты  запрещается
+cu/ru/	1001111	Указания пищи:  Пост:  мясо, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока молочные продукты,  и рыба  запрещается
+cu/ru/	1010000	Указания пищи:  Пост:  мясо,  и рыба  разрешается, пока молочные продукты, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1010001	Указания пищи:  Пост:  мясо, рыба,  и сухофрукты  разрешается, пока молочные продукты, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	1010010	Указания пищи:  Пост:  мясо, рыба,  и вино  разрешается, пока молочные продукты, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1010011	Указания пищи:  Пост:  мясо, рыба, вино,  и сухофрукты  разрешается, пока молочные продукты, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	1010100	Указания пищи:  Пост:  мясо, рыба,  и растительное масло  разрешается, пока молочные продукты, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	1010101	Указания пищи:  Пост:  мясо, рыба, растительное масло,  и сухофрукты  разрешается, пока молочные продукты, рыбная икпа,  и вино  запрещается
+cu/ru/	1010110	Указания пищи:  Пост:  мясо, рыба, растительное масло,  и вино  разрешается, пока молочные продукты, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	1010111	Указания пищи:  Пост:  мясо, рыба, растительное масло, вино,  и сухофрукты  разрешается, пока молочные продукты,  и рыбная икпа  запрещается
+cu/ru/	1011000	Указания пищи:  Пост:  мясо, рыба,  и рыбная икпа  разрешается, пока молочные продукты, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1011001	Указания пищи:  Пост:  мясо, рыба, рыбная икпа,  и сухофрукты  разрешается, пока молочные продукты, растительное масло,  и вино  запрещается
+cu/ru/	1011010	Указания пищи:  Пост:  мясо, рыба, рыбная икпа,  и вино  разрешается, пока молочные продукты, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1011011	Указания пищи:  Пост:  мясо, рыба, рыбная икпа, вино,  и сухофрукты  разрешается, пока молочные продукты,  и растительное масло  запрещается
+cu/ru/	1011100	Указания пищи:  Пост:  мясо, рыба, рыбная икпа,  и растительное масло  разрешается, пока молочные продукты, вино,  и сухофрукты  запрещается
+cu/ru/	1011101	Указания пищи:  Пост:  мясо, рыба, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока молочные продукты,  и вино  запрещается
+cu/ru/	1011110	Указания пищи:  Пост:  мясо, рыба, рыбная икпа, растительное масло,  и вино  разрешается, пока молочные продукты,  и сухофрукты  запрещается
+cu/ru/	1011111	Указания пищи:  Пост:  мясо, рыба, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока молочные продуктыПост:  мясо, рыба, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока молочные продукты  запрещается
+cu/ru/	1100000	Указания пищи:  Пост:  мясо,  и молочные продукты  разрешается, пока рыба, рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1100001	Указания пищи:  Пост:  мясо, молочные продукты,  и сухофрукты  разрешается, пока рыба, рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	1100010	Указания пищи:  Пост:  мясо, молочные продукты,  и вино  разрешается, пока рыба, рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1100011	Указания пищи:  Пост:  мясо, молочные продукты, вино,  и сухофрукты  разрешается, пока рыба, рыбная икпа,  и растительное масло  запрещается
+cu/ru/	1100100	Указания пищи:  Пост:  мясо, молочные продукты,  и растительное масло  разрешается, пока рыба, рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	1100101	Указания пищи:  Пост:  мясо, молочные продукты, растительное масло,  и сухофрукты  разрешается, пока рыба, рыбная икпа,  и вино  запрещается
+cu/ru/	1100110	Указания пищи:  Пост:  мясо, молочные продукты, растительное масло,  и вино  разрешается, пока рыба, рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	1100111	Указания пищи:  Пост:  мясо, молочные продукты, растительное масло, вино,  и сухофрукты  разрешается, пока рыба,  и рыбная икпа  запрещается
+cu/ru/	1101000	Указания пищи:  Пост:  мясо, молочные продукты,  и рыбная икпа  разрешается, пока рыба, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1101001	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа,  и сухофрукты  разрешается, пока рыба, растительное масло,  и вино  запрещается
+cu/ru/	1101010	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа,  и вино  разрешается, пока рыба, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1101011	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа, вино,  и сухофрукты  разрешается, пока рыба,  и растительное масло  запрещается
+cu/ru/	1101100	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа,  и растительное масло  разрешается, пока рыба, вино,  и сухофрукты  запрещается
+cu/ru/	1101101	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока рыба,  и вино  запрещается
+cu/ru/	1101110	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа, растительное масло,  и вино  разрешается, пока рыба,  и сухофрукты  запрещается
+cu/ru/	1101111	Указания пищи:  Пост:  мясо, молочные продукты, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока рыбаПост:  мясо, молочные продукты, рыбная икпа, растительное масло, вино,  и сухофрукты  разрешается, пока рыба  запрещается
+cu/ru/	1110000	Указания пищи:  Пост:  мясо, молочные продукты,  и рыба  разрешается, пока рыбная икпа, растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1110001	Указания пищи:  Пост:  мясо, молочные продукты, рыба,  и сухофрукты  разрешается, пока рыбная икпа, растительное масло,  и вино  запрещается
+cu/ru/	1110010	Указания пищи:  Пост:  мясо, молочные продукты, рыба,  и вино  разрешается, пока рыбная икпа, растительное масло,  и сухофрукты  запрещается
+cu/ru/	1110011	Указания пищи:  Пост:  мясо, молочные продукты, рыба, вино,  и сухофрукты  разрешается, пока рыбная икпа,  и растительное масло  запрещается
+cu/ru/	1110100	Указания пищи:  Пост:  мясо, молочные продукты, рыба,  и растительное масло  разрешается, пока рыбная икпа, вино,  и сухофрукты  запрещается
+cu/ru/	1110101	Указания пищи:  Пост:  мясо, молочные продукты, рыба, растительное масло,  и сухофрукты  разрешается, пока рыбная икпа,  и вино  запрещается
+cu/ru/	1110110	Указания пищи:  Пост:  мясо, молочные продукты, рыба, растительное масло,  и вино  разрешается, пока рыбная икпа,  и сухофрукты  запрещается
+cu/ru/	1110111	Указания пищи:  Пост:  мясо, молочные продукты, рыба, растительное масло, вино,  и сухофрукты  разрешается, пока рыбная икпаПост:  мясо, молочные продукты, рыба, растительное масло, вино,  и сухофрукты  разрешается, пока рыбная икпа  запрещается
+cu/ru/	1111000	Указания пищи:  Пост:  мясо, молочные продукты, рыба,  и рыбная икпа  разрешается, пока растительное масло, вино,  и сухофрукты  запрещается
+cu/ru/	1111001	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа,  и сухофрукты  разрешается, пока растительное масло,  и вино  запрещается
+cu/ru/	1111010	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа,  и вино  разрешается, пока растительное масло,  и сухофрукты  запрещается
+cu/ru/	1111011	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа, вино,  и сухофрукты  разрешается, пока растительное маслоПост:  мясо, молочные продукты, рыба, рыбная икпа, вино,  и сухофрукты  разрешается, пока растительное масло  запрещается
+cu/ru/	1111100	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа,  и растительное масло  разрешается, пока вино,  и сухофрукты  запрещается
+cu/ru/	1111101	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока виноПост:  мясо, молочные продукты, рыба, рыбная икпа, растительное масло,  и сухофрукты  разрешается, пока вино  запрещается
+cu/ru/	1111110	Указания пищи:  Пост:  мясо, молочные продукты, рыба, рыбная икпа, растительное масло,  и вино  разрешается, пока сухофруктыПост:  мясо, молочные продукты, рыба, рыбная икпа, растительное масло,  и вино  разрешается, пока сухофрукты  запрещается
+cu/ru/	1111111	Указания пищи: Поста нет 
+el/mono/	0000000	Fasting regulations: Strict fast : Monastic Rule: No Food 
+el/mono/	0000001	Fasting regulations: Strict fast : Monastic Rule: Dry Food only 
+el/mono/	0000010	Fasting regulations: Fast: Wine is permitted 
+el/mono/	0000011	Fasting regulations: Strict fast : Monastic Rule: Hot Food without oil 
+el/mono/	0000100	Fasting regulations:  Fast:  oil is permitted, while meat, diary products, fish, caviar, wine,  and dry food are forbidden
+el/mono/	0000101	Fasting regulations:  Fast:  oil,  and dry food are permitted, while meat, diary products, fish, caviar,  and wine are forbidden
+el/mono/	0000110	Fasting regulations:  Fast:  oil,  and wine are permitted, while meat, diary products, fish, caviar,  and dry food are forbidden
+el/mono/	0000111	Fasting regulations: Fast: Wine and oil allowed 
+el/mono/	0001000	Fasting regulations:  Fast:  caviar is permitted, while meat, diary products, fish, oil, wine,  and dry food are forbidden
+el/mono/	0001001	Fasting regulations:  Fast:  caviar,  and dry food are permitted, while meat, diary products, fish, oil,  and wine are forbidden
+el/mono/	0001010	Fasting regulations:  Fast:  caviar,  and wine are permitted, while meat, diary products, fish, oil,  and dry food are forbidden
+el/mono/	0001011	Fasting regulations:  Fast:  caviar, wine,  and dry food are permitted, while meat, diary products, fish,  and oil are forbidden
+el/mono/	0001100	Fasting regulations:  Fast:  caviar,  and oil are permitted, while meat, diary products, fish, wine,  and dry food are forbidden
+el/mono/	0001101	Fasting regulations:  Fast:  caviar, oil,  and dry food are permitted, while meat, diary products, fish,  and wine are forbidden
+el/mono/	0001110	Fasting regulations:  Fast:  caviar, oil,  and wine are permitted, while meat, diary products, fish,  and dry food are forbidden
+el/mono/	0001111	Fasting regulations: Fast: Caviar, wine, and oil permitted 
+el/mono/	0010000	Fasting regulations:  Fast:  fish is permitted, while meat, diary products, caviar, oil, wine,  and dry food are forbidden
+el/mono/	0010001	Fasting regulations:  Fast:  fish,  and dry food are permitted, while meat, diary products, caviar, oil,  and wine are forbidden
+el/mono/	0010010	Fasting regulations:  Fast:  fish,  and wine are permitted, while meat, diary products, caviar, oil,  and dry food are forbidden
+el/mono/	0010011	Fasting regulations:  Fast:  fish, wine,  and dry food are permitted, while meat, diary products, caviar,  and oil are forbidden
+el/mono/	0010100	Fasting regulations:  Fast:  fish,  and oil are permitted, while meat, diary products, caviar, wine,  and dry food are forbidden
+el/mono/	0010101	Fasting regulations:  Fast:  fish, oil,  and dry food are permitted, while meat, diary products, caviar,  and wine are forbidden
+el/mono/	0010110	Fasting regulations:  Fast:  fish, oil,  and wine are permitted, while meat, diary products, caviar,  and dry food are forbidden
+el/mono/	0010111	Fasting regulations:  Fast:  fish, oil, wine,  and dry food are permitted, while meat, diary products,  and caviar are forbidden
+el/mono/	0011000	Fasting regulations:  Fast:  fish,  and caviar are permitted, while meat, diary products, oil, wine,  and dry food are forbidden
+el/mono/	0011001	Fasting regulations:  Fast:  fish, caviar,  and dry food are permitted, while meat, diary products, oil,  and wine are forbidden
+el/mono/	0011010	Fasting regulations:  Fast:  fish, caviar,  and wine are permitted, while meat, diary products, oil,  and dry food are forbidden
+el/mono/	0011011	Fasting regulations:  Fast:  fish, caviar, wine,  and dry food are permitted, while meat, diary products,  and oil are forbidden
+el/mono/	0011100	Fasting regulations:  Fast:  fish, caviar,  and oil are permitted, while meat, diary products, wine,  and dry food are forbidden
+el/mono/	0011101	Fasting regulations:  Fast:  fish, caviar, oil,  and dry food are permitted, while meat, diary products,  and wine are forbidden
+el/mono/	0011110	Fasting regulations:  Fast:  fish, caviar, oil,  and wine are permitted, while meat, diary products,  and dry food are forbidden
+el/mono/	0011111	Fasting regulations: Fast: Fish, wine, and oil allowed 
+el/mono/	0100000	Fasting regulations:  Fast:  diary products is permitted, while meat, fish, caviar, oil, wine,  and dry food are forbidden
+el/mono/	0100001	Fasting regulations:  Fast:  diary products,  and dry food are permitted, while meat, fish, caviar, oil,  and wine are forbidden
+el/mono/	0100010	Fasting regulations:  Fast:  diary products,  and wine are permitted, while meat, fish, caviar, oil,  and dry food are forbidden
+el/mono/	0100011	Fasting regulations:  Fast:  diary products, wine,  and dry food are permitted, while meat, fish, caviar,  and oil are forbidden
+el/mono/	0100100	Fasting regulations:  Fast:  diary products,  and oil are permitted, while meat, fish, caviar, wine,  and dry food are forbidden
+el/mono/	0100101	Fasting regulations:  Fast:  diary products, oil,  and dry food are permitted, while meat, fish, caviar,  and wine are forbidden
+el/mono/	0100110	Fasting regulations:  Fast:  diary products, oil,  and wine are permitted, while meat, fish, caviar,  and dry food are forbidden
+el/mono/	0100111	Fasting regulations:  Fast:  diary products, oil, wine,  and dry food are permitted, while meat, fish,  and caviar are forbidden
+el/mono/	0101000	Fasting regulations:  Fast:  diary products,  and caviar are permitted, while meat, fish, oil, wine,  and dry food are forbidden
+el/mono/	0101001	Fasting regulations:  Fast:  diary products, caviar,  and dry food are permitted, while meat, fish, oil,  and wine are forbidden
+el/mono/	0101010	Fasting regulations:  Fast:  diary products, caviar,  and wine are permitted, while meat, fish, oil,  and dry food are forbidden
+el/mono/	0101011	Fasting regulations:  Fast:  diary products, caviar, wine,  and dry food are permitted, while meat, fish,  and oil are forbidden
+el/mono/	0101100	Fasting regulations:  Fast:  diary products, caviar,  and oil are permitted, while meat, fish, wine,  and dry food are forbidden
+el/mono/	0101101	Fasting regulations:  Fast:  diary products, caviar, oil,  and dry food are permitted, while meat, fish,  and wine are forbidden
+el/mono/	0101110	Fasting regulations:  Fast:  diary products, caviar, oil,  and wine are permitted, while meat, fish,  and dry food are forbidden
+el/mono/	0101111	Fasting regulations:  Fast:  diary products, caviar, oil, wine,  and dry food are permitted, while meat,  and fish are forbidden
+el/mono/	0110000	Fasting regulations:  Fast:  diary products,  and fish are permitted, while meat, caviar, oil, wine,  and dry food are forbidden
+el/mono/	0110001	Fasting regulations:  Fast:  diary products, fish,  and dry food are permitted, while meat, caviar, oil,  and wine are forbidden
+el/mono/	0110010	Fasting regulations:  Fast:  diary products, fish,  and wine are permitted, while meat, caviar, oil,  and dry food are forbidden
+el/mono/	0110011	Fasting regulations:  Fast:  diary products, fish, wine,  and dry food are permitted, while meat, caviar,  and oil are forbidden
+el/mono/	0110100	Fasting regulations:  Fast:  diary products, fish,  and oil are permitted, while meat, caviar, wine,  and dry food are forbidden
+el/mono/	0110101	Fasting regulations:  Fast:  diary products, fish, oil,  and dry food are permitted, while meat, caviar,  and wine are forbidden
+el/mono/	0110110	Fasting regulations:  Fast:  diary products, fish, oil,  and wine are permitted, while meat, caviar,  and dry food are forbidden
+el/mono/	0110111	Fasting regulations:  Fast:  diary products, fish, oil, wine,  and dry food are permitted, while meat,  and caviar are forbidden
+el/mono/	0111000	Fasting regulations:  Fast:  diary products, fish,  and caviar are permitted, while meat, oil, wine,  and dry food are forbidden
+el/mono/	0111001	Fasting regulations:  Fast:  diary products, fish, caviar,  and dry food are permitted, while meat, oil,  and wine are forbidden
+el/mono/	0111010	Fasting regulations:  Fast:  diary products, fish, caviar,  and wine are permitted, while meat, oil,  and dry food are forbidden
+el/mono/	0111011	Fasting regulations:  Fast:  diary products, fish, caviar, wine,  and dry food are permitted, while meat,  and oil are forbidden
+el/mono/	0111100	Fasting regulations:  Fast:  diary products, fish, caviar,  and oil are permitted, while meat, wine,  and dry food are forbidden
+el/mono/	0111101	Fasting regulations:  Fast:  diary products, fish, caviar, oil,  and dry food are permitted, while meat,  and wine are forbidden
+el/mono/	0111110	Fasting regulations:  Fast:  diary products, fish, caviar, oil,  and wine are permitted, while meat,  and dry food are forbidden
+el/mono/	0111111	Fasting regulations: Fast: Meat is excluded 
+el/mono/	1000000	Fasting regulations:  Fast:  meat is permitted, while diary products, fish, caviar, oil, wine,  and dry food are forbidden
+el/mono/	1000001	Fasting regulations:  Fast:  meat,  and dry food are permitted, while diary products, fish, caviar, oil,  and wine are forbidden
+el/mono/	1000010	Fasting regulations:  Fast:  meat,  and wine are permitted, while diary products, fish, caviar, oil,  and dry food are forbidden
+el/mono/	1000011	Fasting regulations:  Fast:  meat, wine,  and dry food are permitted, while diary products, fish, caviar,  and oil are forbidden
+el/mono/	1000100	Fasting regulations:  Fast:  meat,  and oil are permitted, while diary products, fish, caviar, wine,  and dry food are forbidden
+el/mono/	1000101	Fasting regulations:  Fast:  meat, oil,  and dry food are permitted, while diary products, fish, caviar,  and wine are forbidden
+el/mono/	1000110	Fasting regulations:  Fast:  meat, oil,  and wine are permitted, while diary products, fish, caviar,  and dry food are forbidden
+el/mono/	1000111	Fasting regulations:  Fast:  meat, oil, wine,  and dry food are permitted, while diary products, fish,  and caviar are forbidden
+el/mono/	1001000	Fasting regulations:  Fast:  meat,  and caviar are permitted, while diary products, fish, oil, wine,  and dry food are forbidden
+el/mono/	1001001	Fasting regulations:  Fast:  meat, caviar,  and dry food are permitted, while diary products, fish, oil,  and wine are forbidden
+el/mono/	1001010	Fasting regulations:  Fast:  meat, caviar,  and wine are permitted, while diary products, fish, oil,  and dry food are forbidden
+el/mono/	1001011	Fasting regulations:  Fast:  meat, caviar, wine,  and dry food are permitted, while diary products, fish,  and oil are forbidden
+el/mono/	1001100	Fasting regulations:  Fast:  meat, caviar,  and oil are permitted, while diary products, fish, wine,  and dry food are forbidden
+el/mono/	1001101	Fasting regulations:  Fast:  meat, caviar, oil,  and dry food are permitted, while diary products, fish,  and wine are forbidden
+el/mono/	1001110	Fasting regulations:  Fast:  meat, caviar, oil,  and wine are permitted, while diary products, fish,  and dry food are forbidden
+el/mono/	1001111	Fasting regulations:  Fast:  meat, caviar, oil, wine,  and dry food are permitted, while diary products,  and fish are forbidden
+el/mono/	1010000	Fasting regulations:  Fast:  meat,  and fish are permitted, while diary products, caviar, oil, wine,  and dry food are forbidden
+el/mono/	1010001	Fasting regulations:  Fast:  meat, fish,  and dry food are permitted, while diary products, caviar, oil,  and wine are forbidden
+el/mono/	1010010	Fasting regulations:  Fast:  meat, fish,  and wine are permitted, while diary products, caviar, oil,  and dry food are forbidden
+el/mono/	1010011	Fasting regulations:  Fast:  meat, fish, wine,  and dry food are permitted, while diary products, caviar,  and oil are forbidden
+el/mono/	1010100	Fasting regulations:  Fast:  meat, fish,  and oil are permitted, while diary products, caviar, wine,  and dry food are forbidden
+el/mono/	1010101	Fasting regulations:  Fast:  meat, fish, oil,  and dry food are permitted, while diary products, caviar,  and wine are forbidden
+el/mono/	1010110	Fasting regulations:  Fast:  meat, fish, oil,  and wine are permitted, while diary products, caviar,  and dry food are forbidden
+el/mono/	1010111	Fasting regulations:  Fast:  meat, fish, oil, wine,  and dry food are permitted, while diary products,  and caviar are forbidden
+el/mono/	1011000	Fasting regulations:  Fast:  meat, fish,  and caviar are permitted, while diary products, oil, wine,  and dry food are forbidden
+el/mono/	1011001	Fasting regulations:  Fast:  meat, fish, caviar,  and dry food are permitted, while diary products, oil,  and wine are forbidden
+el/mono/	1011010	Fasting regulations:  Fast:  meat, fish, caviar,  and wine are permitted, while diary products, oil,  and dry food are forbidden
+el/mono/	1011011	Fasting regulations:  Fast:  meat, fish, caviar, wine,  and dry food are permitted, while diary products,  and oil are forbidden
+el/mono/	1011100	Fasting regulations:  Fast:  meat, fish, caviar,  and oil are permitted, while diary products, wine,  and dry food are forbidden
+el/mono/	1011101	Fasting regulations:  Fast:  meat, fish, caviar, oil,  and dry food are permitted, while diary products,  and wine are forbidden
+el/mono/	1011110	Fasting regulations:  Fast:  meat, fish, caviar, oil,  and wine are permitted, while diary products,  and dry food are forbidden
+el/mono/	1011111	Fasting regulations:  Fast:  meat, fish, caviar, oil, wine,  and dry food are permitted, while diary productsFast:  meat, fish, caviar, oil, wine,  and dry food are permitted, while diary products is forbidden
+el/mono/	1100000	Fasting regulations:  Fast:  meat,  and diary products are permitted, while fish, caviar, oil, wine,  and dry food are forbidden
+el/mono/	1100001	Fasting regulations:  Fast:  meat, diary products,  and dry food are permitted, while fish, caviar, oil,  and wine are forbidden
+el/mono/	1100010	Fasting regulations:  Fast:  meat, diary products,  and wine are permitted, while fish, caviar, oil,  and dry food are forbidden
+el/mono/	1100011	Fasting regulations:  Fast:  meat, diary products, wine,  and dry food are permitted, while fish, caviar,  and oil are forbidden
+el/mono/	1100100	Fasting regulations:  Fast:  meat, diary products,  and oil are permitted, while fish, caviar, wine,  and dry food are forbidden
+el/mono/	1100101	Fasting regulations:  Fast:  meat, diary products, oil,  and dry food are permitted, while fish, caviar,  and wine are forbidden
+el/mono/	1100110	Fasting regulations:  Fast:  meat, diary products, oil,  and wine are permitted, while fish, caviar,  and dry food are forbidden
+el/mono/	1100111	Fasting regulations:  Fast:  meat, diary products, oil, wine,  and dry food are permitted, while fish,  and caviar are forbidden
+el/mono/	1101000	Fasting regulations:  Fast:  meat, diary products,  and caviar are permitted, while fish, oil, wine,  and dry food are forbidden
+el/mono/	1101001	Fasting regulations:  Fast:  meat, diary products, caviar,  and dry food are permitted, while fish, oil,  and wine are forbidden
+el/mono/	1101010	Fasting regulations:  Fast:  meat, diary products, caviar,  and wine are permitted, while fish, oil,  and dry food are forbidden
+el/mono/	1101011	Fasting regulations:  Fast:  meat, diary products, caviar, wine,  and dry food are permitted, while fish,  and oil are forbidden
+el/mono/	1101100	Fasting regulations:  Fast:  meat, diary products, caviar,  and oil are permitted, while fish, wine,  and dry food are forbidden
+el/mono/	1101101	Fasting regulations:  Fast:  meat, diary products, caviar, oil,  and dry food are permitted, while fish,  and wine are forbidden
+el/mono/	1101110	Fasting regulations:  Fast:  meat, diary products, caviar, oil,  and wine are permitted, while fish,  and dry food are forbidden
+el/mono/	1101111	Fasting regulations:  Fast:  meat, diary products, caviar, oil, wine,  and dry food are permitted, while fishFast:  meat, diary products, caviar, oil, wine,  and dry food are permitted, while fish is forbidden
+el/mono/	1110000	Fasting regulations:  Fast:  meat, diary products,  and fish are permitted, while caviar, oil, wine,  and dry food are forbidden
+el/mono/	1110001	Fasting regulations:  Fast:  meat, diary products, fish,  and dry food are permitted, while caviar, oil,  and wine are forbidden
+el/mono/	1110010	Fasting regulations:  Fast:  meat, diary products, fish,  and wine are permitted, while caviar, oil,  and dry food are forbidden
+el/mono/	1110011	Fasting regulations:  Fast:  meat, diary products, fish, wine,  and dry food are permitted, while caviar,  and oil are forbidden
+el/mono/	1110100	Fasting regulations:  Fast:  meat, diary products, fish,  and oil are permitted, while caviar, wine,  and dry food are forbidden
+el/mono/	1110101	Fasting regulations:  Fast:  meat, diary products, fish, oil,  and dry food are permitted, while caviar,  and wine are forbidden
+el/mono/	1110110	Fasting regulations:  Fast:  meat, diary products, fish, oil,  and wine are permitted, while caviar,  and dry food are forbidden
+el/mono/	1110111	Fasting regulations:  Fast:  meat, diary products, fish, oil, wine,  and dry food are permitted, while caviarFast:  meat, diary products, fish, oil, wine,  and dry food are permitted, while caviar is forbidden
+el/mono/	1111000	Fasting regulations:  Fast:  meat, diary products, fish,  and caviar are permitted, while oil, wine,  and dry food are forbidden
+el/mono/	1111001	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and dry food are permitted, while oil,  and wine are forbidden
+el/mono/	1111010	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and wine are permitted, while oil,  and dry food are forbidden
+el/mono/	1111011	Fasting regulations:  Fast:  meat, diary products, fish, caviar, wine,  and dry food are permitted, while oilFast:  meat, diary products, fish, caviar, wine,  and dry food are permitted, while oil is forbidden
+el/mono/	1111100	Fasting regulations:  Fast:  meat, diary products, fish, caviar,  and oil are permitted, while wine,  and dry food are forbidden
+el/mono/	1111101	Fasting regulations:  Fast:  meat, diary products, fish, caviar, oil,  and dry food are permitted, while wineFast:  meat, diary products, fish, caviar, oil,  and dry food are permitted, while wine is forbidden
+el/mono/	1111110	Fasting regulations:  Fast:  meat, diary products, fish, caviar, oil,  and wine are permitted, while dry foodFast:  meat, diary products, fish, caviar, oil,  and wine are permitted, while dry food is forbidden
+el/mono/	1111111	Fasting regulations: Fast free 
+zh/Hans/	0000000	斋戒规则：严格规定斋日：按照修行规矩：禁食
+zh/Hans/	0000001	斋戒规则：严格规定斋日：按照修行规矩：干食
+zh/Hans/	0000010	斋戒规则：斋日（酒可饮）
+zh/Hans/	0000011	斋戒规则：严格规定斋日：按照修行规矩：免油热食
+zh/Hans/	0000100	斋戒规则： 斋日： 油 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	0000101	斋戒规则： 斋日： 油,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 鱼子,  及 酒 都 不可食用
+zh/Hans/	0000110	斋戒规则： 斋日： 油,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 鱼子,  及 干食 都 不可食用
+zh/Hans/	0000111	斋戒规则：斋日（酒、油可食）
+zh/Hans/	0001000	斋戒规则： 斋日： 鱼子 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0001001	斋戒规则： 斋日： 鱼子,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 油,  及 酒 都 不可食用
+zh/Hans/	0001010	斋戒规则： 斋日： 鱼子,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 油,  及 干食 都 不可食用
+zh/Hans/	0001011	斋戒规则： 斋日： 鱼子, 酒,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼,  及 油 都 不可食用
+zh/Hans/	0001100	斋戒规则： 斋日： 鱼子,  及 油 都 可食用, while 肉类和动物制品, 乳制品, 鱼, 酒,  及 干食 都 不可食用
+zh/Hans/	0001101	斋戒规则： 斋日： 鱼子, 油,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼,  及 酒 都 不可食用
+zh/Hans/	0001110	斋戒规则： 斋日： 鱼子, 油,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 鱼,  及 干食 都 不可食用
+zh/Hans/	0001111	斋戒规则：斋日（鱼子、酒及油可食）
+zh/Hans/	0010000	斋戒规则： 斋日： 鱼 都 可食用, while 肉类和动物制品, 乳制品, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0010001	斋戒规则： 斋日： 鱼,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	0010010	斋戒规则： 斋日： 鱼,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	0010011	斋戒规则： 斋日： 鱼, 酒,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼子,  及 油 都 不可食用
+zh/Hans/	0010100	斋戒规则： 斋日： 鱼,  及 油 都 可食用, while 肉类和动物制品, 乳制品, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	0010101	斋戒规则： 斋日： 鱼, 油,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 鱼子,  及 酒 都 不可食用
+zh/Hans/	0010110	斋戒规则： 斋日： 鱼, 油,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 鱼子,  及 干食 都 不可食用
+zh/Hans/	0010111	斋戒规则： 斋日： 鱼, 油, 酒,  及 干食 都 可食用, while 肉类和动物制品, 乳制品,  及 鱼子 都 不可食用
+zh/Hans/	0011000	斋戒规则： 斋日： 鱼,  及 鱼子 都 可食用, while 肉类和动物制品, 乳制品, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0011001	斋戒规则： 斋日： 鱼, 鱼子,  及 干食 都 可食用, while 肉类和动物制品, 乳制品, 油,  及 酒 都 不可食用
+zh/Hans/	0011010	斋戒规则： 斋日： 鱼, 鱼子,  及 酒 都 可食用, while 肉类和动物制品, 乳制品, 油,  及 干食 都 不可食用
+zh/Hans/	0011011	斋戒规则： 斋日： 鱼, 鱼子, 酒,  及 干食 都 可食用, while 肉类和动物制品, 乳制品,  及 油 都 不可食用
+zh/Hans/	0011100	斋戒规则： 斋日： 鱼, 鱼子,  及 油 都 可食用, while 肉类和动物制品, 乳制品, 酒,  及 干食 都 不可食用
+zh/Hans/	0011101	斋戒规则： 斋日： 鱼, 鱼子, 油,  及 干食 都 可食用, while 肉类和动物制品, 乳制品,  及 酒 都 不可食用
+zh/Hans/	0011110	斋戒规则： 斋日： 鱼, 鱼子, 油,  及 酒 都 可食用, while 肉类和动物制品, 乳制品,  及 干食 都 不可食用
+zh/Hans/	0011111	斋戒规则：斋日（鱼、酒及油可食）
+zh/Hans/	0100000	斋戒规则： 斋日： 乳制品 都 可食用, while 肉类和动物制品, 鱼, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0100001	斋戒规则： 斋日： 乳制品,  及 干食 都 可食用, while 肉类和动物制品, 鱼, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	0100010	斋戒规则： 斋日： 乳制品,  及 酒 都 可食用, while 肉类和动物制品, 鱼, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	0100011	斋戒规则： 斋日： 乳制品, 酒,  及 干食 都 可食用, while 肉类和动物制品, 鱼, 鱼子,  及 油 都 不可食用
+zh/Hans/	0100100	斋戒规则： 斋日： 乳制品,  及 油 都 可食用, while 肉类和动物制品, 鱼, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	0100101	斋戒规则： 斋日： 乳制品, 油,  及 干食 都 可食用, while 肉类和动物制品, 鱼, 鱼子,  及 酒 都 不可食用
+zh/Hans/	0100110	斋戒规则： 斋日： 乳制品, 油,  及 酒 都 可食用, while 肉类和动物制品, 鱼, 鱼子,  及 干食 都 不可食用
+zh/Hans/	0100111	斋戒规则： 斋日： 乳制品, 油, 酒,  及 干食 都 可食用, while 肉类和动物制品, 鱼,  及 鱼子 都 不可食用
+zh/Hans/	0101000	斋戒规则： 斋日： 乳制品,  及 鱼子 都 可食用, while 肉类和动物制品, 鱼, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0101001	斋戒规则： 斋日： 乳制品, 鱼子,  及 干食 都 可食用, while 肉类和动物制品, 鱼, 油,  及 酒 都 不可食用
+zh/Hans/	0101010	斋戒规则： 斋日： 乳制品, 鱼子,  及 酒 都 可食用, while 肉类和动物制品, 鱼, 油,  及 干食 都 不可食用
+zh/Hans/	0101011	斋戒规则： 斋日： 乳制品, 鱼子, 酒,  及 干食 都 可食用, while 肉类和动物制品, 鱼,  及 油 都 不可食用
+zh/Hans/	0101100	斋戒规则： 斋日： 乳制品, 鱼子,  及 油 都 可食用, while 肉类和动物制品, 鱼, 酒,  及 干食 都 不可食用
+zh/Hans/	0101101	斋戒规则： 斋日： 乳制品, 鱼子, 油,  及 干食 都 可食用, while 肉类和动物制品, 鱼,  及 酒 都 不可食用
+zh/Hans/	0101110	斋戒规则： 斋日： 乳制品, 鱼子, 油,  及 酒 都 可食用, while 肉类和动物制品, 鱼,  及 干食 都 不可食用
+zh/Hans/	0101111	斋戒规则： 斋日： 乳制品, 鱼子, 油, 酒,  及 干食 都 可食用, while 肉类和动物制品,  及 鱼 都 不可食用
+zh/Hans/	0110000	斋戒规则： 斋日： 乳制品,  及 鱼 都 可食用, while 肉类和动物制品, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0110001	斋戒规则： 斋日： 乳制品, 鱼,  及 干食 都 可食用, while 肉类和动物制品, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	0110010	斋戒规则： 斋日： 乳制品, 鱼,  及 酒 都 可食用, while 肉类和动物制品, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	0110011	斋戒规则： 斋日： 乳制品, 鱼, 酒,  及 干食 都 可食用, while 肉类和动物制品, 鱼子,  及 油 都 不可食用
+zh/Hans/	0110100	斋戒规则： 斋日： 乳制品, 鱼,  及 油 都 可食用, while 肉类和动物制品, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	0110101	斋戒规则： 斋日： 乳制品, 鱼, 油,  及 干食 都 可食用, while 肉类和动物制品, 鱼子,  及 酒 都 不可食用
+zh/Hans/	0110110	斋戒规则： 斋日： 乳制品, 鱼, 油,  及 酒 都 可食用, while 肉类和动物制品, 鱼子,  及 干食 都 不可食用
+zh/Hans/	0110111	斋戒规则： 斋日： 乳制品, 鱼, 油, 酒,  及 干食 都 可食用, while 肉类和动物制品,  及 鱼子 都 不可食用
+zh/Hans/	0111000	斋戒规则： 斋日： 乳制品, 鱼,  及 鱼子 都 可食用, while 肉类和动物制品, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	0111001	斋戒规则： 斋日： 乳制品, 鱼, 鱼子,  及 干食 都 可食用, while 肉类和动物制品, 油,  及 酒 都 不可食用
+zh/Hans/	0111010	斋戒规则： 斋日： 乳制品, 鱼, 鱼子,  及 酒 都 可食用, while 肉类和动物制品, 油,  及 干食 都 不可食用
+zh/Hans/	0111011	斋戒规则： 斋日： 乳制品, 鱼, 鱼子, 酒,  及 干食 都 可食用, while 肉类和动物制品,  及 油 都 不可食用
+zh/Hans/	0111100	斋戒规则： 斋日： 乳制品, 鱼, 鱼子,  及 油 都 可食用, while 肉类和动物制品, 酒,  及 干食 都 不可食用
+zh/Hans/	0111101	斋戒规则： 斋日： 乳制品, 鱼, 鱼子, 油,  及 干食 都 可食用, while 肉类和动物制品,  及 酒 都 不可食用
+zh/Hans/	0111110	斋戒规则： 斋日： 乳制品, 鱼, 鱼子, 油,  及 酒 都 可食用, while 肉类和动物制品,  及 干食 都 不可食用
+zh/Hans/	0111111	斋戒规则：斋日（Meat is excluded）
+zh/Hans/	1000000	斋戒规则： 斋日： 肉类和动物制品 都 可食用, while 乳制品, 鱼, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1000001	斋戒规则： 斋日： 肉类和动物制品,  及 干食 都 可食用, while 乳制品, 鱼, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	1000010	斋戒规则： 斋日： 肉类和动物制品,  及 酒 都 可食用, while 乳制品, 鱼, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	1000011	斋戒规则： 斋日： 肉类和动物制品, 酒,  及 干食 都 可食用, while 乳制品, 鱼, 鱼子,  及 油 都 不可食用
+zh/Hans/	1000100	斋戒规则： 斋日： 肉类和动物制品,  及 油 都 可食用, while 乳制品, 鱼, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	1000101	斋戒规则： 斋日： 肉类和动物制品, 油,  及 干食 都 可食用, while 乳制品, 鱼, 鱼子,  及 酒 都 不可食用
+zh/Hans/	1000110	斋戒规则： 斋日： 肉类和动物制品, 油,  及 酒 都 可食用, while 乳制品, 鱼, 鱼子,  及 干食 都 不可食用
+zh/Hans/	1000111	斋戒规则： 斋日： 肉类和动物制品, 油, 酒,  及 干食 都 可食用, while 乳制品, 鱼,  及 鱼子 都 不可食用
+zh/Hans/	1001000	斋戒规则： 斋日： 肉类和动物制品,  及 鱼子 都 可食用, while 乳制品, 鱼, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1001001	斋戒规则： 斋日： 肉类和动物制品, 鱼子,  及 干食 都 可食用, while 乳制品, 鱼, 油,  及 酒 都 不可食用
+zh/Hans/	1001010	斋戒规则： 斋日： 肉类和动物制品, 鱼子,  及 酒 都 可食用, while 乳制品, 鱼, 油,  及 干食 都 不可食用
+zh/Hans/	1001011	斋戒规则： 斋日： 肉类和动物制品, 鱼子, 酒,  及 干食 都 可食用, while 乳制品, 鱼,  及 油 都 不可食用
+zh/Hans/	1001100	斋戒规则： 斋日： 肉类和动物制品, 鱼子,  及 油 都 可食用, while 乳制品, 鱼, 酒,  及 干食 都 不可食用
+zh/Hans/	1001101	斋戒规则： 斋日： 肉类和动物制品, 鱼子, 油,  及 干食 都 可食用, while 乳制品, 鱼,  及 酒 都 不可食用
+zh/Hans/	1001110	斋戒规则： 斋日： 肉类和动物制品, 鱼子, 油,  及 酒 都 可食用, while 乳制品, 鱼,  及 干食 都 不可食用
+zh/Hans/	1001111	斋戒规则： 斋日： 肉类和动物制品, 鱼子, 油, 酒,  及 干食 都 可食用, while 乳制品,  及 鱼 都 不可食用
+zh/Hans/	1010000	斋戒规则： 斋日： 肉类和动物制品,  及 鱼 都 可食用, while 乳制品, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1010001	斋戒规则： 斋日： 肉类和动物制品, 鱼,  及 干食 都 可食用, while 乳制品, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	1010010	斋戒规则： 斋日： 肉类和动物制品, 鱼,  及 酒 都 可食用, while 乳制品, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	1010011	斋戒规则： 斋日： 肉类和动物制品, 鱼, 酒,  及 干食 都 可食用, while 乳制品, 鱼子,  及 油 都 不可食用
+zh/Hans/	1010100	斋戒规则： 斋日： 肉类和动物制品, 鱼,  及 油 都 可食用, while 乳制品, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	1010101	斋戒规则： 斋日： 肉类和动物制品, 鱼, 油,  及 干食 都 可食用, while 乳制品, 鱼子,  及 酒 都 不可食用
+zh/Hans/	1010110	斋戒规则： 斋日： 肉类和动物制品, 鱼, 油,  及 酒 都 可食用, while 乳制品, 鱼子,  及 干食 都 不可食用
+zh/Hans/	1010111	斋戒规则： 斋日： 肉类和动物制品, 鱼, 油, 酒,  及 干食 都 可食用, while 乳制品,  及 鱼子 都 不可食用
+zh/Hans/	1011000	斋戒规则： 斋日： 肉类和动物制品, 鱼,  及 鱼子 都 可食用, while 乳制品, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1011001	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子,  及 干食 都 可食用, while 乳制品, 油,  及 酒 都 不可食用
+zh/Hans/	1011010	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子,  及 酒 都 可食用, while 乳制品, 油,  及 干食 都 不可食用
+zh/Hans/	1011011	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子, 酒,  及 干食 都 可食用, while 乳制品,  及 油 都 不可食用
+zh/Hans/	1011100	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子,  及 油 都 可食用, while 乳制品, 酒,  及 干食 都 不可食用
+zh/Hans/	1011101	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子, 油,  及 干食 都 可食用, while 乳制品,  及 酒 都 不可食用
+zh/Hans/	1011110	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子, 油,  及 酒 都 可食用, while 乳制品,  及 干食 都 不可食用
+zh/Hans/	1011111	斋戒规则： 斋日： 肉类和动物制品, 鱼, 鱼子, 油, 酒,  及 干食 都 可食用, while 乳制品斋日： 肉类和动物制品, 鱼, 鱼子, 油, 酒,  及 干食 都 可食用, while 乳制品 都 不可食用
+zh/Hans/	1100000	斋戒规则： 斋日： 肉类和动物制品,  及 乳制品 都 可食用, while 鱼, 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1100001	斋戒规则： 斋日： 肉类和动物制品, 乳制品,  及 干食 都 可食用, while 鱼, 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	1100010	斋戒规则： 斋日： 肉类和动物制品, 乳制品,  及 酒 都 可食用, while 鱼, 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	1100011	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 酒,  及 干食 都 可食用, while 鱼, 鱼子,  及 油 都 不可食用
+zh/Hans/	1100100	斋戒规则： 斋日： 肉类和动物制品, 乳制品,  及 油 都 可食用, while 鱼, 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	1100101	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 油,  及 干食 都 可食用, while 鱼, 鱼子,  及 酒 都 不可食用
+zh/Hans/	1100110	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 油,  及 酒 都 可食用, while 鱼, 鱼子,  及 干食 都 不可食用
+zh/Hans/	1100111	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 油, 酒,  及 干食 都 可食用, while 鱼,  及 鱼子 都 不可食用
+zh/Hans/	1101000	斋戒规则： 斋日： 肉类和动物制品, 乳制品,  及 鱼子 都 可食用, while 鱼, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1101001	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子,  及 干食 都 可食用, while 鱼, 油,  及 酒 都 不可食用
+zh/Hans/	1101010	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子,  及 酒 都 可食用, while 鱼, 油,  及 干食 都 不可食用
+zh/Hans/	1101011	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子, 酒,  及 干食 都 可食用, while 鱼,  及 油 都 不可食用
+zh/Hans/	1101100	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子,  及 油 都 可食用, while 鱼, 酒,  及 干食 都 不可食用
+zh/Hans/	1101101	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子, 油,  及 干食 都 可食用, while 鱼,  及 酒 都 不可食用
+zh/Hans/	1101110	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子, 油,  及 酒 都 可食用, while 鱼,  及 干食 都 不可食用
+zh/Hans/	1101111	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼子, 油, 酒,  及 干食 都 可食用, while 鱼斋日： 肉类和动物制品, 乳制品, 鱼子, 油, 酒,  及 干食 都 可食用, while 鱼 都 不可食用
+zh/Hans/	1110000	斋戒规则： 斋日： 肉类和动物制品, 乳制品,  及 鱼 都 可食用, while 鱼子, 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1110001	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼,  及 干食 都 可食用, while 鱼子, 油,  及 酒 都 不可食用
+zh/Hans/	1110010	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼,  及 酒 都 可食用, while 鱼子, 油,  及 干食 都 不可食用
+zh/Hans/	1110011	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 酒,  及 干食 都 可食用, while 鱼子,  及 油 都 不可食用
+zh/Hans/	1110100	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼,  及 油 都 可食用, while 鱼子, 酒,  及 干食 都 不可食用
+zh/Hans/	1110101	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 油,  及 干食 都 可食用, while 鱼子,  及 酒 都 不可食用
+zh/Hans/	1110110	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 油,  及 酒 都 可食用, while 鱼子,  及 干食 都 不可食用
+zh/Hans/	1110111	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 油, 酒,  及 干食 都 可食用, while 鱼子斋日： 肉类和动物制品, 乳制品, 鱼, 油, 酒,  及 干食 都 可食用, while 鱼子 都 不可食用
+zh/Hans/	1111000	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼,  及 鱼子 都 可食用, while 油, 酒,  及 干食 都 不可食用
+zh/Hans/	1111001	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子,  及 干食 都 可食用, while 油,  及 酒 都 不可食用
+zh/Hans/	1111010	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子,  及 酒 都 可食用, while 油,  及 干食 都 不可食用
+zh/Hans/	1111011	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 酒,  及 干食 都 可食用, while 油斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 酒,  及 干食 都 可食用, while 油 都 不可食用
+zh/Hans/	1111100	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子,  及 油 都 可食用, while 酒,  及 干食 都 不可食用
+zh/Hans/	1111101	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 油,  及 干食 都 可食用, while 酒斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 油,  及 干食 都 可食用, while 酒 都 不可食用
+zh/Hans/	1111110	斋戒规则： 斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 油,  及 酒 都 可食用, while 干食斋日： 肉类和动物制品, 乳制品, 鱼, 鱼子, 油,  及 酒 都 可食用, while 干食 都 不可食用
+zh/Hans/	1111111	斋戒规则：免斋期
+zh/Hant/	0000000	齋戒規則：嚴格規定齋日：按照修行規矩：禁食
+zh/Hant/	0000001	齋戒規則：嚴格規定齋日：按照修行規矩：幹食
+zh/Hant/	0000010	齋戒規則：齋日（酒可飲）
+zh/Hant/	0000011	齋戒規則：嚴格規定齋日：按照修行規矩：免油熱食
+zh/Hant/	0000100	齋戒規則： 齋日： 油 都 可食用, while 肉類和動物製品, 乳製品, 魚, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	0000101	齋戒規則： 齋日： 油,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚, 魚子,  及 酒 都 不可食用
+zh/Hant/	0000110	齋戒規則： 齋日： 油,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 魚, 魚子,  及 幹食 都 不可食用
+zh/Hant/	0000111	齋戒規則：齋日（酒、油可食）
+zh/Hant/	0001000	齋戒規則： 齋日： 魚子 都 可食用, while 肉類和動物製品, 乳製品, 魚, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0001001	齋戒規則： 齋日： 魚子,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚, 油,  及 酒 都 不可食用
+zh/Hant/	0001010	齋戒規則： 齋日： 魚子,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 魚, 油,  及 幹食 都 不可食用
+zh/Hant/	0001011	齋戒規則： 齋日： 魚子, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚,  及 油 都 不可食用
+zh/Hant/	0001100	齋戒規則： 齋日： 魚子,  及 油 都 可食用, while 肉類和動物製品, 乳製品, 魚, 酒,  及 幹食 都 不可食用
+zh/Hant/	0001101	齋戒規則： 齋日： 魚子, 油,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚,  及 酒 都 不可食用
+zh/Hant/	0001110	齋戒規則： 齋日： 魚子, 油,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 魚,  及 幹食 都 不可食用
+zh/Hant/	0001111	齋戒規則：齋日（魚子、酒及油可食）
+zh/Hant/	0010000	齋戒規則： 齋日： 魚 都 可食用, while 肉類和動物製品, 乳製品, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0010001	齋戒規則： 齋日： 魚,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	0010010	齋戒規則： 齋日： 魚,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	0010011	齋戒規則： 齋日： 魚, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚子,  及 油 都 不可食用
+zh/Hant/	0010100	齋戒規則： 齋日： 魚,  及 油 都 可食用, while 肉類和動物製品, 乳製品, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	0010101	齋戒規則： 齋日： 魚, 油,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 魚子,  及 酒 都 不可食用
+zh/Hant/	0010110	齋戒規則： 齋日： 魚, 油,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 魚子,  及 幹食 都 不可食用
+zh/Hant/	0010111	齋戒規則： 齋日： 魚, 油, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品,  及 魚子 都 不可食用
+zh/Hant/	0011000	齋戒規則： 齋日： 魚,  及 魚子 都 可食用, while 肉類和動物製品, 乳製品, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0011001	齋戒規則： 齋日： 魚, 魚子,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品, 油,  及 酒 都 不可食用
+zh/Hant/	0011010	齋戒規則： 齋日： 魚, 魚子,  及 酒 都 可食用, while 肉類和動物製品, 乳製品, 油,  及 幹食 都 不可食用
+zh/Hant/	0011011	齋戒規則： 齋日： 魚, 魚子, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品,  及 油 都 不可食用
+zh/Hant/	0011100	齋戒規則： 齋日： 魚, 魚子,  及 油 都 可食用, while 肉類和動物製品, 乳製品, 酒,  及 幹食 都 不可食用
+zh/Hant/	0011101	齋戒規則： 齋日： 魚, 魚子, 油,  及 幹食 都 可食用, while 肉類和動物製品, 乳製品,  及 酒 都 不可食用
+zh/Hant/	0011110	齋戒規則： 齋日： 魚, 魚子, 油,  及 酒 都 可食用, while 肉類和動物製品, 乳製品,  及 幹食 都 不可食用
+zh/Hant/	0011111	齋戒規則：齋日（魚、酒及油可食）
+zh/Hant/	0100000	齋戒規則： 齋日： 乳製品 都 可食用, while 肉類和動物製品, 魚, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0100001	齋戒規則： 齋日： 乳製品,  及 幹食 都 可食用, while 肉類和動物製品, 魚, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	0100010	齋戒規則： 齋日： 乳製品,  及 酒 都 可食用, while 肉類和動物製品, 魚, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	0100011	齋戒規則： 齋日： 乳製品, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 魚, 魚子,  及 油 都 不可食用
+zh/Hant/	0100100	齋戒規則： 齋日： 乳製品,  及 油 都 可食用, while 肉類和動物製品, 魚, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	0100101	齋戒規則： 齋日： 乳製品, 油,  及 幹食 都 可食用, while 肉類和動物製品, 魚, 魚子,  及 酒 都 不可食用
+zh/Hant/	0100110	齋戒規則： 齋日： 乳製品, 油,  及 酒 都 可食用, while 肉類和動物製品, 魚, 魚子,  及 幹食 都 不可食用
+zh/Hant/	0100111	齋戒規則： 齋日： 乳製品, 油, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 魚,  及 魚子 都 不可食用
+zh/Hant/	0101000	齋戒規則： 齋日： 乳製品,  及 魚子 都 可食用, while 肉類和動物製品, 魚, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0101001	齋戒規則： 齋日： 乳製品, 魚子,  及 幹食 都 可食用, while 肉類和動物製品, 魚, 油,  及 酒 都 不可食用
+zh/Hant/	0101010	齋戒規則： 齋日： 乳製品, 魚子,  及 酒 都 可食用, while 肉類和動物製品, 魚, 油,  及 幹食 都 不可食用
+zh/Hant/	0101011	齋戒規則： 齋日： 乳製品, 魚子, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 魚,  及 油 都 不可食用
+zh/Hant/	0101100	齋戒規則： 齋日： 乳製品, 魚子,  及 油 都 可食用, while 肉類和動物製品, 魚, 酒,  及 幹食 都 不可食用
+zh/Hant/	0101101	齋戒規則： 齋日： 乳製品, 魚子, 油,  及 幹食 都 可食用, while 肉類和動物製品, 魚,  及 酒 都 不可食用
+zh/Hant/	0101110	齋戒規則： 齋日： 乳製品, 魚子, 油,  及 酒 都 可食用, while 肉類和動物製品, 魚,  及 幹食 都 不可食用
+zh/Hant/	0101111	齋戒規則： 齋日： 乳製品, 魚子, 油, 酒,  及 幹食 都 可食用, while 肉類和動物製品,  及 魚 都 不可食用
+zh/Hant/	0110000	齋戒規則： 齋日： 乳製品,  及 魚 都 可食用, while 肉類和動物製品, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0110001	齋戒規則： 齋日： 乳製品, 魚,  及 幹食 都 可食用, while 肉類和動物製品, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	0110010	齋戒規則： 齋日： 乳製品, 魚,  及 酒 都 可食用, while 肉類和動物製品, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	0110011	齋戒規則： 齋日： 乳製品, 魚, 酒,  及 幹食 都 可食用, while 肉類和動物製品, 魚子,  及 油 都 不可食用
+zh/Hant/	0110100	齋戒規則： 齋日： 乳製品, 魚,  及 油 都 可食用, while 肉類和動物製品, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	0110101	齋戒規則： 齋日： 乳製品, 魚, 油,  及 幹食 都 可食用, while 肉類和動物製品, 魚子,  及 酒 都 不可食用
+zh/Hant/	0110110	齋戒規則： 齋日： 乳製品, 魚, 油,  及 酒 都 可食用, while 肉類和動物製品, 魚子,  及 幹食 都 不可食用
+zh/Hant/	0110111	齋戒規則： 齋日： 乳製品, 魚, 油, 酒,  及 幹食 都 可食用, while 肉類和動物製品,  及 魚子 都 不可食用
+zh/Hant/	0111000	齋戒規則： 齋日： 乳製品, 魚,  及 魚子 都 可食用, while 肉類和動物製品, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	0111001	齋戒規則： 齋日： 乳製品, 魚, 魚子,  及 幹食 都 可食用, while 肉類和動物製品, 油,  及 酒 都 不可食用
+zh/Hant/	0111010	齋戒規則： 齋日： 乳製品, 魚, 魚子,  及 酒 都 可食用, while 肉類和動物製品, 油,  及 幹食 都 不可食用
+zh/Hant/	0111011	齋戒規則： 齋日： 乳製品, 魚, 魚子, 酒,  及 幹食 都 可食用, while 肉類和動物製品,  及 油 都 不可食用
+zh/Hant/	0111100	齋戒規則： 齋日： 乳製品, 魚, 魚子,  及 油 都 可食用, while 肉類和動物製品, 酒,  及 幹食 都 不可食用
+zh/Hant/	0111101	齋戒規則： 齋日： 乳製品, 魚, 魚子, 油,  及 幹食 都 可食用, while 肉類和動物製品,  及 酒 都 不可食用
+zh/Hant/	0111110	齋戒規則： 齋日： 乳製品, 魚, 魚子, 油,  及 酒 都 可食用, while 肉類和動物製品,  及 幹食 都 不可食用
+zh/Hant/	0111111	齋戒規則：齋日（Meat is excluded）
+zh/Hant/	1000000	齋戒規則： 齋日： 肉類和動物製品 都 可食用, while 乳製品, 魚, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1000001	齋戒規則： 齋日： 肉類和動物製品,  及 幹食 都 可食用, while 乳製品, 魚, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	1000010	齋戒規則： 齋日： 肉類和動物製品,  及 酒 都 可食用, while 乳製品, 魚, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	1000011	齋戒規則： 齋日： 肉類和動物製品, 酒,  及 幹食 都 可食用, while 乳製品, 魚, 魚子,  及 油 都 不可食用
+zh/Hant/	1000100	齋戒規則： 齋日： 肉類和動物製品,  及 油 都 可食用, while 乳製品, 魚, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	1000101	齋戒規則： 齋日： 肉類和動物製品, 油,  及 幹食 都 可食用, while 乳製品, 魚, 魚子,  及 酒 都 不可食用
+zh/Hant/	1000110	齋戒規則： 齋日： 肉類和動物製品, 油,  及 酒 都 可食用, while 乳製品, 魚, 魚子,  及 幹食 都 不可食用
+zh/Hant/	1000111	齋戒規則： 齋日： 肉類和動物製品, 油, 酒,  及 幹食 都 可食用, while 乳製品, 魚,  及 魚子 都 不可食用
+zh/Hant/	1001000	齋戒規則： 齋日： 肉類和動物製品,  及 魚子 都 可食用, while 乳製品, 魚, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1001001	齋戒規則： 齋日： 肉類和動物製品, 魚子,  及 幹食 都 可食用, while 乳製品, 魚, 油,  及 酒 都 不可食用
+zh/Hant/	1001010	齋戒規則： 齋日： 肉類和動物製品, 魚子,  及 酒 都 可食用, while 乳製品, 魚, 油,  及 幹食 都 不可食用
+zh/Hant/	1001011	齋戒規則： 齋日： 肉類和動物製品, 魚子, 酒,  及 幹食 都 可食用, while 乳製品, 魚,  及 油 都 不可食用
+zh/Hant/	1001100	齋戒規則： 齋日： 肉類和動物製品, 魚子,  及 油 都 可食用, while 乳製品, 魚, 酒,  及 幹食 都 不可食用
+zh/Hant/	1001101	齋戒規則： 齋日： 肉類和動物製品, 魚子, 油,  及 幹食 都 可食用, while 乳製品, 魚,  及 酒 都 不可食用
+zh/Hant/	1001110	齋戒規則： 齋日： 肉類和動物製品, 魚子, 油,  及 酒 都 可食用, while 乳製品, 魚,  及 幹食 都 不可食用
+zh/Hant/	1001111	齋戒規則： 齋日： 肉類和動物製品, 魚子, 油, 酒,  及 幹食 都 可食用, while 乳製品,  及 魚 都 不可食用
+zh/Hant/	1010000	齋戒規則： 齋日： 肉類和動物製品,  及 魚 都 可食用, while 乳製品, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1010001	齋戒規則： 齋日： 肉類和動物製品, 魚,  及 幹食 都 可食用, while 乳製品, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	1010010	齋戒規則： 齋日： 肉類和動物製品, 魚,  及 酒 都 可食用, while 乳製品, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	1010011	齋戒規則： 齋日： 肉類和動物製品, 魚, 酒,  及 幹食 都 可食用, while 乳製品, 魚子,  及 油 都 不可食用
+zh/Hant/	1010100	齋戒規則： 齋日： 肉類和動物製品, 魚,  及 油 都 可食用, while 乳製品, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	1010101	齋戒規則： 齋日： 肉類和動物製品, 魚, 油,  及 幹食 都 可食用, while 乳製品, 魚子,  及 酒 都 不可食用
+zh/Hant/	1010110	齋戒規則： 齋日： 肉類和動物製品, 魚, 油,  及 酒 都 可食用, while 乳製品, 魚子,  及 幹食 都 不可食用
+zh/Hant/	1010111	齋戒規則： 齋日： 肉類和動物製品, 魚, 油, 酒,  及 幹食 都 可食用, while 乳製品,  及 魚子 都 不可食用
+zh/Hant/	1011000	齋戒規則： 齋日： 肉類和動物製品, 魚,  及 魚子 都 可食用, while 乳製品, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1011001	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子,  及 幹食 都 可食用, while 乳製品, 油,  及 酒 都 不可食用
+zh/Hant/	1011010	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子,  及 酒 都 可食用, while 乳製品, 油,  及 幹食 都 不可食用
+zh/Hant/	1011011	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子, 酒,  及 幹食 都 可食用, while 乳製品,  及 油 都 不可食用
+zh/Hant/	1011100	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子,  及 油 都 可食用, while 乳製品, 酒,  及 幹食 都 不可食用
+zh/Hant/	1011101	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子, 油,  及 幹食 都 可食用, while 乳製品,  及 酒 都 不可食用
+zh/Hant/	1011110	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子, 油,  及 酒 都 可食用, while 乳製品,  及 幹食 都 不可食用
+zh/Hant/	1011111	齋戒規則： 齋日： 肉類和動物製品, 魚, 魚子, 油, 酒,  及 幹食 都 可食用, while 乳製品齋日： 肉類和動物製品, 魚, 魚子, 油, 酒,  及 幹食 都 可食用, while 乳製品 都 不可食用
+zh/Hant/	1100000	齋戒規則： 齋日： 肉類和動物製品,  及 乳製品 都 可食用, while 魚, 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1100001	齋戒規則： 齋日： 肉類和動物製品, 乳製品,  及 幹食 都 可食用, while 魚, 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	1100010	齋戒規則： 齋日： 肉類和動物製品, 乳製品,  及 酒 都 可食用, while 魚, 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	1100011	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 酒,  及 幹食 都 可食用, while 魚, 魚子,  及 油 都 不可食用
+zh/Hant/	1100100	齋戒規則： 齋日： 肉類和動物製品, 乳製品,  及 油 都 可食用, while 魚, 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	1100101	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 油,  及 幹食 都 可食用, while 魚, 魚子,  及 酒 都 不可食用
+zh/Hant/	1100110	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 油,  及 酒 都 可食用, while 魚, 魚子,  及 幹食 都 不可食用
+zh/Hant/	1100111	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 油, 酒,  及 幹食 都 可食用, while 魚,  及 魚子 都 不可食用
+zh/Hant/	1101000	齋戒規則： 齋日： 肉類和動物製品, 乳製品,  及 魚子 都 可食用, while 魚, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1101001	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子,  及 幹食 都 可食用, while 魚, 油,  及 酒 都 不可食用
+zh/Hant/	1101010	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子,  及 酒 都 可食用, while 魚, 油,  及 幹食 都 不可食用
+zh/Hant/	1101011	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子, 酒,  及 幹食 都 可食用, while 魚,  及 油 都 不可食用
+zh/Hant/	1101100	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子,  及 油 都 可食用, while 魚, 酒,  及 幹食 都 不可食用
+zh/Hant/	1101101	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子, 油,  及 幹食 都 可食用, while 魚,  及 酒 都 不可食用
+zh/Hant/	1101110	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子, 油,  及 酒 都 可食用, while 魚,  及 幹食 都 不可食用
+zh/Hant/	1101111	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚子, 油, 酒,  及 幹食 都 可食用, while 魚齋日： 肉類和動物製品, 乳製品, 魚子, 油, 酒,  及 幹食 都 可食用, while 魚 都 不可食用
+zh/Hant/	1110000	齋戒規則： 齋日： 肉類和動物製品, 乳製品,  及 魚 都 可食用, while 魚子, 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1110001	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚,  及 幹食 都 可食用, while 魚子, 油,  及 酒 都 不可食用
+zh/Hant/	1110010	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚,  及 酒 都 可食用, while 魚子, 油,  及 幹食 都 不可食用
+zh/Hant/	1110011	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 酒,  及 幹食 都 可食用, while 魚子,  及 油 都 不可食用
+zh/Hant/	1110100	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚,  及 油 都 可食用, while 魚子, 酒,  及 幹食 都 不可食用
+zh/Hant/	1110101	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 油,  及 幹食 都 可食用, while 魚子,  及 酒 都 不可食用
+zh/Hant/	1110110	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 油,  及 酒 都 可食用, while 魚子,  及 幹食 都 不可食用
+zh/Hant/	1110111	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 油, 酒,  及 幹食 都 可食用, while 魚子齋日： 肉類和動物製品, 乳製品, 魚, 油, 酒,  及 幹食 都 可食用, while 魚子 都 不可食用
+zh/Hant/	1111000	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚,  及 魚子 都 可食用, while 油, 酒,  及 幹食 都 不可食用
+zh/Hant/	1111001	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子,  及 幹食 都 可食用, while 油,  及 酒 都 不可食用
+zh/Hant/	1111010	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子,  及 酒 都 可食用, while 油,  及 幹食 都 不可食用
+zh/Hant/	1111011	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 酒,  及 幹食 都 可食用, while 油齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 酒,  及 幹食 都 可食用, while 油 都 不可食用
+zh/Hant/	1111100	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子,  及 油 都 可食用, while 酒,  及 幹食 都 不可食用
+zh/Hant/	1111101	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 油,  及 幹食 都 可食用, while 酒齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 油,  及 幹食 都 可食用, while 酒 都 不可食用
+zh/Hant/	1111110	齋戒規則： 齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 油,  及 酒 都 可食用, while 幹食齋日： 肉類和動物製品, 乳製品, 魚, 魚子, 油,  及 酒 都 可食用, while 幹食 都 不可食用
+zh/Hant/	1111111	齋戒規則：免齋期

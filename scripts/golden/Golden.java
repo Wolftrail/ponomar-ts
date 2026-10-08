@@ -18,7 +18,34 @@ public class Golden
 				case "pcalendar": pcalendar(out, stride); break;
 				case "dsl": dsl(out); break;
 				case "day": day(out, stride, args[3]); break;
+				case "fastconvert": fastconvert(out); break;
 				default: throw new IllegalArgumentException(mode);
+			}
+		}
+	}
+
+	// Fasting.convert for every 7-digit level in several languages. Run with cwd = vendor/ponomar.
+	private static void fastconvert(PrintWriter out)
+	{
+		out.println("language\tlevel\ttext");
+		for (String language : new String[] { "en/", "fr/", "cu/ru/", "el/mono/", "zh/Hans/", "zh/Hant/" })
+		{
+			OrderedHashtable info = new OrderedHashtable();
+			info.put("LS", language);
+			Fasting fasting = new Fasting(info);
+			for (int n = 0; n < 128; n++)
+			{
+				String level = String.format("%7s", Integer.toBinaryString(n)).replace(' ', '0');
+				String text;
+				try
+				{
+					text = fasting.convert(level);
+				}
+				catch (Throwable t)
+				{
+					text = "ERR";
+				}
+				out.println(language + "\t" + level + "\t" + String.valueOf(text).replace('\t', ' ').replace('\n', ' '));
 			}
 		}
 	}
@@ -66,7 +93,9 @@ public class Golden
 		String[] languages = { "en/", "cu/ru/", "el/mono/" };
 		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
 		field.setAccessible(true);
-		out.println(String.join("\t", "language", "gs", "year", "month", "day", "nday", "ndayP", "ndayF", "doy", "dow", "paschalFile", "paschal", "menaion", "rankPaschal", "rankMenaion", "dRank", "tone"));
+		java.lang.reflect.Field fastField = Fasting.class.getDeclaredField("Fast");
+		fastField.setAccessible(true);
+		out.println(String.join("\t", "language", "gs", "year", "month", "day", "nday", "ndayP", "ndayF", "doy", "dow", "paschalFile", "paschal", "menaion", "rankPaschal", "rankMenaion", "dRank", "tone", "fastLevel", "fastText"));
 		for (String language : languages)
 		{
 			for (int gs = 0; gs <= 1; gs++)
@@ -125,9 +154,24 @@ public class Golden
 						Day menaion = new Day(menaionFile, info);
 						int rankPaschal = paschal.getDayRank();
 						int rankMenaion = menaion.getDayRank();
+						int dRank = Math.max(rankPaschal, rankMenaion);
+						// As Main.write(): fasting runs once dRank holds the day's rank.
+						info.put("dRank", dRank);
+						String fastLevel;
+						String fastText;
+						try
+						{
+							fastText = new Fasting(info).FastRules();
+							fastLevel = (String) fastField.get(null);
+						}
+						catch (Throwable t)
+						{
+							fastText = "ERR";
+							fastLevel = "ERR";
+						}
 						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, "" + nday, "" + ndayP, "" + ndayF, "" + doy, "" + dow,
 							paschalFile, describe(field, paschal), describe(field, menaion), "" + rankPaschal, "" + rankMenaion,
-							"" + Math.max(rankPaschal, rankMenaion), "" + paschal.getTone()));
+							"" + Math.max(rankPaschal, rankMenaion), "" + paschal.getTone(), fastLevel, String.valueOf(fastText).replace('\t', ' ').replace('\n', ' ')));
 					}
 				}
 			}

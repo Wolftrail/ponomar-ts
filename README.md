@@ -15,6 +15,16 @@ day.rank; // 8: Pascha
 day.paschal.commemorations; // [{ sid: [], cid: "9001", rank: 8 }]
 ```
 
+Fasting follows from the resolved day, and Bible references in the data parse into structured ranges (no Bible text is included):
+
+```ts
+import { getDayFasting, parseBibleReference, renderFastingLevel } from "ponomar-ts";
+
+getDayFasting(day)?.level; // "1111111": no fast
+await renderFastingLevel("0000111", "en"); // "Fasting regulations: Fast: Wine and oil allowed "
+parseBibleReference("Lk_2:20-21, 40-52").ranges; // two ranges in chapter 2
+```
+
 Data loads lazily per language, so the API is asynchronous.
 
 ```ts

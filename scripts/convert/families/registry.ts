@@ -27,9 +27,15 @@ export function convertRegistry(files: readonly GeneratedFile[]): GeneratedFile 
 		`/** As MENAION_LOADERS, keyed by the floating-feast file number. */\n` +
 		`export const FLOAT_LOADERS: Readonly<Record<string, Loader<{ FLOAT: Readonly<Record<number, FloatFile>> }>>> = ${loaders(files, day("float"), slug)};\n\n` +
 		`/** Keyed "<chunk>.<language slug>"; the chunk of a life id comes from LIFE_CHUNKS. */\n` +
-		`export const LIFE_LOADERS: Readonly<Record<string, Loader<{ LIVES: Readonly<Record<string, Life>> }>>> = ${loaders(files, new RegExp(`^${PREFIX}lives/([^/]+)\\.ts$`), (match) => match[1]!)};\n`;
+		`export const LIFE_LOADERS: Readonly<Record<string, Loader<{ LIVES: Readonly<Record<string, Life>> }>>> = ${loaders(files, new RegExp(`^${PREFIX}lives/([^/]+)\\.ts$`), (match) => match[1]!)};\n\n` +
+		`/** Language slug to that language directory's phrases, Times labels, podobni and number rules. */\n` +
+		`export const LANGUAGE_PACK_LOADERS: Readonly<Record<string, Loader<{ LANGUAGE_PACK: LanguagePackData }>>> = ${loaders(files, new RegExp(`^${PREFIX}language/([^.]+)\\.ts$`), slug)};\n\n` +
+		`/** Language slug to that language directory's prayer and label texts. */\n` +
+		`export const PRAYER_LOADERS: Readonly<Record<string, Loader<{ PRAYERS: Readonly<Record<string, PrayerText>> }>>> = ${loaders(files, new RegExp(`^${PREFIX}services/prayers\\.([^.]+)\\.ts$`), slug)};\n\n` +
+		`/** Language slug to that language directory's Octoechos tables. */\n` +
+		`export const OCTOECHOS_LOADERS: Readonly<Record<string, Loader<{ OCTOECHOS: Readonly<Record<string, readonly OctoechosEntry[]>> }>>> = ${loaders(files, new RegExp(`^${PREFIX}services/octoechos\\.([^.]+)\\.ts$`), slug)};\n`;
 	return {
 		path: `${PREFIX}registry.ts`,
-		content: header("the generated day and life modules", 'import type { DayFile, FloatFile, Life } from "../types.ts";') + body.replace(/\n\t"index": [^\n]*/, ""),
+		content: header("the generated day, life, language and service modules", 'import type { DayFile, FloatFile, LanguagePackData, Life, OctoechosEntry, PrayerText } from "../types.ts";') + body.replace(/\n\t"index": [^\n]*/, ""),
 	};
 }

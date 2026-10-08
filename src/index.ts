@@ -19,3 +19,16 @@ export type { ResolveDayOptions, ResolvedCommemoration, ResolvedDay, ResolvedPar
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";
+export {
+	describeFastingLevel,
+	FASTING_FOODS,
+	getDayFasting,
+	getFasting,
+	getFastingLevel,
+	renderFastingLevel,
+} from "./engine/fasting.ts";
+export type { FastingFood, FastingResult } from "./engine/fasting.ts";
+export { BibleReferenceError, findBibleBook, formatBibleReference, parseBibleReference } from "./bible/reference.ts";
+export type { BibleReference, VerseEndpoint, VerseRange } from "./bible/reference.ts";
+export { BIBLE_BOOKS } from "./data/generated/bibleBooks.ts";
+export type { BibleBook } from "./data/types.ts";
