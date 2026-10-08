@@ -26,6 +26,16 @@ gospel[0]; // { reading: "Jn_20:1-10", rank: 8, commemoration: "9001" }
 
 `getMatinsReadings(day, language)` returns the Matins Gospel the same way.
 
+Language packs supply phrases, numerals and repeat counts:
+
+```ts
+import { formatNumber, formatTimes, getPhrase } from "ponomar-ts";
+
+await formatNumber("cu/ru", 107); // "р҃з"
+await formatTimes("en", 5); // "<i>5 times</i>"
+await getPhrase("en", "Rank0"); // "^NF"
+```
+
 Names, lives and hymns come per commemoration:
 
 ```ts

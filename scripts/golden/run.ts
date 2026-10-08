@@ -81,6 +81,11 @@ function runLives(): void {
 	writeFileSync(join(sampleDir, "lives.tsv"), sample.join("\n") + "\n");
 }
 
+// Small enough to commit whole.
+function runNumbers(): void {
+	runInVendor("numbers", join(sampleDir, "numbers.tsv"), "1");
+}
+
 try {
 	const sources = readdirSync(upstream)
 		.filter((f) => f.endsWith(".java"))
@@ -89,7 +94,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -100,6 +105,8 @@ try {
 			runReadings(mode);
 		} else if (mode === "lives") {
 			runLives();
+		} else if (mode === "numbers") {
+			runNumbers();
 		} else {
 			for (const [dir, stride] of [[fullDir, 1], [sampleDir, SAMPLE_STRIDE]] as const) {
 				runJava(mode, join(dir, `${mode}.csv`), stride);

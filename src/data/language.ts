@@ -42,3 +42,8 @@ export async function getTimesLabels(language: string): Promise<readonly TimesLa
 export async function getPodobni(language: string): Promise<readonly Podoben[]> {
 	return (await lookup("podobni", language)) ?? [];
 }
+
+/** The `RuleBasedNumbers.xml` phrase table of the first language along the chain that has one. */
+export async function getNumberRules(language: string): Promise<Readonly<Record<string, string>> | undefined> {
+	return lookup("numberRules", language);
+}

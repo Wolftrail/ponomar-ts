@@ -22,6 +22,7 @@ public class Golden
 				case "liturgy": liturgy(out, stride, args[3], false); break;
 				case "matins": liturgy(out, stride, args[3], true); break;
 				case "lives": lives(out, args[3]); break;
+				case "numbers": numbers(out); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -250,6 +251,44 @@ public class Golden
 		return text.replace('\t', ' ').replace('\n', ' ').replace('\r', ' ');
 	}
 
+	// RuleBasedNumber.getFormattedNumber for a spread of numbers in every language with rules, and in one without. Run with cwd = vendor/ponomar.
+	private static void numbers(PrintWriter out)
+	{
+		java.util.List<Long> values = new java.util.ArrayList<Long>();
+		for (long n = 0; n <= 3000; n++)
+		{
+			values.add(n);
+		}
+		for (long n = 3001; n <= 20000; n += 7)
+		{
+			values.add(n);
+		}
+		for (long n : new long[] { 4999, 5000, 9999, 10000, 10001, 12345, 99999, 100000, 100001, 123456, 999999, 1000000, 1000001, 1234567, 9999999, 10000000, 10000001, 12345678, 99999999, 100000000, 100000001, 123456789, 999999999, 1000000000, 1000000001, 1234567890L, 9999999999L, 10000000000L, 10000000001L, 99999999999L })
+		{
+			values.add(n);
+		}
+		out.println("language\tnumber\ttext");
+		for (String language : new String[] { "", "en/", "fr/", "cu/ru/", "el/mono/", "zh/Hans/", "zh/Hant/" })
+		{
+			OrderedHashtable info = new OrderedHashtable();
+			info.put("LS", language);
+			RuleBasedNumber rules = new RuleBasedNumber(info);
+			for (long n : values)
+			{
+				String text;
+				try
+				{
+					text = rules.getFormattedNumber((double) n);
+				}
+				catch (Throwable t)
+				{
+					text = "ERR";
+				}
+				out.println(language + "\t" + n + "\t" + clean(text));
+			}
+		}
+	}
+
 	// What a commemoration's life file yields on each day it occurs: its names in every grammatical form, its life, and the
 	// Liturgy troparia and kontakia (as DoSaint1 shows them). One row per distinct result; the date says which context gave it.
 	private static void lives(PrintWriter out, String yearList) throws Exception
@@ -263,7 +302,7 @@ public class Golden
 		services.setAccessible(true);
 		String[] forms = { "Nominative", "Genetive", "Dative", "Possessive", "Short", "ShortF", "Name", "Index" };
 		String[] hymnNodes = { "/LITURGY/TROPARION", "/LITURGY/KONTAKION" };
-		out.println(String.join("\t", "language", "year", "month", "day", "cid", "nominative", "genitive", "dative", "possessive", "short", "shortF", "name", "index", "life", "copyright", "lifeId", "troparion1", "troparion2", "kontakion1", "kontakion2"));
+		out.println(String.join("\t", "language", "year", "month", "day", "cid", "nominative", "genitive", "dative", "possessive", "short", "shortF", "name", "index", "life", "copyright", "lifeId", "troparion1", "troparion2", "kontakion1", "kontakion2", "label"));
 		java.util.Set<String> seen = new java.util.HashSet<String>();
 		for (String language : languages)
 		{
@@ -305,9 +344,14 @@ public class Golden
 
 					for (Day part : new Day[] { menaion, paschal })
 					{
-						for (Object item : (java.util.Vector) commemorations.get(part))
+						java.util.Vector list = (java.util.Vector) commemorations.get(part);
+						// The tag Main shows after a commemoration's readings, one entry per commemoration in order.
+						OrderedHashtable[] labelled = list.isEmpty() ? null : part.getReadings();
+						int position = 0;
+						for (Object item : list)
 						{
 							Commemoration1 c = (Commemoration1) item;
+							OrderedHashtable entry = (OrderedHashtable) labelled[position++].get("Readings");
 							StringBuilder row = new StringBuilder(c.getCId());
 							for (String form : forms)
 							{
@@ -348,6 +392,7 @@ public class Golden
 									row.append('\t').append(tone == null ? "" : clean(tone.toString())).append('/').append(podoben == null ? "" : clean(podoben.toString())).append('/').append(text == null ? "-" : fingerprint(text.toString()));
 								}
 							}
+							row.append('\t').append(clean(entry.get("Name").toString()));
 							String key = language + "\t" + row;
 							if (seen.add(key))
 							{

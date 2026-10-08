@@ -47,7 +47,7 @@ function tokenize(source: string): Token[] {
 			i++;
 			continue;
 		}
-		const number = /^(?:\d+\.?\d*|\.\d+)/.exec(source.slice(i));
+		const number = /^(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/.exec(source.slice(i));
 		if (number) {
 			tokens.push({ type: "number", value: Number(number[0]) });
 			i += number[0].length;

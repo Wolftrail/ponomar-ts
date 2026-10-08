@@ -27,6 +27,10 @@ export type {
 export { getLiturgyReadings } from "./engine/liturgy.ts";
 export type { LiturgyReading, LiturgyReadings, LiturgyReadingType } from "./engine/liturgy.ts";
 export { getMatinsReadings } from "./engine/matins.ts";
+export { getPhrase, getPhraseList, getPhrases } from "./data/language.ts";
+export { commemorationLabel, formatCommemoration, formatTimes, podobenIntro } from "./engine/localization.ts";
+export { formatNumber, formatRuleBasedNumber, parseNumberRules } from "./engine/numbers.ts";
+export type { NumberRules } from "./engine/numbers.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";

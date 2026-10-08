@@ -10,6 +10,7 @@ import {
 	nameForm,
 } from "../../src/engine/commemoration.ts";
 import { dayVariables } from "../../src/engine/context.ts";
+import { commemorationLabel } from "../../src/engine/localization.ts";
 
 const FORMS: readonly NameForm[] = ["nominative", "genitive", "dative", "possessive", "short", "shortF", "name", "index"];
 
@@ -61,6 +62,7 @@ async function compare(rows: readonly Row[]): Promise<string[]> {
 			const value = nameForm(names, form);
 			check(form, value === undefined ? "-" : clean(value), row[form]);
 		}
+		check("label", clean((await commemorationLabel(language, names)) ?? "-"), row["label"]);
 
 		const life = await commemorationLife(cid, language);
 		check("life", life === undefined ? "-" : hasMarkup(life.text) ? undefined : fingerprint(life.text), row["life"]);
