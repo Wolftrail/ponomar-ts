@@ -213,5 +213,86 @@ export interface BibleBook {
 	readonly alternativeChapters?: readonly number[];
 }
 
+/** Attributes shared by the directives of a service template. `cmd` is a condition in the expression language. */
+interface ServiceDirectiveBase {
+	readonly cmd?: string;
+}
+
+/** Names the service and the texts for its title, header, source and comment lines (keys of the text files). */
+export interface ServiceTitle extends ServiceDirectiveBase {
+	readonly directive: "title";
+	readonly value: string;
+	readonly header?: string;
+	readonly source?: string;
+	readonly comment?: string;
+}
+
+export interface ServiceSubtitle extends ServiceDirectiveBase {
+	readonly directive: "subtitle";
+	readonly value: string;
+}
+
+/** Includes another template; `null` means the included template may be missing. */
+export interface ServiceGet extends ServiceDirectiveBase {
+	readonly directive: "get";
+	readonly file: string;
+	readonly null?: string;
+}
+
+/** Emits a named prayer (`what`) spoken by `who`, optionally repeated `times` and followed by commands. */
+export interface ServiceCreate extends ServiceDirectiveBase {
+	readonly directive: "create";
+	readonly what: string;
+	readonly who: string;
+	readonly redFirst?: string;
+	readonly newLine?: string;
+	readonly times?: string;
+	readonly command?: string;
+	readonly commandB?: string;
+	readonly header?: string;
+}
+
+/** A reading from Scripture: `verses` names it, or `getReading` takes it from the day's readings. */
+export interface ServiceBible extends ServiceDirectiveBase {
+	readonly directive: "bible";
+	readonly who: string;
+	readonly newLine: string;
+	readonly verses?: string;
+	readonly redFirst?: string;
+	readonly header?: string;
+	readonly twoStars?: string;
+	readonly getReading?: string;
+}
+
+/** Emits a variable proper (troparion, kontakion, ...) of the given type and id from the day's data. */
+export interface ServiceGetId extends ServiceDirectiveBase {
+	readonly directive: "getId";
+	readonly type: string;
+	readonly id: string;
+	readonly what: string;
+	readonly who: string;
+	readonly redFirst: string;
+	readonly newLine: string;
+	readonly header?: string;
+	readonly times?: string;
+}
+
+export type ServiceDirective = ServiceTitle | ServiceSubtitle | ServiceGet | ServiceCreate | ServiceBible | ServiceGetId;
+
+/** A language's prayer or label: `text` is exactly as upstream, markup included. */
+export interface PrayerText {
+	readonly header?: string;
+	readonly text: string;
+}
+
+/** What one Octoechos entry of a tone and weekday says to sing at an hour; ids name entries in the prayer texts. */
+export interface OctoechosEntry {
+	readonly hour: "primes" | "terce" | "sexte" | "none";
+	readonly type: string;
+	readonly troparion1?: string;
+	readonly kontakion1: string;
+	readonly cmd: string;
+}
+
 /** Which month chunk holds a life; "movable" covers triodion/pentecostarion, "other" the unreferenced rest. */
 export type LifeChunk = "01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09" | "10" | "11" | "12" | "movable" | "other";

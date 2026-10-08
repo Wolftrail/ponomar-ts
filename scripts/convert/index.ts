@@ -5,8 +5,9 @@ import { convertDays } from "./families/days.ts";
 import { convertLanguagePacks } from "./families/language.ts";
 import { convertLives } from "./families/lives.ts";
 import { convertRules } from "./families/rules.ts";
+import { convertServices } from "./families/services.ts";
 
-const generators: readonly (() => GeneratedFile[])[] = [convertRules, convertDays, convertLanguagePacks, convertLives, convertBibleBooks];
+const generators: readonly (() => GeneratedFile[])[] = [convertRules, convertDays, convertLanguagePacks, convertLives, convertBibleBooks, convertServices];
 const files = generators.flatMap((generate) => generate());
 
 if (process.argv.includes("--check")) {

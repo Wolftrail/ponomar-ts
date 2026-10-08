@@ -16,3 +16,13 @@
 
 - Add regression fixtures against upstream behavior as each subsystem is ported.
 - Document supported language packs and deliberate differences from the original Java application.
+
+## Revisit before release
+
+Data skipped during conversion (see LIMITATIONS.md). Re-check each against the finished engine and convert it if any code path turns out to need it.
+
+- `Services/Var`: scratch files written and re-read at runtime by Primes, ThirdHour, SixthHour and NinthHour. Confirm the Phase 6 composer rebuilds the same structure in memory.
+- `Commemorations/` (`0`, `123`, `543`, `T`): no upstream reader, and its ids are in no day file. Confirm nothing in day resolution or lives needs them.
+- `Services/menaion` (`P_3174`, `P_163`): Paramony files used only by commented-out code. Confirm the Christmas and Theophany eve services need no hymns from them.
+- `cu/xml/01/14_new.xml` and `fr/xml/lives/050307;.xml`: a draft and a misnamed copy, skipped by exact name. Confirm neither carries data the real files lack.
+- Language packs: `LS == ##` template entries and translator-comment attributes were dropped. Confirm no lookup needs them.
