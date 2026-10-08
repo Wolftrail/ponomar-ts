@@ -11,6 +11,10 @@ notice.
 
 ## [Unreleased]
 
+### Added
+
+- Restarted the package as a TypeScript reimplementation of Ponomar, beginning with Julian Pascha calculation.
+
 ### Changed
 
 - **Vendored HTOC window extended from 3 → 6 years (2025–2027 → 2025–2030).**
