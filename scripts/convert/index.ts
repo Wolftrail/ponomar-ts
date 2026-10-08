@@ -1,14 +1,8 @@
 // Regenerates src/data/generated from the vendored Ponomar XML. `--check` fails if the output has drifted.
-import { findDrift, type GeneratedFile, writeFiles } from "./emit.ts";
-import { convertBibleBooks } from "./families/bible.ts";
-import { convertDays } from "./families/days.ts";
-import { convertLanguagePacks } from "./families/language.ts";
-import { convertLives } from "./families/lives.ts";
-import { convertRules } from "./families/rules.ts";
-import { convertServices } from "./families/services.ts";
+import { generateAll } from "./all.ts";
+import { findDrift, writeFiles } from "./emit.ts";
 
-const generators: readonly (() => GeneratedFile[])[] = [convertRules, convertDays, convertLanguagePacks, convertLives, convertBibleBooks, convertServices];
-const files = generators.flatMap((generate) => generate());
+const files = generateAll();
 
 if (process.argv.includes("--check")) {
 	const drift = findDrift(files);

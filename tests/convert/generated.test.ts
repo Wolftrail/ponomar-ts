@@ -9,11 +9,8 @@ import { MENAION as MENAION_EN } from "../../src/data/generated/days/menaion.en.
 import { PENTECOSTARION } from "../../src/data/generated/days/pentecostarion.base.ts";
 import { TRIODION } from "../../src/data/generated/days/triodion.base.ts";
 import { FLOAT as FLOAT_EN } from "../../src/data/generated/days/float.en.ts";
+import { generateAll } from "../../scripts/convert/all.ts";
 import { findDrift } from "../../scripts/convert/emit.ts";
-import { convertDays } from "../../scripts/convert/families/days.ts";
-import { convertLanguagePacks } from "../../scripts/convert/families/language.ts";
-import { convertLives } from "../../scripts/convert/families/lives.ts";
-import { convertRules } from "../../scripts/convert/families/rules.ts";
 import { LANGUAGES, languageChain, languageSlug, listFiles, xmlDir } from "../../scripts/convert/sources.ts";
 import { DEFAULT_CONFIGURATION } from "../../src/data/generated/config.ts";
 import { LANGUAGE_PACK as PACK_CU } from "../../src/data/generated/language/cu.ts";
@@ -40,7 +37,7 @@ test("language chain follows upstream langFileFind", () => {
 });
 
 test("generated data is up to date", () => {
-	assert.deepEqual(findDrift([...convertRules(), ...convertDays(), ...convertLanguagePacks(), ...convertLives()]), []);
+	assert.deepEqual(findDrift(generateAll()), []);
 });
 
 test("rule files keep every period, rule and command", () => {

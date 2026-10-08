@@ -11,26 +11,7 @@ export const languagesRoot = join(repoRoot, "vendor", "ponomar", "Ponomar", "lan
 export const LANGUAGES = ["", "cu", "cu/ru", "el", "el/mono", "en", "fr", "zh", "zh/Hans", "zh/Hant"] as const;
 export type Language = (typeof LANGUAGES)[number];
 
-/**
- * Directories searched for a file, most specific first: "cu/ru" -> ["cu/ru", "cu", ""].
- * Mirrors Helpers.langFileFind, which drops the last path segment until the file is found.
- */
-export function languageChain(language: string): string[] {
-	const chain: string[] = [];
-	let current = language.replace(/\/+$/, "");
-	while (current !== "") {
-		chain.push(current);
-		const slash = current.lastIndexOf("/");
-		current = slash === -1 ? "" : current.slice(0, slash);
-	}
-	chain.push("");
-	return chain;
-}
-
-/** `language` as a module-name segment: "cu/ru" -> "cu-ru", "" -> "base". */
-export function languageSlug(language: string): string {
-	return language === "" ? "base" : language.replaceAll("/", "-");
-}
+export { languageChain, languageSlug } from "../../src/core/language.ts";
 
 export function xmlDir(language: string): string {
 	return language === "" ? join(languagesRoot, "xml") : join(languagesRoot, ...language.split("/"), "xml");

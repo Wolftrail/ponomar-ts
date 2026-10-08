@@ -17,6 +17,7 @@ public class Golden
 				case "pascha": pascha(out); break;
 				case "pcalendar": pcalendar(out, stride); break;
 				case "dsl": dsl(out); break;
+				case "day": day(out, stride, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -56,6 +57,96 @@ public class Golden
 			}
 			out.println(row);
 		}
+	}
+
+	// What Main.write() derives for a date: day variables, the Triodion/Pentecostarion and Menaion files it opens,
+	// and the commemorations (sid:cid:rank) each yields once Cmd guards are applied. Run with cwd = vendor/ponomar.
+	private static void day(PrintWriter out, int stride, String yearList) throws Exception
+	{
+		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
+		field.setAccessible(true);
+		out.println(String.join("\t", "language", "gs", "year", "month", "day", "nday", "ndayP", "ndayF", "doy", "dow", "paschalFile", "paschal", "menaion", "rankPaschal", "rankMenaion", "dRank", "tone"));
+		for (String language : languages)
+		{
+			for (int gs = 0; gs <= 1; gs++)
+			{
+				for (String yearText : yearList.split(","))
+				{
+					int year = Integer.parseInt(yearText);
+					JDate pascha = Paschalion.getPascha(year);
+					JDate previous = Paschalion.getPascha(year - 1);
+					JDate next = Paschalion.getPascha(year + 1);
+					long first = new JDate(1, 1, year).getJulianDay();
+					long last = new JDate(12, 31, year).getJulianDay();
+					for (long j = first; j <= last; j += stride)
+					{
+						JDate today = new JDate(j);
+						int dow = today.getDayOfWeek();
+						int doy = today.getDoy();
+						int nday = (int) JDate.difference(today, pascha);
+						int ndayP = (int) JDate.difference(today, previous);
+						int ndayF = (int) JDate.difference(today, next);
+						OrderedHashtable info = new OrderedHashtable();
+						info.put("dow", dow);
+						info.put("doy", doy);
+						info.put("nday", nday);
+						info.put("ndayP", ndayP);
+						info.put("ndayF", ndayF);
+						info.put("GS", gs);
+						info.put("LS", language);
+						info.put("Year", today.getYear());
+						info.put("dRank", 0);
+						info.put("Ideographic", "0");
+
+						String folder;
+						int line;
+						if (nday >= -70 && nday < 0)
+						{
+							folder = "xml/triodion/";
+							line = Math.abs(nday);
+						}
+						else if (nday < -70)
+						{
+							folder = "xml/pentecostarion/";
+							line = ndayP + 1;
+						}
+						else
+						{
+							folder = "xml/pentecostarion/";
+							line = nday + 1;
+						}
+						String paschalFile = folder + (line >= 10 ? Integer.toString(line) : "0" + line);
+						int m = today.getMonth();
+						int d = today.getDay();
+						String menaionFile = "xml/" + (m < 10 ? "0" + m : "" + m) + (d < 10 ? "/0" + d : "/" + d);
+
+						Day paschal = new Day(paschalFile, info);
+						Day menaion = new Day(menaionFile, info);
+						int rankPaschal = paschal.getDayRank();
+						int rankMenaion = menaion.getDayRank();
+						out.println(String.join("\t", language, "" + gs, "" + year, "" + m, "" + d, "" + nday, "" + ndayP, "" + ndayF, "" + doy, "" + dow,
+							paschalFile, describe(field, paschal), describe(field, menaion), "" + rankPaschal, "" + rankMenaion,
+							"" + Math.max(rankPaschal, rankMenaion), "" + paschal.getTone()));
+					}
+				}
+			}
+		}
+	}
+
+	private static String describe(java.lang.reflect.Field field, Day day) throws Exception
+	{
+		StringBuilder text = new StringBuilder();
+		for (Object item : (java.util.Vector) field.get(day))
+		{
+			Commemoration1 c = (Commemoration1) item;
+			if (text.length() > 0)
+			{
+				text.append('|');
+			}
+			text.append(c.getSId()).append(':').append(c.getCId()).append(':').append(c.getRank());
+		}
+		return text.toString();
 	}
 
 	private static String ymd(JDate d)

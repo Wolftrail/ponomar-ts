@@ -40,6 +40,22 @@ function runDsl(): void {
 	);
 }
 
+// Years chosen to move the Triodion and Lucan Jump boundaries: earliest and latest Pascha, leap and non-leap, and now.
+const DAY_YEARS = "2010,2024,2026,2037,2041,2048,2078";
+const DAY_SAMPLE_EVERY = 5;
+
+function runDay(): void {
+	const full = join(fullDir, "day.tsv");
+	// The upstream engine reads its data relative to vendor/ponomar.
+	execFileSync("java", ["-Djava.awt.headless=true", "-cp", classes, "Ponomar.Golden", "day", full, "1", DAY_YEARS], {
+		cwd: join(root, "vendor", "ponomar"),
+		stdio: ["ignore", "inherit", "ignore"],
+	});
+	const lines = readFileSync(full, "utf8").trim().split(/\r?\n/);
+	const sample = [lines[0]!, ...lines.slice(1).filter((_, i) => i % DAY_SAMPLE_EVERY === 0)];
+	writeFileSync(join(sampleDir, "day.tsv"), sample.join("\n") + "\n");
+}
+
 try {
 	const sources = readdirSync(upstream)
 		.filter((f) => f.endsWith(".java"))
@@ -48,9 +64,11 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day"]) {
 		if (mode === "dsl") {
 			runDsl();
+		} else if (mode === "day") {
+			runDay();
 		} else {
 			for (const [dir, stride] of [[fullDir, 1], [sampleDir, SAMPLE_STRIDE]] as const) {
 				runJava(mode, join(dir, `${mode}.csv`), stride);

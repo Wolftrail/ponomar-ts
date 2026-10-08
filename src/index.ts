@@ -14,3 +14,8 @@ export {
 	getSolarCycle,
 } from "./paschalion.ts";
 export type { JulianDate } from "./paschalion.ts";
+export { NO_RANK, resolveDay } from "./engine/day.ts";
+export type { ResolveDayOptions, ResolvedCommemoration, ResolvedDay, ResolvedPart } from "./engine/day.ts";
+export { dayVariables } from "./engine/context.ts";
+export type { GospelScheme, JulianDay } from "./engine/context.ts";
+export { commemorationRank } from "./engine/rank.ts";

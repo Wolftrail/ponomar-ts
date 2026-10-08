@@ -26,3 +26,4 @@ Data skipped during conversion (see LIMITATIONS.md). Re-check each against the f
 - `Services/menaion` (`P_3174`, `P_163`): Paramony files used only by commented-out code. Confirm the Christmas and Theophany eve services need no hymns from them.
 - `cu/xml/01/14_new.xml` and `fr/xml/lives/050307;.xml`: a draft and a misnamed copy, skipped by exact name. Confirm neither carries data the real files lack.
 - Language packs: `LS == ##` template entries and translator-comment attributes were dropped. Confirm no lookup needs them.
+- `LIMITATIONS.md`: once every phase is done, re-read it end to end. Decide for each limitation and deliberate difference whether it should now be fixed, kept (and reworded), or removed, and make sure nothing listed as unported has since been ported.

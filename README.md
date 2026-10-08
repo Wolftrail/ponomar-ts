@@ -4,7 +4,18 @@ A fresh TypeScript reimplementation of the Ponomar Orthodox liturgics engine. Th
 
 ## Current scope
 
-Julian dates, calendar conversion, the Paschalion, and the expression language used by Ponomar's data files.
+Julian dates, calendar conversion, the Paschalion, the expression language used by Ponomar's data files, and day resolution: which Triodion/Pentecostarion and Menaion commemorations fall on a date, their ranks, the day rank and the Octoechos tone.
+
+```ts
+import { resolveDay } from "ponomar-ts";
+
+// Dates are Julian-calendar; see pcalendar.fromGregorian to convert.
+const day = await resolveDay({ date: { year: 2026, month: 3, day: 30 }, language: "cu/ru" });
+day.rank; // 8: Pascha
+day.paschal.commemorations; // [{ sid: [], cid: "9001", rank: 8 }]
+```
+
+Data loads lazily per language, so the API is asynchronous.
 
 ```ts
 import { getPascha, evaluateBoolean } from "ponomar-ts";
