@@ -12,3 +12,4 @@ TypeScript reimplementation of the Ponomar Orthodox liturgics engine. The upstre
 - Public entry point: `src/index.ts`.
 - `npm run typecheck`, `npm test`, and `npm run build` validate the package.
 - Keep public APIs focused on Ponomar behavior; document behavior differences from upstream.
+- Do not ship Bible text or translation data; consumers supply it. Only the book catalogue (`src/data/generated/bibleBooks.ts`) is included.

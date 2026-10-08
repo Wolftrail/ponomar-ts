@@ -53,6 +53,7 @@
   "scripts": {
     "clean": "node --experimental-strip-types scripts/clean.ts",
     "golden": "node --experimental-strip-types scripts/golden/run.ts",
+    "convert": "node --experimental-strip-types scripts/convert/index.ts",
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",

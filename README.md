@@ -26,6 +26,8 @@ npm run build
 
 Tests compare against fixtures generated from the upstream Java code. `npm run golden` regenerates them and needs a JDK; it also writes exhaustive dumps to `scratch/golden/`, which the tests use when present.
 
+`npm run convert` regenerates `src/data/generated/` from the vendored XML, and `npm run convert -- --check` fails if the committed output has drifted.
+
 ## Licensing
 
 The project is licensed under GPL-3.0-or-later. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md); the upstream Ponomar license is also retained at `vendor/ponomar/LICENSE`.
