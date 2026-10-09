@@ -24,6 +24,7 @@ public class Golden
 				case "lives": lives(out, args[3]); break;
 				case "numbers": numbers(out); break;
 				case "hours": hours(out, stride, args[3]); break;
+				case "royal": royal(out, args[3]); break;
 				case "texts": texts(out, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
@@ -430,6 +431,77 @@ public class Golden
 		catch (java.io.IOException e)
 		{
 			return "-";
+		}
+	}
+
+	// What RoyalHours composes on every day: whether it serves, the flag it settles on, and the directives its template yields.
+	// It opens a window as its last step, which fails headless, after composing. Run with cwd = vendor/ponomar.
+	private static void royal(PrintWriter out, String yearList) throws Exception
+	{
+		java.io.PrintStream console = System.out;
+		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
+		out.println(String.join("\t", "language", "year", "month", "day", "served", "PFlag", "lines", "trace"));
+		for (String language : new String[] { "en/", "cu/ru/", "fr/", "el/mono/" })
+		{
+			for (String yearText : yearList.split(","))
+			{
+				int year = Integer.parseInt(yearText);
+				JDate pascha = Paschalion.getPascha(year);
+				JDate previous = Paschalion.getPascha(year - 1);
+				JDate next = Paschalion.getPascha(year + 1);
+				long first = new JDate(1, 1, year).getJulianDay();
+				long last = new JDate(12, 31, year).getJulianDay();
+				for (long j = first; j <= last; j++)
+				{
+					JDate today = new JDate(j);
+					int nday = (int) JDate.difference(today, pascha);
+					int ndayP = (int) JDate.difference(today, previous);
+					OrderedHashtable info = new OrderedHashtable();
+					info.put("dow", today.getDayOfWeek());
+					info.put("doy", today.getDoy());
+					info.put("nday", nday);
+					info.put("ndayP", ndayP);
+					info.put("ndayF", (int) JDate.difference(today, next));
+					info.put("GS", 0);
+					info.put("LS", language);
+					info.put("Year", today.getYear());
+					info.put("dRank", 0);
+					info.put("Ideographic", "0");
+					info.put("ReadSep", "; ");
+					info.put("Tone", -1);
+					int m = today.getMonth();
+					int d = today.getDay();
+
+					System.setOut(quiet);
+					try
+					{
+						try
+						{
+							new RoyalHours(today, info);
+						}
+						catch (Throwable expected)
+						{
+							// The window cannot open headless; composing is done by then.
+						}
+						boolean served = info.get("PFlag") != null;
+						TraceService service = new TraceService(info);
+						if (served)
+						{
+							service.startService("xml/Services/RoyalHours.xml");
+						}
+						System.setOut(console);
+						if (served && System.getProperty("golden.dump") != null)
+						{
+							java.nio.file.Files.write(java.nio.file.Paths.get(System.getProperty("golden.dump") + language.replace('/', '_') + year + "-" + m + "-" + d + ".txt"), service.trace, java.nio.charset.StandardCharsets.UTF_8);
+						}
+						out.println(String.join("\t", language, "" + year, "" + m, "" + d, served ? "1" : "0", cell(info.get("PFlag")), "" + service.trace.size(), fingerprint(String.join("\n", service.trace))));
+					}
+					finally
+					{
+						System.setOut(console);
+					}
+				}
+			}
 		}
 	}
 

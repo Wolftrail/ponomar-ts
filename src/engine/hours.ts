@@ -37,6 +37,8 @@ export interface ServiceFlags {
 	readonly PFlag2?: number;
 	/** Sixth Hour only: 1 when the day appoints a prophecy to read. */
 	readonly PFlag3?: number;
+	/** Royal Hours only: 0 Nativity, 1 Theophany, 2 Good Friday. */
+	readonly PFlag?: number;
 }
 
 export interface ComposedService {
@@ -221,4 +223,21 @@ export function composeSixthHour(day: ResolvedDay, language: string, options: Se
 /** The Ninth Hour. */
 export function composeNinthHour(day: ResolvedDay, language: string, options: ServiceOptions = {}): Promise<ComposedService> {
 	return composeHour("none", day, language, options);
+}
+
+/**
+ * The Royal Hours, served on Good Friday and on the eves of Nativity and Theophany (Fridays, or any day but a weekend when the
+ * eve falls on one). A priest is always taken to be present. `type` is "RoyalHours" on those days and "None" otherwise.
+ */
+export async function composeRoyalHours(day: ResolvedDay, language: string): Promise<ComposedService> {
+	const { nday, doy, dow } = day.variables as { nday: number; doy: number; dow: number };
+	const weekday = dow !== 6 && dow !== 0;
+	const theophanyEve = (doy === 4 && weekday) || (doy === 2 && dow === 5) || (doy === 3 && dow === 5);
+	const nativityEve = (doy === 357 && weekday) || (doy === 356 && dow === 5) || (doy === 355 && dow === 5);
+	if (!(nday === -2 || theophanyEve || nativityEve)) {
+		return { type: "None", flags: { PS: 1 }, nodes: [] };
+	}
+	const PFlag = theophanyEve ? 1 : nday === -2 ? 2 : 0;
+	const nodes = await expandServiceTemplate("RoyalHours", language, { ...day.variables, dRank: day.rank, PS: 1, PFlag });
+	return { type: "RoyalHours", flags: { PS: 1, PFlag }, nodes };
 }

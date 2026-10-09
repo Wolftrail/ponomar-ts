@@ -14,14 +14,15 @@ export type CommemorationHymn = Omit<LifeHymn, "kind">;
 type ItemOf<K extends LifeItem["kind"]> = Extract<LifeItem, { kind: K }>;
 
 /**
- * The items of one kind in one section (Vespers, Liturgy, ...) of a commemoration's service, keyed by their `type`.
- * Life files are read root first and a later item of the same type replaces an earlier one; a `Cmd` on the
- * service, the section or the item itself must hold for it to count. Items without a `type` are not reachable upstream.
+ * The items of one kind in one section (Vespers, Liturgy, ...) of a commemoration's service, keyed by their `type`; without a
+ * section, the hymns placed directly in the service. Life files are read root first and a later item of the same type
+ * replaces an earlier one; a `Cmd` on the service, the section or the item itself must hold for it to count. Items without a
+ * `type` are not reachable upstream.
  */
 async function sectionItems<K extends LifeItem["kind"]>(
 	cid: string,
 	language: string,
-	section: LifeSectionName,
+	section: LifeSectionName | undefined,
 	kind: K,
 	context: DslContext,
 ): Promise<Record<string, ItemOf<K>>> {
@@ -31,11 +32,12 @@ async function sectionItems<K extends LifeItem["kind"]>(
 			if (service.cmd !== undefined && !evaluateBoolean(service.cmd, context)) {
 				continue;
 			}
-			for (const part of service.sections) {
-				if (part.section !== section || (part.cmd !== undefined && !evaluateBoolean(part.cmd, context))) {
-					continue;
-				}
-				for (const item of part.items) {
+			const lists: (readonly LifeItem[])[] =
+				section === undefined
+					? [service.hymns]
+					: service.sections.filter((part) => part.section === section && (part.cmd === undefined || evaluateBoolean(part.cmd, context))).map((part) => part.items);
+			for (const list of lists) {
+				for (const item of list) {
 					const cmd = item.kind === "scripture" ? item.cmd : undefined;
 					if (item.kind === kind && item.type !== undefined && (cmd === undefined || evaluateBoolean(cmd, context))) {
 						items[item.type] = item as ItemOf<K>;
@@ -77,13 +79,13 @@ export async function commemorationHymns(
 }
 
 /**
- * One item of a commemoration's service (`getService("/SEXTE/PROKEIMENON", "1a")` upstream), whatever its kind:
- * `kind` is the element, `type` its `Type` attribute.
+ * One item of a commemoration's service (`getService("/SEXTE/PROKEIMENON", "1a")` upstream), whatever its kind: `kind` is
+ * the element, `type` its `Type` attribute. A hymn placed directly in the service (`getService("/TROPARION", "1")`) has no section.
  */
 export async function commemorationServiceItem(
 	cid: string,
 	language: string,
-	section: LifeSectionName,
+	section: LifeSectionName | undefined,
 	kind: LifeItem["kind"],
 	type: string,
 	context: DslContext,

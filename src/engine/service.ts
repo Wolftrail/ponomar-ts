@@ -169,8 +169,11 @@ async function expandDirective(
 		case "getId": {
 			const cid = directive.type === "T" ? `98${directive.id}` : directive.id;
 			const slash = directive.what.lastIndexOf("/");
-			const [section, kind] = directive.what.substring(0, slash).split("/").filter((part) => part !== "").map((part) => part.toLowerCase());
-			const item = await commemorationServiceItem(cid, language, section as LifeSectionName, kind as LifeItem["kind"], directive.what.substring(slash + 1), context);
+			const [first, second] = directive.what.substring(0, slash).split("/").filter((part) => part !== "").map((part) => part.toLowerCase());
+			// "/TROPARION/1" names a hymn placed directly in the service; "/SEXTE/TROPARION/1" one in a section.
+			const section = second === undefined ? undefined : (first as LifeSectionName);
+			const kind = (second ?? first) as LifeItem["kind"];
+			const item = await commemorationServiceItem(cid, language, section, kind, directive.what.substring(slash + 1), context);
 			const text = item === undefined || item.kind === "scripture" || item.text === "" ? undefined : item.text;
 			const headerText = item === undefined || item.kind === "scripture" ? undefined : item.header;
 			const tone = item === undefined || item.kind === "scripture" ? undefined : item.tone;
@@ -181,7 +184,7 @@ async function expandDirective(
 				cid,
 				what: directive.what,
 				...(text === undefined ? {} : { text }),
-				...(headerText === undefined || headerText === "" ? {} : { headerText }),
+				...(headerText === undefined ? {} : { headerText }),
 				...(tone === undefined ? {} : { tone }),
 				...(await presentation(language, directive)),
 			});

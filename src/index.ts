@@ -42,7 +42,7 @@ export type {
 	ServiceSubtitleNode,
 	ServiceTitleNode,
 } from "./engine/service.ts";
-export { composeHour, composeNinthHour, composePrimes, composeSixthHour, composeThirdHour } from "./engine/hours.ts";
+export { composeHour, composeNinthHour, composePrimes, composeRoyalHours, composeSixthHour, composeThirdHour } from "./engine/hours.ts";
 export type { ComposedService, HourName, ServiceFlags, ServiceOptions, ServiceParts, ServiceWho } from "./engine/hours.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";

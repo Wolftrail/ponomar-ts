@@ -87,9 +87,14 @@ function runNumbers(): void {
 	runInVendor("numbers", join(sampleDir, "numbers.tsv"), "1");
 }
 
-// Every third day keeps the run short; the composer's inputs change slowly through the year.
+// Every second day keeps the run short; the composers' inputs change slowly through the year.
 function runHours(): void {
 	runInVendor("hours", join(sampleDir, "hours.tsv"), "2", DAY_YEARS);
+}
+
+// Every day: the Royal Hours are served on only a few, and the rest check the gating.
+function runRoyal(): void {
+	runInVendor("royal", join(sampleDir, "royal.tsv"), "1", DAY_YEARS);
 }
 
 // Every prayer, command and title file any language has, read in each language so that fallback is checked too.
@@ -113,7 +118,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "hours", "texts"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "hours", "royal", "texts"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -128,6 +133,8 @@ try {
 			runNumbers();
 		} else if (mode === "hours") {
 			runHours();
+		} else if (mode === "royal") {
+			runRoyal();
 		} else if (mode === "texts") {
 			await runTexts();
 		} else {

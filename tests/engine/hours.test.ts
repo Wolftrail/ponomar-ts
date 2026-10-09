@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { composeHour, type HourName, type ServiceParts, type ServiceWho } from "../../src/engine/hours.ts";
 import { resolveDay } from "../../src/engine/day.ts";
-import type { ServiceNode } from "../../src/engine/service.ts";
+import { composeHour, type HourName, type ServiceParts, type ServiceWho } from "../../src/engine/hours.ts";
+import { describeNode, fingerprint, orDash } from "./traceDescribe.ts";
 
 const [header, ...lines] = readFileSync(new URL("../fixtures/golden/hours.tsv", import.meta.url), "utf8").replace(/\r?\n$/, "").split(/\r?\n/);
 const names = header!.split("\t");
@@ -16,39 +16,6 @@ const PARTS: Readonly<Record<string, ServiceParts>> = {
 	"W.Ending": "withoutEnding",
 	"W.BeginningEnding": "withoutBeginningOrEnding",
 };
-
-/** The oracle's fingerprint: length and Java's String.hashCode of the trimmed text. */
-function fingerprint(text: string | undefined): string {
-	if (text === undefined) {
-		return "-";
-	}
-	const trimmed = text.trim();
-	let hash = 0;
-	for (let i = 0; i < trimmed.length; i++) {
-		hash = (Math.imul(31, hash) + trimmed.charCodeAt(i)) | 0;
-	}
-	return `${trimmed.length}:${(hash >>> 0).toString(16)}`;
-}
-
-const flag = (value: boolean): string => (value ? "1" : "0");
-const orDash = (value: string | number | undefined): string => (value === undefined ? "-" : String(value));
-
-/** One line per node in the form the oracle records directives. */
-function describe(node: ServiceNode): string {
-	switch (node.kind) {
-		case "title":
-			return `title|${fingerprint(node.title)}|${fingerprint(node.windowTitle)}|${fingerprint(node.source)}|${fingerprint(node.comment)}`;
-		case "subtitle":
-			return `subtitle|${fingerprint(node.title)}`;
-		case "prayer":
-			return `prayer|${node.what}|${node.who}|${flag(node.redFirst)}|${flag(node.newLine)}|${flag(node.header)}|${orDash(node.times)}|${orDash(node.command)}|${orDash(node.commandB)}`;
-		case "reading":
-			// Upstream looks for an attribute "2Stars" while the data spells it "TwoStars", so it never sees one.
-			return `reading|${orDash(node.verses)}|${orDash(node.intro)}|${node.who}|${flag(node.redFirst)}|${flag(node.newLine)}|${flag(node.header)}|-`;
-		case "proper":
-			return `proper|${node.commemorationType}|${node.id}|${node.what}|${node.who}|${flag(node.redFirst)}|${flag(node.newLine)}|${flag(node.header)}|${fingerprint(node.text)}|${node.text === undefined ? "-" : (node.headerText ?? "-")}`;
-	}
-}
 
 test("the hours compose as the upstream engine does", async () => {
 	assert.ok(rows.length > 4000, `the fixture holds only ${rows.length} rows`);
@@ -76,7 +43,7 @@ test("the hours compose as the upstream engine does", async () => {
 			assert.equal(row["PFlag1"], "-", where);
 			continue;
 		}
-		const trace = service.nodes.map(describe).join("\n");
+		const trace = service.nodes.map(describeNode).join("\n");
 		const got = [service.type, orDash(service.flags.PS), orDash(service.flags.PFlag1), orDash(service.flags.PFlag2), orDash(service.flags.PFlag3), String(service.nodes.length), fingerprint(trace)].join("\t");
 		const expected = [row["type"], row["PS"], row["PFlag1"], row["PFlag2"], row["PFlag3"], row["lines"], row["trace"]].join("\t");
 		compared[hour] = (compared[hour] ?? 0) + 1;
