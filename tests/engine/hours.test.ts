@@ -28,13 +28,6 @@ test("the hours compose as the upstream engine does", async () => {
 		}
 		const hour = row["hour"] as HourName;
 		const language = row["language"]!;
-		// Upstream cannot write its scratch files where the language has no Services/Var directory (Greek) and stops there.
-		if (row["PFlag2"] === "2" && row["kath"] === "-") {
-			continue;
-		}
-		if (language === "el/mono/" && hour === "sexte" && ["Normal", "Easter", "Lenten"].includes(row["type"]!)) {
-			continue;
-		}
 		const where = `${language} ${row["year"]}-${row["month"]}-${row["day"]} ${hour} ${row["who"]}/${row["parts"]}`;
 		const day = await resolveDay({ date: { year: Number(row["year"]), month: Number(row["month"]), day: Number(row["day"]) }, language });
 		const service = await composeHour(hour, day, language, { who: WHO[row["who"]!]!, parts: PARTS[row["parts"]!]! });

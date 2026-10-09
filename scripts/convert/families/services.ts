@@ -1,6 +1,6 @@
 // Converts service templates, per-language prayer texts and the Octoechos tables under Services/.
 // Not converted on purpose: Services/Var (scratch files the hour classes write at runtime and read back),
-// Services/menaion (two Paramony files used only by commented-out code) and Commemorations/ (no reader upstream).
+// Services/menaion (read only by the unported search database; no day file names its ids) and Commemorations/ (no reader upstream).
 import type { OctoechosEntry, PrayerText, ServiceDirective } from "../../../src/data/types.ts";
 import { type GeneratedFile, header, literal } from "../emit.ts";
 import { attributes, checkExpression, children, compact } from "../schema.ts";

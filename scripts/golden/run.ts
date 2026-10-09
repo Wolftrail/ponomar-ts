@@ -57,7 +57,7 @@ function runDay(): void {
 function runInVendor(mode: string, output: string, stride: string, extra = ""): void {
 	execFileSync("java", ["-Djava.awt.headless=true", "-cp", classes, "Ponomar.Golden", mode, output, stride, extra], {
 		cwd: join(root, "vendor", "ponomar"),
-		stdio: ["ignore", "inherit", "ignore"],
+		stdio: ["ignore", "inherit", process.env["GOLDEN_STDERR"] ? "inherit" : "ignore"],
 	});
 }
 

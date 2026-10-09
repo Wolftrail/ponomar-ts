@@ -21,9 +21,6 @@ import { childElements, type XmlElement } from "../xml.ts";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
 
-// Upstream opens lives/<CId>.xml only, so this misnamed copy (a typo for 050307.xml) is never read.
-const IGNORED = new Set(["fr/xml/lives/050307;.xml"]);
-
 /** Text with inline `<br/>` and `<p>` kept as HTML; any other child element is an error. */
 function inlineText(element: XmlElement, where: string): string {
 	let out = "";
@@ -268,11 +265,9 @@ export function convertLives(): GeneratedFile[] {
 	const grouped = new Map<string, { sources: string[]; lives: Record<string, Life> }>();
 	for (const language of LANGUAGES) {
 		for (const file of listFiles(language, "lives")) {
-			if (IGNORED.has(`${language === "" ? "" : `${language}/`}xml/lives/${file}`)) {
-				continue;
-			}
 			const cid = file.replace(/\.xml$/, "");
-			if (!/^\d+$/.test(cid)) {
+			// fr/xml/05/03.xml names its commemoration "050307;" with the semicolon, so that is the file upstream opens.
+			if (!/^\d+;?$/.test(cid)) {
 				throw new Error(`${sourcePath(language, `lives/${file}`)}: unexpected life file name`);
 			}
 			const chunk = assigned.get(cid) ?? "other";

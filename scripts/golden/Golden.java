@@ -132,7 +132,7 @@ public class Golden
 	// reading is its CId here (upstream uses its localized name); transferred sequential readings carry a weekday.
 	private static void liturgy(PrintWriter out, int stride, String yearList, boolean matins) throws Exception
 	{
-		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		String[] languages = { "en/", "cu/ru/", "el/mono/", "fr/", "zh/Hans/", "zh/Hant/" };
 		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
 		field.setAccessible(true);
 		String section = matins ? "MATINS" : "LITURGY";
@@ -174,21 +174,30 @@ public class Golden
 						int d = today.getDay();
 						Day paschal = new Day(folder + (line >= 10 ? Integer.toString(line) : "0" + line), info);
 						Day menaion = new Day("xml/" + (m < 10 ? "0" + m : "" + m) + (d < 10 ? "/0" + d : "/" + d), info);
-						info.put("dRank", Math.max(menaion.getDayRank(), paschal.getDayRank()));
-
-						// As Main: the menaion's commemorations first, then the Triodion or Pentecostarion's.
 						java.util.Vector entries = new java.util.Vector();
-						for (Day part : new Day[] { menaion, paschal })
+						try
 						{
-							for (Object item : (java.util.Vector) field.get(part))
+							info.put("dRank", Math.max(menaion.getDayRank(), paschal.getDayRank()));
+
+							// As Main: the menaion's commemorations first, then the Triodion or Pentecostarion's.
+							for (Day part : new Day[] { menaion, paschal })
 							{
-								Commemoration1 c = (Commemoration1) item;
-								Object table = c.getReadings().get(section);
-								if (table != null)
+								for (Object item : (java.util.Vector) field.get(part))
 								{
-									entries.add(new Object[] { table, Integer.valueOf(c.getRank()), c.getCId() });
+									Commemoration1 c = (Commemoration1) item;
+									Object table = c.getReadings().get(section);
+									if (table != null)
+									{
+										entries.add(new Object[] { table, Integer.valueOf(c.getRank()), c.getCId() });
+									}
 								}
 							}
+						}
+						catch (NumberFormatException failure)
+						{
+							// fr/xml/05/03.xml names the commemoration "050307;", which Commemoration1.getRank cannot parse.
+							System.err.println("SKIP " + language + year + "-" + m + "-" + d + " gs" + gs + ": " + failure.getMessage());
+							continue;
 						}
 						String[] results = new String[types.length];
 						for (int t = 0; t < types.length; t++)
@@ -560,6 +569,19 @@ public class Golden
 		java.io.PrintStream console = System.out;
 		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
 		java.util.Map<String, byte[]> saved = new java.util.HashMap<String, byte[]>();
+		// Upstream opens its scratch files for writing without creating the directory, which Greek lacks; give it one for the run.
+		java.util.List<java.io.File> createdDirs = new java.util.ArrayList<java.io.File>();
+		for (String language : languages)
+		{
+			java.io.File dir = new java.io.File("Ponomar/languages/" + language + "xml/Services/Var");
+			java.io.File made = dir;
+			while (made != null && !made.exists())
+			{
+				createdDirs.add(made);
+				made = made.getParentFile();
+			}
+			dir.mkdirs();
+		}
 		for (String language : languages)
 		{
 			for (String path : scratchPaths(language, scratch))
@@ -693,6 +715,10 @@ public class Golden
 						changeFile(path, null);
 					}
 				}
+			}
+			for (java.io.File dir : createdDirs)
+			{
+				changeFile(dir.getPath(), null);
 			}
 		}
 	}
@@ -850,7 +876,7 @@ public class Golden
 	// Liturgy troparia and kontakia (as DoSaint1 shows them). One row per distinct result; the date says which context gave it.
 	private static void lives(PrintWriter out, String yearList) throws Exception
 	{
-		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		String[] languages = { "en/", "cu/ru/", "el/mono/", "fr/", "zh/Hans/", "zh/Hant/" };
 		java.lang.reflect.Field commemorations = Day.class.getDeclaredField("OrderedCommemorations");
 		commemorations.setAccessible(true);
 		java.lang.reflect.Field information = Commemoration1.class.getDeclaredField("Information");
@@ -903,7 +929,17 @@ public class Golden
 					{
 						java.util.Vector list = (java.util.Vector) commemorations.get(part);
 						// The tag Main shows after a commemoration's readings, one entry per commemoration in order.
-						OrderedHashtable[] labelled = list.isEmpty() ? null : part.getReadings();
+						OrderedHashtable[] labelled;
+						try
+						{
+							labelled = list.isEmpty() ? null : part.getReadings();
+						}
+						catch (NumberFormatException failure)
+						{
+							// fr/xml/05/03.xml names the commemoration "050307;", which Commemoration1.getRank cannot parse.
+							System.err.println("SKIP " + language + year + "-" + m + "-" + d + ": " + failure.getMessage());
+							continue;
+						}
 						int position = 0;
 						for (Object item : list)
 						{
@@ -1003,7 +1039,7 @@ public class Golden
 	// and the commemorations (sid:cid:rank) each yields once Cmd guards are applied. Run with cwd = vendor/ponomar.
 	private static void day(PrintWriter out, int stride, String yearList) throws Exception
 	{
-		String[] languages = { "en/", "cu/ru/", "el/mono/" };
+		String[] languages = { "en/", "cu/ru/", "el/mono/", "fr/", "zh/Hans/", "zh/Hant/" };
 		java.lang.reflect.Field field = Day.class.getDeclaredField("OrderedCommemorations");
 		field.setAccessible(true);
 		java.lang.reflect.Field fastField = Fasting.class.getDeclaredField("Fast");
@@ -1065,8 +1101,19 @@ public class Golden
 
 						Day paschal = new Day(paschalFile, info);
 						Day menaion = new Day(menaionFile, info);
-						int rankPaschal = paschal.getDayRank();
-						int rankMenaion = menaion.getDayRank();
+						int rankPaschal;
+						int rankMenaion;
+						try
+						{
+							rankPaschal = paschal.getDayRank();
+							rankMenaion = menaion.getDayRank();
+						}
+						catch (NumberFormatException failure)
+						{
+							// fr/xml/05/03.xml names the commemoration "050307;", which Commemoration1.getRank cannot parse.
+							System.err.println("SKIP " + language + year + "-" + m + "-" + d + " gs" + gs + ": " + failure.getMessage());
+							continue;
+						}
 						int dRank = Math.max(rankPaschal, rankMenaion);
 						// As Main.write(): fasting runs once dRank holds the day's rank.
 						info.put("dRank", dRank);

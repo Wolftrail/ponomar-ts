@@ -8,8 +8,6 @@ import { LIFE_CHUNKS } from "../../src/data/generated/lives/index.ts";
 import type { Life } from "../../src/data/types.ts";
 
 const livesDir = fileURLToPath(new URL("../../src/data/generated/lives/", import.meta.url));
-const IGNORED = new Set(["fr/050307;.xml"]);
-
 type Chunk = Readonly<Record<string, Life>>;
 
 async function loadChunk(chunk: string, language: string): Promise<Chunk | undefined> {
@@ -25,9 +23,6 @@ const chunkNames: string[] = [...new Set<string>(Object.values(LIFE_CHUNKS))].so
 function rawCounts(language: string): Record<string, number> {
 	const totals: Record<string, number> = { files: 0, NAME: 0, LIFE: 0, SERVICE: 0, SCRIPTURE: 0, hymns: 0, verses: 0, INFO: 0, REF: 0 };
 	for (const file of listFiles(language, "lives")) {
-		if (IGNORED.has(`${language}/${file}`)) {
-			continue;
-		}
 		const text = readFileSync(join(xmlDir(language), "lives", file), "utf8").replace(/<!--[\s\S]*?-->/g, "");
 		const count = (names: string): number => (text.match(new RegExp(`<(${names})[\\s/>]`, "g")) ?? []).length;
 		totals["files"]! += 1;
@@ -105,9 +100,7 @@ test("index covers every life id in every language", () => {
 	const ids = new Set<string>();
 	for (const language of LANGUAGES) {
 		for (const file of listFiles(language, "lives")) {
-			if (!IGNORED.has(`${language}/${file}`)) {
-				ids.add(file.replace(/\.xml$/, ""));
-			}
+			ids.add(file.replace(/\.xml$/, ""));
 		}
 	}
 	assert.equal(Object.keys(LIFE_CHUNKS).length, ids.size);
