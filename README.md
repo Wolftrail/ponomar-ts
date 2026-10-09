@@ -85,6 +85,20 @@ getPascha(2026); // Julian 30 March 2026, plus its Julian day number
 evaluateBoolean("nday >= -48 && dow != 0", { nday: -10, dow: 3 }); // true
 ```
 
+## Packaging
+
+ESM only, Node.js 20 or newer, no runtime dependencies. The main entry point re-exports everything; the self-contained parts also have subpaths that load no data:
+
+| Import | Contents |
+| --- | --- |
+| `ponomar-ts` | The whole API |
+| `ponomar-ts/paschalion` | Pascha, Pentecost, Lent, Apostles' Fast, cycles |
+| `ponomar-ts/astronomy` | Sunrise, sunset, lunar phase |
+| `ponomar-ts/bible` | Reference parser and book catalogue |
+| `ponomar-ts/dsl` | The expression language |
+
+The generated data is about 5 MB packed. Each language is a separate module loaded on first use through a literal `import()`, so a bundler can split it and a runtime reads only the languages it asks for. Language ids: `cu`, `cu/ru`, `el`, `el/mono`, `en`, `fr`, `zh/Hans` and `zh/Hant`. A more specific id falls back along its chain (`cu/ru`, then `cu`, then the base data), as upstream does.
+
 ## Development
 
 Requires Node.js 20 or newer.
@@ -94,7 +108,10 @@ npm install
 npm run typecheck
 npm test
 npm run build
+npm run smoke
 ```
+
+`npm run smoke` needs a prior build; it installs the packed tarball into a temporary project and imports every entry point.
 
 Tests compare against fixtures generated from the upstream Java code. `npm run golden` regenerates them and needs a JDK; it also writes exhaustive dumps to `scratch/golden/`, which the tests use when present.
 
