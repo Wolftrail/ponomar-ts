@@ -25,6 +25,9 @@ public class Golden
 				case "numbers": numbers(out); break;
 				case "hours": hours(out, stride, args[3]); break;
 				case "royal": royal(out, args[3]); break;
+				case "sun": sun(out, stride, args[3]); break;
+				case "suntime": suntime(out, stride, args[3]); break;
+				case "moon": moon(out, stride, args[3]); break;
 				case "texts": texts(out, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
@@ -691,6 +694,117 @@ public class Golden
 					}
 				}
 			}
+		}
+	}
+
+	// Places for the sunrise oracle: the configured default, mid-latitudes, the Southern Hemisphere, and polar cases where the sun
+	// never rises or never sets. Each is name, longitude, latitude, time zone.
+	private static final Object[][] PLACES = {
+		{ "default", 45.0, 51.0, 1 }, { "moscow", 37.62, 55.75, 3 }, { "jordanville", -74.99, 42.93, -5 }, { "sydney", 151.2, -33.87, 10 },
+		{ "equator", 0.0, 0.0, 0 }, { "reykjavik", -21.9, 64.15, 0 }, { "tromso", 18.96, 69.65, 1 }, { "mcmurdo", 166.67, -77.85, 12 } };
+
+	// Sunrise.getSunriseSunset as raw decimal hours, for the places above with the options cycled (daylight saving, altitude).
+	private static void sun(PrintWriter out, int stride, String yearList)
+	{
+		double[] altitudes = { -0.833, -6.0, -12.0, -18.0, 0.0 };
+		out.println("year\tmonth\tday\tplace\tdst\taltitude\tsunrise\tsunset");
+		int count = 0;
+		for (String yearText : yearList.split(","))
+		{
+			int year = Integer.parseInt(yearText);
+			for (long j = new JDate(1, 1, year).getJulianDay(); j <= new JDate(12, 31, year).getJulianDay(); j += stride)
+			{
+				JDate today = new JDate(j);
+				for (Object[] place : PLACES)
+				{
+					boolean dst = count % 2 == 1;
+					double altitude = altitudes[(count / 2) % altitudes.length];
+					count++;
+					double[] hours = Sunrise.getSunriseSunset(today, (Double) place[1], (Double) place[2], (Integer) place[3], dst, altitude);
+					out.println(String.join("\t", "" + year, "" + today.getMonth(), "" + today.getDay(), (String) place[0], dst ? "1" : "0", Double.toString(altitude), Double.toString(hours[0]), Double.toString(hours[1])));
+				}
+			}
+		}
+	}
+
+	// Sunrise.getSunriseSunsetString: the times as each language writes them, with and without ideographic numerals.
+	// Run with cwd = vendor/ponomar.
+	private static void suntime(PrintWriter out, int stride, String yearList)
+	{
+		Object[][] languages = { { "en/", "0" }, { "cu/", "0" }, { "cu/", "1" }, { "cu/ru/", "0" }, { "fr/", "0" }, { "zh/Hans/", "1" }, { "el/mono/", "1" } };
+		Object[][] places = { PLACES[0], PLACES[1], PLACES[6] };
+		java.io.PrintStream console = System.out;
+		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
+		out.println("language\tideographic\tyear\tmonth\tday\tplace\tsunrise\tsunset");
+		for (Object[] language : languages)
+		{
+			OrderedHashtable info = new OrderedHashtable();
+			info.put("LS", language[0]);
+			info.put("Ideographic", language[1]);
+			System.setOut(quiet);
+			try
+			{
+				new Sunrise(info);
+				for (String yearText : yearList.split(","))
+				{
+					int year = Integer.parseInt(yearText);
+					for (long j = new JDate(1, 1, year).getJulianDay(); j <= new JDate(12, 31, year).getJulianDay(); j += stride)
+					{
+						JDate today = new JDate(j);
+						for (Object[] place : places)
+						{
+							String[] times;
+							try
+							{
+								times = Sunrise.getSunriseSunsetString(today, (Double) place[1], (Double) place[2], (Integer) place[3]);
+							}
+							catch (Throwable t)
+							{
+								times = new String[] { "ERR", "ERR" };
+							}
+							out.println(String.join("\t", (String) language[0], (String) language[1], "" + year, "" + today.getMonth(), "" + today.getDay(), (String) place[0], clean(times[0]), clean(times[1])));
+						}
+					}
+				}
+			}
+			finally
+			{
+				System.setOut(console);
+			}
+		}
+	}
+
+	// Astronomy.lunarage (degrees between the moon and the sun) and lunarphase in four languages. Run with cwd = vendor/ponomar.
+	private static void moon(PrintWriter out, int stride, String yearList)
+	{
+		String[] languages = { "en/", "cu/ru/", "fr/", "zh/Hans/" };
+		Astronomy sky = new Astronomy();
+		java.io.PrintStream console = System.out;
+		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
+		out.println("year\tmonth\tday\tjdn\tage\t" + String.join("\t", languages));
+		System.setOut(quiet);
+		try
+		{
+			for (String yearText : yearList.split(","))
+			{
+				int year = Integer.parseInt(yearText);
+				for (long j = new JDate(1, 1, year).getJulianDay(); j <= new JDate(12, 31, year).getJulianDay(); j += stride)
+				{
+					JDate today = new JDate(j);
+					StringBuilder row = new StringBuilder(year + "\t" + today.getMonth() + "\t" + today.getDay() + "\t" + j + "\t" + Double.toString(sky.lunarage(j)));
+					for (String language : languages)
+					{
+						OrderedHashtable info = new OrderedHashtable();
+						info.put("LS", language);
+						row.append('\t').append(clean(sky.lunarphase(j, info)));
+					}
+					out.println(row);
+				}
+			}
+		}
+		finally
+		{
+			System.setOut(console);
 		}
 	}
 

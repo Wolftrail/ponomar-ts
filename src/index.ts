@@ -44,6 +44,18 @@ export type {
 } from "./engine/service.ts";
 export { composeHour, composeNinthHour, composePrimes, composeRoyalHours, composeSixthHour, composeThirdHour } from "./engine/hours.ts";
 export type { ComposedService, HourName, ServiceFlags, ServiceOptions, ServiceParts, ServiceWho } from "./engine/hours.ts";
+export {
+	formatClockTime,
+	getSunriseSunset,
+	getSunriseSunsetStrings,
+	lunarAge,
+	lunarLongitude,
+	lunarPhase,
+	lunarPhaseIndex,
+	solarLongitude,
+	SUN_ALTITUDE,
+} from "./astronomy/astronomy.ts";
+export type { ClockOptions, SunOptions, SunPlace, SunTimes } from "./astronomy/astronomy.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";

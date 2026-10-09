@@ -46,6 +46,26 @@ nameForm(names, "short"); // "Pascha"
 await commemorationLife("9001", "en"); // undefined when the commemoration has no life
 ```
 
+The First, Third, Sixth and Ninth Hours and the Royal Hours are composed as typed nodes (Scripture passages are references; supply their text yourself):
+
+```ts
+import { composePrimes } from "ponomar-ts";
+
+const hour = await composePrimes(day, "en", { who: "priest", parts: "independent" });
+hour.type; // "Normal", "Lenten", "Paschal", ... or "None" when no hour is served
+hour.nodes[0]; // { kind: "title", title: "...", ... }, then prayers, readings and propers
+```
+
+Sunrise, sunset and the Moon's phase need only a Julian day number:
+
+```ts
+import { getSunriseSunset, jdate, lunarPhase } from "ponomar-ts";
+
+const { jdn } = jdate.julianDate(day.date.year, day.date.month, day.date.day);
+getSunriseSunset(jdn, { longitude: 45, latitude: 51, timeZone: 1 }); // { sunrise, sunset } in local decimal hours
+await lunarPhase("en", jdn); // "Waxing Crescent"
+```
+
 Fasting follows from the resolved day, and Bible references in the data parse into structured ranges (no Bible text is included):
 
 ```ts

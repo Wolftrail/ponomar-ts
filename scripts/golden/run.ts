@@ -97,6 +97,13 @@ function runRoyal(): void {
 	runInVendor("royal", join(sampleDir, "royal.tsv"), "1", DAY_YEARS);
 }
 
+// Sunrise and moon values: dates spread through the test years, with places, options and languages varied.
+function runAstronomy(): void {
+	runInVendor("sun", join(sampleDir, "sun.tsv"), "5", DAY_YEARS);
+	runInVendor("suntime", join(sampleDir, "suntime.tsv"), "17", DAY_YEARS);
+	runInVendor("moon", join(sampleDir, "moon.tsv"), "3", DAY_YEARS);
+}
+
 // Every prayer, command and title file any language has, read in each language so that fallback is checked too.
 async function runTexts(): Promise<void> {
 	const keys = new Set<string>();
@@ -118,7 +125,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "hours", "royal", "texts"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "hours", "royal", "astronomy", "texts"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -135,6 +142,8 @@ try {
 			runHours();
 		} else if (mode === "royal") {
 			runRoyal();
+		} else if (mode === "astronomy") {
+			runAstronomy();
 		} else if (mode === "texts") {
 			await runTexts();
 		} else {
