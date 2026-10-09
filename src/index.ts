@@ -42,8 +42,8 @@ export type {
 	ServiceSubtitleNode,
 	ServiceTitleNode,
 } from "./engine/service.ts";
-export { composePrimes } from "./engine/primes.ts";
-export type { ComposedService, ServiceFlags, ServiceOptions, ServiceParts, ServiceWho } from "./engine/primes.ts";
+export { composeHour, composeNinthHour, composePrimes, composeSixthHour, composeThirdHour } from "./engine/hours.ts";
+export type { ComposedService, HourName, ServiceFlags, ServiceOptions, ServiceParts, ServiceWho } from "./engine/hours.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";

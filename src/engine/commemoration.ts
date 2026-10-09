@@ -76,6 +76,21 @@ export async function commemorationHymns(
 	return hymns;
 }
 
+/**
+ * One item of a commemoration's service (`getService("/SEXTE/PROKEIMENON", "1a")` upstream), whatever its kind:
+ * `kind` is the element, `type` its `Type` attribute.
+ */
+export async function commemorationServiceItem(
+	cid: string,
+	language: string,
+	section: LifeSectionName,
+	kind: LifeItem["kind"],
+	type: string,
+	context: DslContext,
+): Promise<LifeItem | undefined> {
+	return (await sectionItems(cid, language, section, kind, context))[type];
+}
+
 export type NameForm = "nominative" | "genitive" | "dative" | "possessive" | "short" | "shortF" | "name" | "index";
 
 /** A commemoration's name in each form its files give; a language need not define them all. */

@@ -88,8 +88,8 @@ function runNumbers(): void {
 }
 
 // Every third day keeps the run short; the composer's inputs change slowly through the year.
-function runPrimes(): void {
-	runInVendor("primes", join(sampleDir, "primes.tsv"), "3", DAY_YEARS);
+function runHours(): void {
+	runInVendor("hours", join(sampleDir, "hours.tsv"), "2", DAY_YEARS);
 }
 
 // Every prayer, command and title file any language has, read in each language so that fallback is checked too.
@@ -113,7 +113,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "primes", "texts"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "hours", "texts"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -126,8 +126,8 @@ try {
 			runLives();
 		} else if (mode === "numbers") {
 			runNumbers();
-		} else if (mode === "primes") {
-			runPrimes();
+		} else if (mode === "hours") {
+			runHours();
 		} else if (mode === "texts") {
 			await runTexts();
 		} else {

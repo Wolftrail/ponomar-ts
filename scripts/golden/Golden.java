@@ -23,7 +23,7 @@ public class Golden
 				case "matins": liturgy(out, stride, args[3], true); break;
 				case "lives": lives(out, args[3]); break;
 				case "numbers": numbers(out); break;
-				case "primes": primes(out, stride, args[3]); break;
+				case "hours": hours(out, stride, args[3]); break;
 				case "texts": texts(out, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
@@ -254,7 +254,8 @@ public class Golden
 	}
 
 	// Records the directives of a service template whose condition holds, as normalized lines, then lets Service handle them.
-	// Bible passages are skipped rather than read, since the port does not carry Bible text.
+	// Bible passages and proper texts are not handed on: the port carries no Bible text, and upstream's null pointer on a missing
+	// proper would end the rest of that include, where the port keeps going.
 	static class TraceService extends Service
 	{
 		final java.util.List<String> trace = new java.util.ArrayList<String>();
@@ -288,6 +289,25 @@ public class Golden
 			return text == null || text.length() == 0 ? "-" : fingerprint(text);
 		}
 
+		private String properText(java.util.Hashtable table)
+		{
+			// The text and header GETID finds in the commemoration's service data, as Service does (it drops the text's first character).
+			String id = table.get("Id").toString();
+			if ("T".equals(table.get("Type")))
+			{
+				id = "98" + id;
+			}
+			String what = table.get("What").toString();
+			int slash = what.lastIndexOf("/");
+			OrderedHashtable item = new Commemoration1("0", id, info).getService(what.substring(0, slash), what.substring(slash + 1));
+			if (item == null || item.get("text") == null || item.get("text").toString().length() == 0)
+			{
+				return "-|-";
+			}
+			Object header = item.get("Header");
+			return fingerprint(item.get("text").toString().substring(1)) + "|" + (header == null ? "-" : clean(header.toString()));
+		}
+
 		@Override
 		public void startElement(String elem, java.util.Hashtable table)
 		{
@@ -313,7 +333,7 @@ public class Golden
 					line = "reading|" + value(table.get("Verses")) + "|" + value(table.get("getReading")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header")) + "|" + value(table.get("2Stars"));
 					break;
 				case "GETID":
-					line = "proper|" + (table.get("Type") == null ? "M" : value(table.get("Type"))) + "|" + value(table.get("Id")) + "|" + value(table.get("What")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header"));
+					line = "proper|" + (table.get("Type") == null ? "M" : value(table.get("Type"))) + "|" + value(table.get("Id")) + "|" + value(table.get("What")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header")) + "|" + properText(table);
 					break;
 				default:
 					break;
@@ -322,7 +342,7 @@ public class Golden
 			{
 				trace.add(line);
 			}
-			if (!elem.equals("BIBLE"))
+			if (!elem.equals("BIBLE") && !elem.equals("GETID"))
 			{
 				super.startElement(elem, table);
 			}
@@ -433,24 +453,34 @@ public class Golden
 		}
 	}
 
-	// What Primes composes for a day: the type and flags it settles on, the scratch files it writes for the template, and the
-	// directives its template then yields. Primes opens a window as its last step, which fails headless, after composing.
-	// Run with cwd = vendor/ponomar. The scratch files it writes and reads are saved and restored around the run.
-	private static void primes(PrintWriter out, int stride, String yearList) throws Exception
+	// What the hour classes compose for a day: the type and flags each settles on, the scratch files it writes for its template, and
+	// the directives the template then yields. Each class opens a window as its last step, which fails headless, after composing.
+	// Run with cwd = vendor/ponomar. The scratch files they write and read are saved and restored around the run.
+	private static void hours(PrintWriter out, int stride, String yearList) throws Exception
 	{
 		ConfigurationFiles.Defaults = new OrderedHashtable();
 		ConfigurationFiles.ReadFile();
 		java.lang.reflect.Field commemorations = Day.class.getDeclaredField("OrderedCommemorations");
 		commemorations.setAccessible(true);
-		java.lang.reflect.Field typeField = Primes.class.getDeclaredField("Type");
-		typeField.setAccessible(true);
+		String[] hourNames = { "primes", "terce", "sexte", "none" };
+		Class<?>[] hourClasses = { Primes.class, ThirdHour.class, SixthHour.class, NinthHour.class };
+		String[] templates = { "Prime", "ThirdHour", "SixthHour", "NinthHour" };
+		// The scratch files holding the first troparion slot, the second, the kontakion and the Kathisma of each hour.
+		String[][] hourFiles = { { "PTrop1", "PTrop2", "PKont1", "PKath" }, { "PTrop31", "PTrop32", "PKont3", "PKath3" }, { "PTrop61", "PTrop62", "PKont6", "PKath6" }, { "PTrop91", "PTrop92", "PKont9", "PKath9" } };
+		java.lang.reflect.Field[] typeFields = new java.lang.reflect.Field[4];
+		for (int h = 0; h < 4; h++)
+		{
+			typeFields[h] = hourClasses[h].getDeclaredField("Type");
+			typeFields[h].setAccessible(true);
+		}
 		java.lang.reflect.Field whoField = PrimeSelector.class.getDeclaredField("LastLocation");
 		whoField.setAccessible(true);
 		java.lang.reflect.Field partsField = PrimeSelector.class.getDeclaredField("LastLocation2");
 		partsField.setAccessible(true);
 		String[] whos = { "Reader", "Priest" };
 		String[] parts = { "Independent", "W.Beginning", "W.Ending", "W.BeginningEnding" };
-		String[] scratch = { "PTrop1", "PTrop2", "PKont1", "PKath" };
+		String[] scratch = { "PTrop1", "PTrop2", "PKont1", "PKath", "PTrop31", "PTrop32", "PKont3", "PKath3", "PTrop61", "PTrop62", "PKont6", "PKath6", "PTrop91", "PTrop92", "PKont9", "PKath9",
+			"TP6R", "TP6C", "PROK61R", "PROK61C", "STYX61R", "STYX61C", "PROK61a", "PROK61b", "Intro6", "Reading6", "PROK62R", "PROK62C", "STYX62R", "STYX62C", "PROK62a", "PROK62b" };
 		String[] languages = { "en/", "cu/ru/", "fr/", "el/mono/" };
 		java.io.PrintStream console = System.out;
 		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
@@ -465,7 +495,7 @@ public class Golden
 				}
 			}
 		}
-		out.println(String.join("\t", "language", "year", "month", "day", "who", "parts", "type", "PS", "PFlag1", "PFlag2", "PTrop1", "PTrop2", "PKont1", "PKath", "lines", "trace"));
+		out.println(String.join("\t", "language", "year", "month", "day", "hour", "who", "parts", "type", "PS", "PFlag1", "PFlag2", "PFlag3", "trop1", "trop2", "kont", "kath", "lines", "trace"));
 		try
 		{
 			int count = 0;
@@ -511,12 +541,13 @@ public class Golden
 						{
 							// A day file naming a commemoration that cannot be ranked (fr 050307;) stops upstream before any service.
 							count++;
-							out.println(String.join("\t", language, "" + year, "" + m, "" + d, "-", "-", "ERR"));
+							out.println(String.join("\t", language, "" + year, "" + m, "" + d, "-", "-", "-", "ERR"));
 							continue;
 						}
 						info.put("Tone", paschal.getTone());
 
-						// Cycle the options so that every combination is exercised across the days.
+						// Cycle the hours and options so that every combination is exercised across the days.
+						int h = (count / 8) % 4;
 						String who = whos[count % 2];
 						String part = parts[(count / 2) % 4];
 						count++;
@@ -531,19 +562,25 @@ public class Golden
 						System.setOut(quiet);
 						try
 						{
-							typeField.set(null, null);
+							typeFields[h].set(null, null);
 							try
 							{
-								new Primes(today, info);
+								switch (h)
+								{
+									case 0: new Primes(today, info); break;
+									case 1: new ThirdHour(today, info); break;
+									case 2: new SixthHour(today, info); break;
+									default: new NinthHour(today, info); break;
+								}
 							}
 							catch (Throwable expected)
 							{
 								// The window cannot open headless; composing is done by then.
 							}
-							Object t = typeField.get(null);
+							Object t = typeFields[h].get(null);
 							type = t == null ? "-" : t.toString();
 
-							String template = type.equals("Paschal") ? "xml/Services/PaschalHours.xml" : "xml/Services/Prime.xml";
+							String template = type.equals("Paschal") ? "xml/Services/PaschalHours.xml" : "xml/Services/" + templates[h] + ".xml";
 							TraceService service = new TraceService(info);
 							if (!type.equals("None") && !type.equals("-"))
 							{
@@ -552,10 +589,10 @@ public class Golden
 							String joined = String.join("\n", service.trace);
 							String var = "Ponomar/languages/" + language + "xml/Services/Var/";
 							System.setOut(console);
-							out.println(String.join("\t", language, "" + year, "" + m, "" + d, who, part, type,
-								cell(info.get("PS")), cell(info.get("PFlag1")), cell(info.get("PFlag2")),
-								fileValue(var + "PTrop1.xml", "What=\"([^\"]*)\""), fileValue(var + "PTrop2.xml", "What=\"([^\"]*)\""),
-								fileValue(var + "PKont1.xml", "What=\"([^\"]*)\""), fileValue(var + "PKath.xml", "File=\"([^\"]*)\""),
+							out.println(String.join("\t", language, "" + year, "" + m, "" + d, hourNames[h], who, part, type,
+								cell(info.get("PS")), cell(info.get("PFlag1")), cell(info.get("PFlag2")), cell(info.get("PFlag3")),
+								fileValue(var + hourFiles[h][0] + ".xml", "What=\"([^\"]*)\""), fileValue(var + hourFiles[h][1] + ".xml", "What=\"([^\"]*)\""),
+								fileValue(var + hourFiles[h][2] + ".xml", "What=\"([^\"]*)\""), fileValue(var + hourFiles[h][3] + ".xml", "File=\"([^\"]*)\""),
 								"" + service.trace.size(), fingerprint(joined)));
 						}
 						finally

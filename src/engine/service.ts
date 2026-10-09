@@ -4,7 +4,8 @@
 
 import { evaluateBoolean, type DslContext } from "../core/dsl/index.ts";
 import { getPrayerText, getServiceTemplate } from "../data/services.ts";
-import type { ServiceDirective } from "../data/types.ts";
+import type { LifeItem, LifeSectionName, ServiceDirective } from "../data/types.ts";
+import { commemorationServiceItem } from "./commemoration.ts";
 import { formatTimes } from "./localization.ts";
 
 /** How a piece of the service is presented: who says it and the layout flags of the template. */
@@ -68,8 +69,14 @@ export interface ServiceProperNode extends ServicePresentation {
 	/** "M" for a Menaion commemoration, "T" for one of the Triodion. */
 	readonly commemorationType: string;
 	readonly id: string;
-	/** The location inside the commemoration's service, e.g. "/ROYALHOURS/VERSE/9P". */
+	/** The commemoration the id names; Triodion ids are prefixed with "98". */
+	readonly cid: string;
+	/** The location inside the commemoration's service, e.g. "/SEXTE/PROKEIMENON/1a". */
 	readonly what: string;
+	/** The text found there; undefined if the commemoration has no such item. */
+	readonly text?: string;
+	readonly headerText?: string;
+	readonly tone?: string;
 }
 
 export type ServiceNode = ServiceTitleNode | ServiceSubtitleNode | ServicePrayerNode | ServiceReadingNode | ServiceProperNode;
@@ -160,7 +167,24 @@ async function expandDirective(
 			return;
 		}
 		case "getId": {
-			out.push({ kind: "proper", commemorationType: directive.type, id: directive.id, what: directive.what, ...(await presentation(language, directive)) });
+			const cid = directive.type === "T" ? `98${directive.id}` : directive.id;
+			const slash = directive.what.lastIndexOf("/");
+			const [section, kind] = directive.what.substring(0, slash).split("/").filter((part) => part !== "").map((part) => part.toLowerCase());
+			const item = await commemorationServiceItem(cid, language, section as LifeSectionName, kind as LifeItem["kind"], directive.what.substring(slash + 1), context);
+			const text = item === undefined || item.kind === "scripture" || item.text === "" ? undefined : item.text;
+			const headerText = item === undefined || item.kind === "scripture" ? undefined : item.header;
+			const tone = item === undefined || item.kind === "scripture" ? undefined : item.tone;
+			out.push({
+				kind: "proper",
+				commemorationType: directive.type,
+				id: directive.id,
+				cid,
+				what: directive.what,
+				...(text === undefined ? {} : { text }),
+				...(headerText === undefined || headerText === "" ? {} : { headerText }),
+				...(tone === undefined ? {} : { tone }),
+				...(await presentation(language, directive)),
+			});
 			return;
 		}
 	}
