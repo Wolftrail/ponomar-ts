@@ -12,13 +12,13 @@
     "lectionary",
     "ponomar"
   ],
-  "homepage": "https://github.com/wolfgangnothdurft/ponomar-ts#readme",
+  "homepage": "https://github.com/Wolftrail/ponomar-ts#readme",
   "bugs": {
-    "url": "https://github.com/wolfgangnothdurft/ponomar-ts/issues"
+    "url": "https://github.com/Wolftrail/ponomar-ts/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wolfgangnothdurft/ponomar-ts.git"
+    "url": "git+https://github.com/Wolftrail/ponomar-ts.git"
   },
   "license": "GPL-3.0-or-later",
   "author": "Wolfgang Nothdurft",
@@ -33,10 +33,24 @@
     "./paschalion": {
       "types": "./dist/paschalion.d.ts",
       "import": "./dist/paschalion.js"
-    }
+    },
+    "./astronomy": {
+      "types": "./dist/astronomy/astronomy.d.ts",
+      "import": "./dist/astronomy/astronomy.js"
+    },
+    "./bible": {
+      "types": "./dist/bible/reference.d.ts",
+      "import": "./dist/bible/reference.js"
+    },
+    "./dsl": {
+      "types": "./dist/core/dsl/index.d.ts",
+      "import": "./dist/core/dsl/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
+    "!dist/data/generated/**/*.map",
     "LICENSE",
     "NOTICE.md",
     "README.md",
@@ -57,6 +71,7 @@
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "smoke": "node --experimental-strip-types scripts/smoke.ts",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
