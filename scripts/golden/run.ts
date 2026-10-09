@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CONTEXT_VARIABLES, collectExpressions, makeContexts } from "./dsl-inputs.ts";
+import { PRAYER_LOADERS } from "../../src/data/generated/registry.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const upstream = join(root, "vendor", "ponomar", "Ponomar");
@@ -86,6 +87,24 @@ function runNumbers(): void {
 	runInVendor("numbers", join(sampleDir, "numbers.tsv"), "1");
 }
 
+// Every third day keeps the run short; the composer's inputs change slowly through the year.
+function runPrimes(): void {
+	runInVendor("primes", join(sampleDir, "primes.tsv"), "3", DAY_YEARS);
+}
+
+// Every prayer, command and title file any language has, read in each language so that fallback is checked too.
+async function runTexts(): Promise<void> {
+	const keys = new Set<string>();
+	for (const load of Object.values(PRAYER_LOADERS)) {
+		for (const key of Object.keys((await load()).PRAYERS)) {
+			keys.add(key);
+		}
+	}
+	const keysFile = join(fullDir, "prayer-keys.txt");
+	writeFileSync(keysFile, [...keys].sort().join("\n") + "\n");
+	runInVendor("texts", join(sampleDir, "texts.tsv"), "1", keysFile);
+}
+
 try {
 	const sources = readdirSync(upstream)
 		.filter((f) => f.endsWith(".java"))
@@ -94,7 +113,7 @@ try {
 	execFileSync("javac", ["-encoding", "UTF-8", "-nowarn", "-d", classes, ...sources], { stdio: "inherit" });
 
 	const modes = process.argv.slice(2);
-	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers"]) {
+	for (const mode of modes.length > 0 ? modes : ["jdate", "pascha", "pcalendar", "dsl", "day", "fastconvert", "liturgy", "matins", "lives", "numbers", "primes", "texts"]) {
 		if (mode === "dsl") {
 			runDsl();
 		} else if (mode === "day") {
@@ -107,6 +126,10 @@ try {
 			runLives();
 		} else if (mode === "numbers") {
 			runNumbers();
+		} else if (mode === "primes") {
+			runPrimes();
+		} else if (mode === "texts") {
+			await runTexts();
 		} else {
 			for (const [dir, stride] of [[fullDir, 1], [sampleDir, SAMPLE_STRIDE]] as const) {
 				runJava(mode, join(dir, `${mode}.csv`), stride);

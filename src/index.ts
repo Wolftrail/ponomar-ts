@@ -31,6 +31,19 @@ export { getPhrase, getPhraseList, getPhrases } from "./data/language.ts";
 export { commemorationLabel, formatCommemoration, formatTimes, podobenIntro } from "./engine/localization.ts";
 export { formatNumber, formatRuleBasedNumber, parseNumberRules } from "./engine/numbers.ts";
 export type { NumberRules } from "./engine/numbers.ts";
+export { expandServiceTemplate } from "./engine/service.ts";
+export type {
+	ServiceFiles,
+	ServiceNode,
+	ServicePrayerNode,
+	ServicePresentation,
+	ServiceProperNode,
+	ServiceReadingNode,
+	ServiceSubtitleNode,
+	ServiceTitleNode,
+} from "./engine/service.ts";
+export { composePrimes } from "./engine/primes.ts";
+export type { ComposedService, ServiceFlags, ServiceOptions, ServiceParts, ServiceWho } from "./engine/primes.ts";
 export { dayVariables } from "./engine/context.ts";
 export type { GospelScheme, JulianDay } from "./engine/context.ts";
 export { commemorationRank } from "./engine/rank.ts";

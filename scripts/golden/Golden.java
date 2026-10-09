@@ -23,6 +23,8 @@ public class Golden
 				case "matins": liturgy(out, stride, args[3], true); break;
 				case "lives": lives(out, args[3]); break;
 				case "numbers": numbers(out); break;
+				case "primes": primes(out, stride, args[3]); break;
+				case "texts": texts(out, args[3]); break;
 				default: throw new IllegalArgumentException(mode);
 			}
 		}
@@ -249,6 +251,338 @@ public class Golden
 	private static String clean(String text)
 	{
 		return text.replace('\t', ' ').replace('\n', ' ').replace('\r', ' ');
+	}
+
+	// Records the directives of a service template whose condition holds, as normalized lines, then lets Service handle them.
+	// Bible passages are skipped rather than read, since the port does not carry Bible text.
+	static class TraceService extends Service
+	{
+		final java.util.List<String> trace = new java.util.ArrayList<String>();
+		private final StringOp condition = new StringOp();
+		private final OrderedHashtable info;
+
+		TraceService(OrderedHashtable info)
+		{
+			super(info);
+			this.info = info;
+			condition.dayInfo = info;
+		}
+
+		private static String flag(Object value)
+		{
+			return "1".equals(value) ? "1" : "0";
+		}
+
+		private static String value(Object value)
+		{
+			return value == null ? "-" : clean(value.toString());
+		}
+
+		private String text(Object name)
+		{
+			if (name == null)
+			{
+				return "-";
+			}
+			String text = new ReadText((OrderedHashtable) info.clone()).readText("xml/Services/Text/" + name + ".xml");
+			return text == null || text.length() == 0 ? "-" : fingerprint(text);
+		}
+
+		@Override
+		public void startElement(String elem, java.util.Hashtable table)
+		{
+			Object cmd = table.get("Cmd");
+			if (cmd != null && !condition.evalbool(cmd.toString()))
+			{
+				super.startElement(elem, table);
+				return;
+			}
+			String line = null;
+			switch (elem)
+			{
+				case "TITLE":
+					line = "title|" + text(table.get("Value")) + "|" + text(table.get("Header")) + "|" + text(table.get("Source")) + "|" + text(table.get("Comment"));
+					break;
+				case "SUBTITLE":
+					line = "subtitle|" + text(table.get("Value"));
+					break;
+				case "CREATE":
+					line = "prayer|" + value(table.get("What")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header")) + "|" + value(table.get("Times")) + "|" + value(table.get("Command")) + "|" + value(table.get("CommandB"));
+					break;
+				case "BIBLE":
+					line = "reading|" + value(table.get("Verses")) + "|" + value(table.get("getReading")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header")) + "|" + value(table.get("2Stars"));
+					break;
+				case "GETID":
+					line = "proper|" + (table.get("Type") == null ? "M" : value(table.get("Type"))) + "|" + value(table.get("Id")) + "|" + value(table.get("What")) + "|" + value(table.get("Who")) + "|" + flag(table.get("RedFirst")) + "|" + flag(table.get("NewLine")) + "|" + flag(table.get("Header"));
+					break;
+				default:
+					break;
+			}
+			if (line != null)
+			{
+				trace.add(line);
+			}
+			if (!elem.equals("BIBLE"))
+			{
+				super.startElement(elem, table);
+			}
+		}
+	}
+
+	// The text and header ReadText finds for each service file name (one per line in the given file) in every language.
+	// Run with cwd = vendor/ponomar.
+	private static void texts(PrintWriter out, String keysFile) throws Exception
+	{
+		java.util.List<String> keys = java.nio.file.Files.readAllLines(java.nio.file.Paths.get(keysFile), java.nio.charset.StandardCharsets.UTF_8);
+		java.io.PrintStream console = System.out;
+		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
+		out.println("language\tkey\ttext\theader");
+		for (String language : new String[] { "en/", "cu/ru/", "el/mono/", "fr/", "zh/Hans/", "zh/Hant/" })
+		{
+			OrderedHashtable info = new OrderedHashtable();
+			info.put("LS", language);
+			for (String key : keys)
+			{
+				if (key.isEmpty())
+				{
+					continue;
+				}
+				System.setOut(quiet);
+				String text;
+				String header;
+				try
+				{
+					ReadText reader = new ReadText(info);
+					text = reader.readText("xml/Services/" + key + ".xml");
+					header = reader.readHeader("xml/Services/" + key + ".xml");
+				}
+				finally
+				{
+					System.setOut(console);
+				}
+				out.println(language + "\t" + key + "\t" + (text == null || text.length() == 0 ? "-" : fingerprint(text)) + "\t" + (header == null || header.length() == 0 ? "-" : fingerprint(header)));
+			}
+		}
+	}
+
+	private static String cell(Object value)
+	{
+		return value == null ? "-" : clean(value.toString());
+	}
+
+	// Upstream leaves the readers of the scratch files open, which blocks changing them on Windows until they are collected.
+	private static void changeFile(String path, byte[] content) throws Exception
+	{
+		for (int attempt = 0; ; attempt++)
+		{
+			try
+			{
+				if (content == null)
+				{
+					java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(path));
+				}
+				else
+				{
+					java.nio.file.Files.write(java.nio.file.Paths.get(path), content);
+				}
+				return;
+			}
+			catch (java.nio.file.FileSystemException e)
+			{
+				if (attempt >= 50)
+				{
+					throw e;
+				}
+				System.gc();
+				Thread.sleep(20);
+			}
+		}
+	}
+
+	private static String fileValue(String path, String pattern)
+	{
+		try
+		{
+			String data = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(path)), java.nio.charset.StandardCharsets.UTF_8);
+			java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern).matcher(data);
+			return m.find() ? m.group(1) : "?";
+		}
+		catch (java.io.IOException e)
+		{
+			return "-";
+		}
+	}
+
+	// The scratch files of a language and of every language it falls back to: upstream reads them with that fallback.
+	private static java.util.List<String> scratchPaths(String language, String[] files)
+	{
+		java.util.List<String> paths = new java.util.ArrayList<String>();
+		String prefix = language;
+		while (true)
+		{
+			for (String file : files)
+			{
+				paths.add("Ponomar/languages/" + prefix + "xml/Services/Var/" + file + ".xml");
+			}
+			if (prefix.isEmpty())
+			{
+				return paths;
+			}
+			int cut = prefix.lastIndexOf('/', prefix.length() - 2);
+			prefix = cut < 0 ? "" : prefix.substring(0, cut + 1);
+		}
+	}
+
+	// What Primes composes for a day: the type and flags it settles on, the scratch files it writes for the template, and the
+	// directives its template then yields. Primes opens a window as its last step, which fails headless, after composing.
+	// Run with cwd = vendor/ponomar. The scratch files it writes and reads are saved and restored around the run.
+	private static void primes(PrintWriter out, int stride, String yearList) throws Exception
+	{
+		ConfigurationFiles.Defaults = new OrderedHashtable();
+		ConfigurationFiles.ReadFile();
+		java.lang.reflect.Field commemorations = Day.class.getDeclaredField("OrderedCommemorations");
+		commemorations.setAccessible(true);
+		java.lang.reflect.Field typeField = Primes.class.getDeclaredField("Type");
+		typeField.setAccessible(true);
+		java.lang.reflect.Field whoField = PrimeSelector.class.getDeclaredField("LastLocation");
+		whoField.setAccessible(true);
+		java.lang.reflect.Field partsField = PrimeSelector.class.getDeclaredField("LastLocation2");
+		partsField.setAccessible(true);
+		String[] whos = { "Reader", "Priest" };
+		String[] parts = { "Independent", "W.Beginning", "W.Ending", "W.BeginningEnding" };
+		String[] scratch = { "PTrop1", "PTrop2", "PKont1", "PKath" };
+		String[] languages = { "en/", "cu/ru/", "fr/", "el/mono/" };
+		java.io.PrintStream console = System.out;
+		java.io.PrintStream quiet = new java.io.PrintStream(java.io.OutputStream.nullOutputStream());
+		java.util.Map<String, byte[]> saved = new java.util.HashMap<String, byte[]>();
+		for (String language : languages)
+		{
+			for (String path : scratchPaths(language, scratch))
+			{
+				if (new java.io.File(path).exists())
+				{
+					saved.put(path, java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(path)));
+				}
+			}
+		}
+		out.println(String.join("\t", "language", "year", "month", "day", "who", "parts", "type", "PS", "PFlag1", "PFlag2", "PTrop1", "PTrop2", "PKont1", "PKath", "lines", "trace"));
+		try
+		{
+			int count = 0;
+			for (String language : languages)
+			{
+				for (String yearText : yearList.split(","))
+				{
+					int year = Integer.parseInt(yearText);
+					JDate pascha = Paschalion.getPascha(year);
+					JDate previous = Paschalion.getPascha(year - 1);
+					JDate next = Paschalion.getPascha(year + 1);
+					long first = new JDate(1, 1, year).getJulianDay();
+					long last = new JDate(12, 31, year).getJulianDay();
+					for (long j = first; j <= last; j += stride)
+					{
+						JDate today = new JDate(j);
+						int nday = (int) JDate.difference(today, pascha);
+						int ndayP = (int) JDate.difference(today, previous);
+						OrderedHashtable info = new OrderedHashtable();
+						info.put("dow", today.getDayOfWeek());
+						info.put("doy", today.getDoy());
+						info.put("nday", nday);
+						info.put("ndayP", ndayP);
+						info.put("ndayF", (int) JDate.difference(today, next));
+						info.put("GS", 0);
+						info.put("LS", language);
+						info.put("Year", today.getYear());
+						info.put("dRank", 0);
+						info.put("Ideographic", "0");
+						info.put("ReadSep", "; ");
+
+						String folder = nday >= -70 && nday < 0 ? "xml/triodion/" : "xml/pentecostarion/";
+						int line = nday >= -70 && nday < 0 ? Math.abs(nday) : (nday < -70 ? ndayP + 1 : nday + 1);
+						int m = today.getMonth();
+						int d = today.getDay();
+						Day paschal = new Day(folder + (line >= 10 ? Integer.toString(line) : "0" + line), info);
+						Day menaion = new Day("xml/" + (m < 10 ? "0" + m : "" + m) + (d < 10 ? "/0" + d : "/" + d), info);
+						try
+						{
+							info.put("dRank", Math.max(menaion.getDayRank(), paschal.getDayRank()));
+						}
+						catch (Throwable broken)
+						{
+							// A day file naming a commemoration that cannot be ranked (fr 050307;) stops upstream before any service.
+							count++;
+							out.println(String.join("\t", language, "" + year, "" + m, "" + d, "-", "-", "ERR"));
+							continue;
+						}
+						info.put("Tone", paschal.getTone());
+
+						// Cycle the options so that every combination is exercised across the days.
+						String who = whos[count % 2];
+						String part = parts[(count / 2) % 4];
+						count++;
+						whoField.set(null, who);
+						partsField.set(null, part);
+						for (String path : scratchPaths(language, scratch))
+						{
+							changeFile(path, null);
+						}
+
+						String type;
+						System.setOut(quiet);
+						try
+						{
+							typeField.set(null, null);
+							try
+							{
+								new Primes(today, info);
+							}
+							catch (Throwable expected)
+							{
+								// The window cannot open headless; composing is done by then.
+							}
+							Object t = typeField.get(null);
+							type = t == null ? "-" : t.toString();
+
+							String template = type.equals("Paschal") ? "xml/Services/PaschalHours.xml" : "xml/Services/Prime.xml";
+							TraceService service = new TraceService(info);
+							if (!type.equals("None") && !type.equals("-"))
+							{
+								service.startService(template);
+							}
+							String joined = String.join("\n", service.trace);
+							String var = "Ponomar/languages/" + language + "xml/Services/Var/";
+							System.setOut(console);
+							out.println(String.join("\t", language, "" + year, "" + m, "" + d, who, part, type,
+								cell(info.get("PS")), cell(info.get("PFlag1")), cell(info.get("PFlag2")),
+								fileValue(var + "PTrop1.xml", "What=\"([^\"]*)\""), fileValue(var + "PTrop2.xml", "What=\"([^\"]*)\""),
+								fileValue(var + "PKont1.xml", "What=\"([^\"]*)\""), fileValue(var + "PKath.xml", "File=\"([^\"]*)\""),
+								"" + service.trace.size(), fingerprint(joined)));
+						}
+						finally
+						{
+							System.setOut(console);
+						}
+					}
+				}
+			}
+		}
+		finally
+		{
+			for (String language : languages)
+			{
+				for (String path : scratchPaths(language, scratch))
+				{
+					if (saved.containsKey(path))
+					{
+						changeFile(path, saved.get(path));
+					}
+					else
+					{
+						changeFile(path, null);
+					}
+				}
+			}
+		}
 	}
 
 	// RuleBasedNumber.getFormattedNumber for a spread of numbers in every language with rules, and in one without. Run with cwd = vendor/ponomar.
